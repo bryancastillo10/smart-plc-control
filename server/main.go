@@ -9,5 +9,7 @@ import (
 func main() {
 	config.LoadEnv()
 
+	infrastructure.ConnectDb()
+
 	infrastructure.RunGin(config.CORS())
 }
