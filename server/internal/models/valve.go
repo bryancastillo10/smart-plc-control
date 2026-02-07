@@ -13,8 +13,11 @@ type Valve struct {
 	Name        string  `gorm:"type:varchar(100);not null" json:"name"`
 	Location    string  `gorm:"type:varchar(100)" json:"location"`
 	Description *string `gorm:"type:varchar(255)" json:"description,omitempty"`
-	Position    float64 `gorm:"not null" json:"position"`
-	IsAuto      bool    `gorm:"not null;default:true" json:"isAuto"`
+
+	Position float64 `gorm:"not null" json:"position"`
+	IsAuto   bool    `gorm:"not null;default:true" json:"isAuto"`
 
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
+
+	SensorConfigs []SensorConfig `gorm:"foreignKey:ValveID" json:"sensorConfigs"`
 }

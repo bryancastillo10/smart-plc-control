@@ -15,6 +15,7 @@ type Plant struct {
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
 
-	Settings PlantSettings `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"settings"`
-	Valve    Valve         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"valve"`
+	Settings PlantSettings  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"settings"`
+	Valves   []Valve        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"valves"`
+	Sensors  []SensorConfig `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"sensors"`
 }
