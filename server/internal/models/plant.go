@@ -16,4 +16,5 @@ type Plant struct {
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
 
 	Settings PlantSettings `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"settings"`
+	Valve    Valve         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"valve"`
 }
