@@ -68,3 +68,33 @@ func (s *Service) SignUp(req SignUpRequest, role string) (*JWTAuthResponse, stri
 
 	return &signUpRes, token, nil
 }
+
+func (s *Service) SignIn(req SignInRequest) (*JWTAuthResponse, string, error) {
+	if req.Email == "" || req.Password == "" {
+		return nil, "", appErr.NewBadRequest("Missing required fields", nil)
+	}
+
+	user, err := s.repo.FindUserByEmail(req.Email)
+	if err != nil {
+		return nil, "", appErr.NewNotFound("Failed to verify if user exists", err)
+	}
+	if user == nil {
+		return nil, "", appErr.NewBadRequest("Invalid email or password", nil)
+	}
+
+	if err := utils.ValidatePassword(user.Password, req.Password); err != nil {
+		return nil, "", appErr.NewBadRequest("Invalid email or password", err)
+	}
+
+	token, err := jwt.GenerateJWT(user)
+	if err != nil {
+		return nil, "", appErr.NewInternal("Failed to generate token", err)
+	}
+
+	signinRes := JWTAuthResponse{
+		ID:   user.ID.String(),
+		Role: string(user.Role),
+	}
+
+	return &signinRes, token, nil
+}
