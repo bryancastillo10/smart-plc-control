@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"log"
-	"plc-dashboard/internal/models"
+	"plc-dashboard/models"
 )
 
 func SyncDatabase() {

@@ -5,7 +5,7 @@ import (
 
 	"time"
 
-	"plc-dashboard/internal/models"
+	"plc-dashboard/models"
 )
 
 func randomRange(min, max float64) float64 {
