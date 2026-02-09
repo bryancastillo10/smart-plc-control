@@ -10,6 +10,10 @@ type Repository struct {
 	db *gorm.DB
 }
 
+func NewRepository(db *gorm.DB) *Repository {
+	return &Repository{db: db}
+}
+
 func (r *Repository) FindUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {

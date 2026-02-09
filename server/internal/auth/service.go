@@ -15,7 +15,7 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) SignUp(req SignUpRequest, role string) (*JWTAuthResponse, string, error) {
+func (s *Service) SignUp(req SignUpRequest) (*JWTAuthResponse, string, error) {
 	// Missing Required Validation
 	if req.Email == "" ||
 		req.UserName == "" || req.Password == "" || req.ConfirmPassword == "" {
