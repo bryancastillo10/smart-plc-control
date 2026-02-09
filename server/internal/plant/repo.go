@@ -1,6 +1,7 @@
 package plant
 
 import (
+	"plc-dashboard/internal/sensorconfig"
 	"plc-dashboard/models"
 	"plc-dashboard/pkg/utils"
 
@@ -24,6 +25,7 @@ func (r *Repository) CreatePlantWithRelations(
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 
+		// Create Plant
 		if err := tx.Create(plant).Error; err != nil {
 			return err
 		}
@@ -31,6 +33,7 @@ func (r *Repository) CreatePlantWithRelations(
 		settings.ID = utils.GenerateUUID()
 		settings.PlantID = plant.ID
 
+		// Create Plant Settings
 		if err := tx.Create(settings).Error; err != nil {
 			return err
 		}
@@ -39,8 +42,45 @@ func (r *Repository) CreatePlantWithRelations(
 			valves[i].PlantID = plant.ID
 		}
 
-		if len(valves) > 0 {
-			if err := tx.Create(&valves).Error; err != nil {
+		// Create Valve
+		if err := tx.Create(&valves).Error; err != nil {
+			return err
+		}
+
+		// Default Sensor Configs
+		var sensorConfigs []models.SensorConfig
+
+		// Plant level sensors
+		for _, tpl := range sensorconfig.DefaultPlantSensors {
+			sensorConfigs = append(sensorConfigs, models.SensorConfig{
+				ID:          utils.GenerateUUID(),
+				PlantID:     plant.ID,
+				ValveID:     nil,
+				Sensor:      tpl.Sensor,
+				BaseMin:     tpl.BaseMin,
+				BaseMax:     tpl.BaseMax,
+				EffectScale: tpl.EffectScale,
+			})
+		}
+
+		// Valve level sensors
+		for _, valve := range valves {
+			for _, tpl := range sensorconfig.DefaultValveSensors {
+				vID := valve.ID
+				sensorConfigs = append(sensorConfigs, models.SensorConfig{
+					ID:          utils.GenerateUUID(),
+					PlantID:     plant.ID,
+					ValveID:     &vID,
+					Sensor:      tpl.Sensor,
+					BaseMin:     tpl.BaseMin,
+					BaseMax:     tpl.BaseMax,
+					EffectScale: tpl.EffectScale,
+				})
+			}
+		}
+
+		if len(sensorConfigs) > 0 {
+			if err := tx.Create(&sensorConfigs).Error; err != nil {
 				return err
 			}
 		}
@@ -52,10 +92,12 @@ func (r *Repository) CreatePlantWithRelations(
 		return nil, err
 	}
 
+	// In-memory handling of saved data
 	var result models.Plant
 	if err := r.db.
 		Preload("Settings").
-		Preload("Valves").
+		Preload("Valves.SensorConfigs").
+		Preload("Sensors").
 		First(&result, "id = ?", plant.ID).Error; err != nil {
 		return nil, err
 	}
