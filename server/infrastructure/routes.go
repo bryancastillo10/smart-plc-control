@@ -2,6 +2,8 @@ package infrastructure
 
 import (
 	"plc-dashboard/internal/auth"
+	"plc-dashboard/internal/plant"
+
 	"plc-dashboard/internal/simulator"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +15,7 @@ func RegisterRoutes(r *gin.Engine) {
 	})
 
 	auth.RegisterAuthRoutes(r, DB)
+	plant.RegisterPlantRoutes(r, DB)
 
 	r.GET("ws/plc", simulator.SensorStream)
 }

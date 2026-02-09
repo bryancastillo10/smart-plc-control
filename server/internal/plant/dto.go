@@ -22,3 +22,27 @@ type InitialValveRequest struct {
 	Position *float64 `json:"position,omitempty"`
 	IsAuto   *bool    `json:"isAuto,omitempty"`
 }
+
+type GetPlantResponse struct {
+	Name        string                `json:"name" binding:"required"`
+	Location    string                `json:"location" binding:"required"`
+	Description *string               `json:"description,omitempty"`
+	Settings    PlantSettingsResponse `json:"settings" binding:"required"`
+	Valve       []ValveItem           `json:"valves" binding:"required,min=1"`
+}
+
+type PlantSettingsResponse struct {
+	ID          string  `json:"id"`
+	UpdatedBy   string  `json:"updatedBy"`
+	Interval    int32   `json:"interval"`
+	NoiseFactor float64 `json:"noiseFactor"`
+}
+
+type ValveItem struct {
+	ID          string   `json:"id"`
+	Name        string   `json:"valveName"`
+	Location    string   `json:"location"`
+	Description *string  `json:"description,omitempty"`
+	Position    *float64 `json:"position,omitempty"`
+	IsAuto      *bool    `json:"isAuto,omitempty"`
+}
