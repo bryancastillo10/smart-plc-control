@@ -3,6 +3,7 @@ package plant
 import (
 	"plc-dashboard/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -38,4 +39,13 @@ func (r *Repository) CreatePlantWithRelations(
 
 		return nil
 	})
+}
+
+func (r *Repository) FindUserByID(id uuid.UUID) (*models.User, error) {
+	var user models.User
+	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, nil
+	}
+
+	return &user, nil
 }

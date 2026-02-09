@@ -1,10 +1,10 @@
 package plant
 
 import (
+	appErr "plc-dashboard/pkg/errors"
+
 	"plc-dashboard/models"
 	"plc-dashboard/pkg/utils"
-
-	"github.com/google/uuid"
 )
 
 type Service struct {
@@ -16,9 +16,13 @@ func NewService(repo *Repository) *Service {
 }
 
 func (s *Service) CreatePlant(
-	adminID uuid.UUID,
 	req CreatePlantRequest,
+	adminID string,
 ) (*models.Plant, error) {
+	uid, err := utils.ParseId(adminID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid ID", err)
+	}
 
 	plant := &models.Plant{
 		Name:        req.Name,
@@ -28,7 +32,7 @@ func (s *Service) CreatePlant(
 
 	settings := &models.PlantSettings{
 		PlantID:     plant.ID,
-		UpdatedBy:   adminID,
+		UpdatedBy:   uid,
 		Interval:    req.Settings.Interval,
 		NoiseFactor: req.Settings.NoiseFactor,
 	}
