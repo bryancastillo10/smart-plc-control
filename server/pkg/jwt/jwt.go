@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	"plc-dashboard/internal/models"
+	"plc-dashboard/models"
 	appErr "plc-dashboard/pkg/errors"
 
 	"fmt"
