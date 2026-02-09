@@ -31,7 +31,6 @@ func (s *Service) CreatePlant(
 	}
 
 	settings := &models.PlantSettings{
-		PlantID:     plant.ID,
 		UpdatedBy:   uid,
 		Interval:    req.Settings.Interval,
 		NoiseFactor: req.Settings.NoiseFactor,
@@ -42,7 +41,6 @@ func (s *Service) CreatePlant(
 	for _, v := range req.Valves {
 
 		valve := models.Valve{
-			PlantID:     plant.ID,
 			Name:        v.Name,
 			Location:    v.Location,
 			Description: v.Description,
@@ -53,12 +51,9 @@ func (s *Service) CreatePlant(
 		valves = append(valves, valve)
 	}
 
-	if err := s.repo.CreatePlantWithRelations(
-		plant,
-		settings,
-		valves,
-	); err != nil {
-		return nil, err
+	plant, err = s.repo.CreatePlantWithRelations(plant, settings, valves)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to create the plant with settings and valves", err)
 	}
 
 	return plant, nil

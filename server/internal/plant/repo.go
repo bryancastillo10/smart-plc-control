@@ -2,6 +2,7 @@ package plant
 
 import (
 	"plc-dashboard/models"
+	"plc-dashboard/pkg/utils"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -19,16 +20,23 @@ func (r *Repository) CreatePlantWithRelations(
 	plant *models.Plant,
 	settings *models.PlantSettings,
 	valves []models.Valve,
-) error {
+) (*models.Plant, error) {
 
-	return r.db.Transaction(func(tx *gorm.DB) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
 
 		if err := tx.Create(plant).Error; err != nil {
 			return err
 		}
 
+		settings.ID = utils.GenerateUUID()
+		settings.PlantID = plant.ID
+
 		if err := tx.Create(settings).Error; err != nil {
 			return err
+		}
+
+		for i := range valves {
+			valves[i].PlantID = plant.ID
 		}
 
 		if len(valves) > 0 {
@@ -39,6 +47,20 @@ func (r *Repository) CreatePlantWithRelations(
 
 		return nil
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var result models.Plant
+	if err := r.db.
+		Preload("Settings").
+		Preload("Valves").
+		First(&result, "id = ?", plant.ID).Error; err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 func (r *Repository) FindUserByID(id uuid.UUID) (*models.User, error) {
