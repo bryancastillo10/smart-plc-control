@@ -2,6 +2,7 @@ package plant
 
 import (
 	"plc-dashboard/models"
+	"plc-dashboard/pkg/utils"
 
 	"github.com/google/uuid"
 )
@@ -41,8 +42,8 @@ func (s *Service) CreatePlant(
 			Name:        v.Name,
 			Location:    v.Location,
 			Description: v.Description,
-			Position:    defaultFloat(v.Position, 0.0),
-			IsAuto:      defaultBool(v.IsAuto, true),
+			Position:    utils.DefaultFloat(v.Position, 0.0),
+			IsAuto:      utils.DefaultBool(v.IsAuto, true),
 		}
 
 		valves = append(valves, valve)
@@ -57,19 +58,4 @@ func (s *Service) CreatePlant(
 	}
 
 	return plant, nil
-}
-
-// Helper Functions
-func defaultFloat(v *float64, def float64) float64 {
-	if v != nil {
-		return *v
-	}
-	return def
-}
-
-func defaultBool(v *bool, def bool) bool {
-	if v != nil {
-		return *v
-	}
-	return def
 }
