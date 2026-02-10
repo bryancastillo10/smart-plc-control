@@ -1,6 +1,7 @@
 package plant
 
 import (
+	"errors"
 	"plc-dashboard/internal/sensorconfig"
 	"plc-dashboard/models"
 	"plc-dashboard/pkg/utils"
@@ -118,11 +119,20 @@ func (r *Repository) GetAllPlants() ([]models.Plant, error) {
 	return plants, nil
 }
 
-func (r *Repository) FindUserByID(id uuid.UUID) (*models.User, error) {
-	var user models.User
-	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
-		return nil, nil
+func (r *Repository) GetPlantByID(id uuid.UUID) (*models.Plant, error) {
+	var plant models.Plant
+
+	err := r.db.
+		Preload("Settings.UpdatedByUser").
+		Preload("Valves").
+		First(&plant, "id = ?", id).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
 	}
 
-	return &user, nil
+	return &plant, nil
 }
