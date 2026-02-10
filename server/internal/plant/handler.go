@@ -1,6 +1,7 @@
 package plant
 
 import (
+	appErr "plc-dashboard/pkg/errors"
 	http_helper "plc-dashboard/pkg/http"
 
 	"github.com/gin-gonic/gin"
@@ -64,4 +65,28 @@ func (h *Handler) GetPlantByID(c *gin.Context) {
 	}
 
 	c.JSON(200, plant)
+}
+
+func (h *Handler) DeletePlant(c *gin.Context) {
+	plantID := c.Param("id")
+	confirm := c.Query("confirm")
+
+	if confirm != "delete" {
+		c.Error(
+			appErr.NewBadRequest(
+				"Deletion not confirmed. Please type 'delete' to confirm this action.",
+				nil,
+			),
+		)
+		return
+	}
+
+	if err := h.service.DeletePlant(plantID); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "The treatment plant has been deleted successfully",
+	})
 }
