@@ -14,5 +14,6 @@ func RegisterPlantRoutes(r *gin.Engine, DB *gorm.DB) {
 	plantGrp := r.Group("/api/plants", middleware.JWTAuthMiddleware())
 	{
 		plantGrp.POST("/", middleware.RequireRoles(models.Admin), plantHandler.CreatePlant)
+		plantGrp.GET("/", plantHandler.GetAllPlants)
 	}
 }

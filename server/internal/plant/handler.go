@@ -41,3 +41,15 @@ func (h *Handler) CreatePlant(c *gin.Context) {
 		"plant":   newPlant,
 	})
 }
+
+func (h *Handler) GetAllPlants(c *gin.Context) {
+	plants, err := h.service.GetAllPlants()
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"plants": plants,
+	})
+}
