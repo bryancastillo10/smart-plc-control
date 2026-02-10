@@ -140,6 +140,7 @@ func (s *Service) GetPlantByID(plantId string) (GetPlantResponse, error) {
 	}
 
 	response := GetPlantResponse{
+		ID:          plant.ID.String(),
 		Name:        plant.Name,
 		Location:    plant.Location,
 		Description: plant.Description,
@@ -148,4 +149,25 @@ func (s *Service) GetPlantByID(plantId string) (GetPlantResponse, error) {
 	}
 
 	return response, nil
+}
+
+func (s *Service) DeletePlant(plantId string) error {
+	pid, err := utils.ParseId(plantId)
+	if err != nil {
+		return appErr.NewBadRequest("Invalid plant ID", err)
+	}
+
+	exists, err := s.repo.IsPlantExists(pid)
+	if err != nil {
+		return appErr.NewInternal("Failed to validate plant existence", err)
+	}
+	if !exists {
+		return appErr.NewNotFound("Treatment plant not found", nil)
+	}
+
+	if err := s.repo.DeletePlant(pid); err != nil {
+		return appErr.NewInternal("Failed to delete treatment plant", err)
+	}
+
+	return nil
 }
