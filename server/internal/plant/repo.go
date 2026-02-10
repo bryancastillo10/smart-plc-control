@@ -136,3 +136,17 @@ func (r *Repository) GetPlantByID(id uuid.UUID) (*models.Plant, error) {
 
 	return &plant, nil
 }
+
+func (r *Repository) IsPlantExists(plantId uuid.UUID) (bool, error) {
+	var count int64
+	if err := r.db.Model(&models.Plant{}).
+		Where("id = ?", plantId).
+		Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func (r *Repository) DeletePlant(plantId uuid.UUID) error {
+	return r.db.Delete(&models.Plant{}, "id = ?", plantId).Error
+}
