@@ -105,6 +105,19 @@ func (r *Repository) CreatePlantWithRelations(
 	return &result, nil
 }
 
+func (r *Repository) GetAllPlants() ([]models.Plant, error) {
+	var plants []models.Plant
+
+	if err := r.db.
+		Preload("Settings.UpdatedByUser").
+		Preload("Valves").
+		Find(&plants).Error; err != nil {
+		return nil, err
+	}
+
+	return plants, nil
+}
+
 func (r *Repository) FindUserByID(id uuid.UUID) (*models.User, error) {
 	var user models.User
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
