@@ -5,6 +5,8 @@ import (
 
 	"plc-dashboard/models"
 	"plc-dashboard/pkg/utils"
+
+	"github.com/google/uuid"
 )
 
 type Service struct {
@@ -57,4 +59,52 @@ func (s *Service) CreatePlant(
 	}
 
 	return plant, nil
+}
+
+func (s *Service) GetAllPlants() ([]GetPlantResponse, error) {
+	plants, err := s.repo.GetAllPlants()
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get all the treatment plants", err)
+	}
+
+	responses := make([]GetPlantResponse, 0, len(plants))
+	for _, plant := range plants {
+
+		updatedBy := ""
+		if plant.Settings.UpdatedByUser.ID != uuid.Nil {
+			updatedBy = plant.Settings.UpdatedByUser.UserName
+		}
+
+		settingsResp := PlantSettingsResponse{
+			ID:          plant.Settings.ID.String(),
+			UpdatedBy:   updatedBy,
+			Interval:    plant.Settings.Interval,
+			NoiseFactor: plant.Settings.NoiseFactor,
+		}
+
+		valvesResp := make([]ValveItem, 0, len(plant.Valves))
+		for _, v := range plant.Valves {
+			position := v.Position
+			isAuto := v.IsAuto
+
+			valvesResp = append(valvesResp, ValveItem{
+				ID:          v.ID.String(),
+				Name:        v.Name,
+				Location:    v.Location,
+				Description: v.Description,
+				Position:    &position,
+				IsAuto:      &isAuto,
+			})
+		}
+		responses = append(responses, GetPlantResponse{
+			Name:        plant.Name,
+			Location:    plant.Location,
+			Description: plant.Description,
+			Settings:    settingsResp,
+			Valve:       valvesResp,
+		})
+	}
+
+	return responses, nil
+
 }
