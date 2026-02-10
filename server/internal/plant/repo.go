@@ -1,6 +1,7 @@
 package plant
 
 import (
+	"errors"
 	"plc-dashboard/internal/sensorconfig"
 	"plc-dashboard/models"
 	"plc-dashboard/pkg/utils"
@@ -105,11 +106,47 @@ func (r *Repository) CreatePlantWithRelations(
 	return &result, nil
 }
 
-func (r *Repository) FindUserByID(id uuid.UUID) (*models.User, error) {
-	var user models.User
-	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
-		return nil, nil
+func (r *Repository) GetAllPlants() ([]models.Plant, error) {
+	var plants []models.Plant
+
+	if err := r.db.
+		Preload("Settings.UpdatedByUser").
+		Preload("Valves").
+		Find(&plants).Error; err != nil {
+		return nil, err
 	}
 
-	return &user, nil
+	return plants, nil
+}
+
+func (r *Repository) GetPlantByID(id uuid.UUID) (*models.Plant, error) {
+	var plant models.Plant
+
+	err := r.db.
+		Preload("Settings.UpdatedByUser").
+		Preload("Valves").
+		First(&plant, "id = ?", id).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &plant, nil
+}
+
+func (r *Repository) IsPlantExists(plantId uuid.UUID) (bool, error) {
+	var count int64
+	if err := r.db.Model(&models.Plant{}).
+		Where("id = ?", plantId).
+		Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func (r *Repository) DeletePlant(plantId uuid.UUID) error {
+	return r.db.Delete(&models.Plant{}, "id = ?", plantId).Error
 }

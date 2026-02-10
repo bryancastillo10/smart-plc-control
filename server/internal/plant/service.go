@@ -5,6 +5,8 @@ import (
 
 	"plc-dashboard/models"
 	"plc-dashboard/pkg/utils"
+
+	"github.com/google/uuid"
 )
 
 type Service struct {
@@ -57,4 +59,115 @@ func (s *Service) CreatePlant(
 	}
 
 	return plant, nil
+}
+
+func (s *Service) GetAllPlants() ([]GetPlantListResponse, error) {
+	plants, err := s.repo.GetAllPlants()
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get all the treatment plants", err)
+	}
+
+	responses := make([]GetPlantListResponse, 0, len(plants))
+
+	for _, plant := range plants {
+
+		updatedBy := ""
+		if plant.Settings.UpdatedByUser.ID != uuid.Nil {
+			updatedBy = plant.Settings.UpdatedByUser.UserName
+		}
+
+		settingsResp := PlantSettingsResponse{
+			ID:          plant.Settings.ID.String(),
+			UpdatedBy:   updatedBy,
+			Interval:    plant.Settings.Interval,
+			NoiseFactor: plant.Settings.NoiseFactor,
+		}
+
+		responses = append(responses, GetPlantListResponse{
+			ID:          plant.ID.String(),
+			Name:        plant.Name,
+			Location:    plant.Location,
+			Description: plant.Description,
+			Settings:    settingsResp,
+			ValveCount:  len(plant.Valves),
+		})
+	}
+
+	return responses, nil
+
+}
+
+func (s *Service) GetPlantByID(plantId string) (GetPlantResponse, error) {
+	plid, err := utils.ParseId(plantId)
+	if err != nil {
+		return GetPlantResponse{}, appErr.NewBadRequest("Invalid plant ID", err)
+	}
+
+	plant, err := s.repo.GetPlantByID(plid)
+	if err != nil {
+		return GetPlantResponse{}, appErr.NewInternal("Failed to retrieve the treatment plant", err)
+	}
+
+	if plant == nil {
+		return GetPlantResponse{}, appErr.NewNotFound("Treatment plant not found", err)
+	}
+
+	updatedBy := ""
+	if plant.Settings.UpdatedByUser.ID != uuid.Nil {
+		updatedBy = plant.Settings.UpdatedByUser.UserName
+	}
+
+	settingsResp := PlantSettingsResponse{
+		ID:          plant.Settings.ID.String(),
+		UpdatedBy:   updatedBy,
+		Interval:    plant.Settings.Interval,
+		NoiseFactor: plant.Settings.NoiseFactor,
+	}
+
+	valvesResp := make([]ValveItem, 0, len(plant.Valves))
+	for _, v := range plant.Valves {
+		position := v.Position
+		isAuto := v.IsAuto
+
+		valvesResp = append(valvesResp, ValveItem{
+			ID:          v.ID.String(),
+			Name:        v.Name,
+			Location:    v.Location,
+			Description: v.Description,
+			Position:    &position,
+			IsAuto:      &isAuto,
+		})
+	}
+
+	response := GetPlantResponse{
+		ID:          plant.ID.String(),
+		Name:        plant.Name,
+		Location:    plant.Location,
+		Description: plant.Description,
+		Settings:    settingsResp,
+		Valve:       valvesResp,
+	}
+
+	return response, nil
+}
+
+func (s *Service) DeletePlant(plantId string) error {
+	pid, err := utils.ParseId(plantId)
+	if err != nil {
+		return appErr.NewBadRequest("Invalid plant ID", err)
+	}
+
+	exists, err := s.repo.IsPlantExists(pid)
+	if err != nil {
+		return appErr.NewInternal("Failed to validate plant existence", err)
+	}
+	if !exists {
+		return appErr.NewNotFound("Treatment plant not found", nil)
+	}
+
+	if err := s.repo.DeletePlant(pid); err != nil {
+		return appErr.NewInternal("Failed to delete treatment plant", err)
+	}
+
+	return nil
 }

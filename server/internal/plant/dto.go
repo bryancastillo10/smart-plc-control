@@ -23,7 +23,17 @@ type InitialValveRequest struct {
 	IsAuto   *bool    `json:"isAuto,omitempty"`
 }
 
+type GetPlantListResponse struct {
+	ID          string                `json:"id"`
+	Name        string                `json:"name"`
+	Location    string                `json:"location"`
+	Description *string               `json:"description,omitempty"`
+	Settings    PlantSettingsResponse `json:"settings"`
+	ValveCount  int                   `json:"valveCount"`
+}
+
 type GetPlantResponse struct {
+	ID          string                `json:"id"`
 	Name        string                `json:"name" binding:"required"`
 	Location    string                `json:"location" binding:"required"`
 	Description *string               `json:"description,omitempty"`
