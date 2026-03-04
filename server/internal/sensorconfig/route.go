@@ -9,14 +9,14 @@ import (
 )
 
 func RegisterSensorConfigRoutes(r *gin.Engine, DB *gorm.DB) {
-	// sensorConfigHandler := NewHandler(DB)
+	sensorConfigHandler := NewHandler(DB)
 
 	sensorGrp := r.Group("/api/plants", middleware.JWTAuthMiddleware())
 	{
-		sensorGrp.GET("/:id/sensor-configs")
-		sensorGrp.GET("/:id/sensor-configs/:configId")
-		sensorGrp.POST("/:id/sensor-configs", middleware.RequireRoles(models.Admin, models.Operator))
-		sensorGrp.PATCH("/:id/sensor-configs/:configId", middleware.RequireRoles(models.Admin, models.Operator))
-		sensorGrp.DELETE("/:id/sensor-configs/:configId", middleware.RequireRoles(models.Admin))
+		sensorGrp.GET("/:id/sensor-configs", sensorConfigHandler.ListSensorConfigs)
+		sensorGrp.GET("/:id/sensor-configs/:configId", sensorConfigHandler.GetSensorConfigByID)
+		sensorGrp.POST("/:id/sensor-configs", middleware.RequireRoles(models.Admin, models.Operator), sensorConfigHandler.CreateSensorConfig)
+		sensorGrp.PATCH("/:id/sensor-configs/:configId", middleware.RequireRoles(models.Admin, models.Operator), sensorConfigHandler.UpdateSensorConfig)
+		sensorGrp.DELETE("/:id/sensor-configs/:configId", middleware.RequireRoles(models.Admin), sensorConfigHandler.DeleteSensorConfig)
 	}
 }

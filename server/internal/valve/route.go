@@ -12,8 +12,8 @@ func RegisterValveRoutes(r *gin.Engine, DB *gorm.DB) {
 
 	valveGrp := r.Group("/api/plants", middleware.JWTAuthMiddleware())
 	{
-		valveGrp.GET("/:id/valves")
-		valveGrp.GET(":id/valves/valveId")
+		valveGrp.GET("/:id/valves", valveHandler.ListValves)
+		valveGrp.GET("/:id/valves/:valveId", valveHandler.GetValveByID)
 		valveGrp.PUT("/:id/valves/:valveId", valveHandler.UpdateValveSettings)
 	}
 }
