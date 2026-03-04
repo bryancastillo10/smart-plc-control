@@ -17,6 +17,35 @@ func NewHandler(db *gorm.DB) *Handler {
 	return &Handler{service: service}
 }
 
+func (h *Handler) ListValves(c *gin.Context) {
+	plantId := c.Param("id")
+
+	valves, err := h.service.ListValves(plantId)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"valves": valves,
+	})
+}
+
+func (h *Handler) GetValveByID(c *gin.Context) {
+	plantId := c.Param("id")
+	valveId := c.Param("valveId")
+
+	valve, err := h.service.GetValveByID(plantId, valveId)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"valve": valve,
+	})
+}
+
 func (h *Handler) UpdateValveSettings(c *gin.Context) {
 	plantId := c.Param("id")
 	valveId := c.Param("valveId")

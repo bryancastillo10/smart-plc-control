@@ -17,6 +17,20 @@ func NewHandler(db *gorm.DB) *Handler {
 	return &Handler{service: service}
 }
 
+func (h *Handler) GetPlantSettings(c *gin.Context) {
+	plantId := c.Param("id")
+
+	settings, err := h.service.GetPlantSettings(plantId)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"settings": settings,
+	})
+}
+
 func (h *Handler) UpdatePlantSettings(c *gin.Context) {
 	plantId := c.Param("id")
 	req, err := http_helper.BindJSON[UpdatePlantSettingsRequest](c)
