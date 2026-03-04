@@ -13,6 +13,7 @@ func RegisterPlantSettingsRoutes(r *gin.Engine, DB *gorm.DB) {
 
 	plantGrp := r.Group("/api/plants", middleware.JWTAuthMiddleware())
 	{
+		plantGrp.GET("/:id/settings")
 		plantGrp.PUT("/:id/settings", middleware.RequireRoles(models.Admin, models.Operator), plantSettingsHandler.UpdatePlantSettings)
 	}
 }
