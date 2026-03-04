@@ -1,8 +1,11 @@
 package plantsettings
 
 import (
+	"plc-dashboard/models"
 	appErr "plc-dashboard/pkg/errors"
 	"plc-dashboard/pkg/utils"
+
+	"github.com/google/uuid"
 )
 
 type Service struct {
@@ -11,6 +14,39 @@ type Service struct {
 
 func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
+}
+
+func mapPlantSettingsResponse(settings *models.PlantSettings) PlantSettingsResponse {
+	updatedBy := ""
+	if settings.UpdatedByUser.ID != uuid.Nil {
+		updatedBy = settings.UpdatedByUser.UserName
+	}
+
+	return PlantSettingsResponse{
+		ID:          settings.ID.String(),
+		PlantID:     settings.PlantID.String(),
+		UpdatedBy:   updatedBy,
+		Interval:    settings.Interval,
+		NoiseFactor: settings.NoiseFactor,
+	}
+}
+
+func (s *Service) GetPlantSettings(plantId string) (*PlantSettingsResponse, error) {
+	pid, err := utils.ParseId(plantId)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid Plant ID", err)
+	}
+
+	settings, err := s.repo.GetPlantSettingsByPlantID(pid)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to retrieve plant settings", err)
+	}
+	if settings == nil {
+		return nil, appErr.NewNotFound("Plant settings not found", nil)
+	}
+
+	response := mapPlantSettingsResponse(settings)
+	return &response, nil
 }
 
 func (s *Service) UpdatePlantSettings(req UpdatePlantSettingsRequest, plantId string, userId string) error {

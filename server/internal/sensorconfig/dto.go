@@ -1,5 +1,7 @@
 package sensorconfig
 
+import "github.com/google/uuid"
+
 type SensorTemplate struct {
 	Sensor      string
 	BaseMin     float64
@@ -17,4 +19,30 @@ var DefaultPlantSensors = []SensorTemplate{
 	{"turbidity", 0, 5, 0.3},
 	{"dissolvedOxygen", 4, 9, 0.2},
 	{"temperature", 20, 32, 0.4},
+}
+
+type CreateSensorConfigRequest struct {
+	ValveID     *uuid.UUID `json:"valveId,omitempty"`
+	Sensor      string     `json:"sensor" binding:"required"`
+	BaseMin     float64    `json:"baseMin" binding:"required"`
+	BaseMax     float64    `json:"baseMax" binding:"required"`
+	EffectScale float64    `json:"effectScale" binding:"required"`
+}
+
+type UpdateSensorConfigRequest struct {
+	ValveID     *uuid.UUID `json:"valveId,omitempty"`
+	Sensor      *string    `json:"sensor,omitempty"`
+	BaseMin     *float64   `json:"baseMin,omitempty"`
+	BaseMax     *float64   `json:"baseMax,omitempty"`
+	EffectScale *float64   `json:"effectScale,omitempty"`
+}
+
+type SensorConfigResponse struct {
+	ID          string     `json:"id"`
+	PlantID     string     `json:"plantId"`
+	ValveID     *uuid.UUID `json:"valveId,omitempty"`
+	Sensor      string     `json:"sensor"`
+	BaseMin     float64    `json:"baseMin"`
+	BaseMax     float64    `json:"baseMax"`
+	EffectScale float64    `json:"effectScale"`
 }

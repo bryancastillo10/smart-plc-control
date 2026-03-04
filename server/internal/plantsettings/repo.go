@@ -23,6 +23,7 @@ func (r *Repository) FindPlantSettingsByPlantID(
 	var settings models.PlantSettings
 
 	if err := r.db.
+		Preload("UpdatedByUser").
 		Where("plant_id = ?", plantID).
 		First(&settings).Error; err != nil {
 
@@ -33,6 +34,10 @@ func (r *Repository) FindPlantSettingsByPlantID(
 	}
 
 	return &settings, nil
+}
+
+func (r *Repository) GetPlantSettingsByPlantID(plantID uuid.UUID) (*models.PlantSettings, error) {
+	return r.FindPlantSettingsByPlantID(plantID)
 }
 
 func (r *Repository) UpdatePlantSettings(
