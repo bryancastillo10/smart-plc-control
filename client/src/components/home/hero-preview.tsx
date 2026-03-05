@@ -23,7 +23,7 @@ import { useMemo } from "react";
 const HeroPreview = () => {
 	const latestReading = waterQualityTrend[waterQualityTrend.length - 1];
 	
-	  const avgPH = useMemo(
+	const avgPH = useMemo(
 		() =>
 		  (
 			waterQualityTrend.reduce((sum, point) => sum + point.pH, 0) /
