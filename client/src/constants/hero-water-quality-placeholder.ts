@@ -1,6 +1,6 @@
 export const waterQualityTrend = [
   {
-    time: "08:00",
+    timeStamp: "2026-03-05T09:22:17.85504126+08:00",
     flowRate: 0.92,
     pH: 6.9,
     turbidity: 8.6,
@@ -8,7 +8,7 @@ export const waterQualityTrend = [
     temperature: 22.4,
   },
   {
-    time: "09:00",
+    timeStamp: "2026-03-05T09:23:21.856722634+08:00",
     flowRate: 1.01,
     pH: 7.1,
     turbidity: 7.2,
@@ -16,7 +16,7 @@ export const waterQualityTrend = [
     temperature: 24.1,
   },
   {
-    time: "10:00",
+    timeStamp: "2026-03-05T09:24:25.8560294+08:00",
     flowRate: 1.08,
     pH: 7.3,
     turbidity: 5.8,
@@ -24,7 +24,7 @@ export const waterQualityTrend = [
     temperature: 25.9,
   },
   {
-    time: "11:00",
+    timeStamp: "2026-03-05T09:25:25.8560294+08:00",
     flowRate: 1.16,
     pH: 7.4,
     turbidity: 4.6,
@@ -32,7 +32,7 @@ export const waterQualityTrend = [
     temperature: 27.3,
   },
   {
-    time: "12:00",
+    timeStamp: "2026-03-05T09:26:25.8560294+08:00",
     flowRate: 1.23,
     pH: 7.2,
     turbidity: 3.4,
@@ -40,7 +40,7 @@ export const waterQualityTrend = [
     temperature: 28.6,
   },
   {
-    time: "13:00",
+    timeStamp: "2026-03-05T09:27:25.8560294+08:00",
     flowRate: 1.29,
     pH: 7.1,
     turbidity: 2.8,
