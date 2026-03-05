@@ -1,15 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+
+import HeroTitle from "@/components/home/hero-title";
+import HeroPreview from "@/components/home/hero-preview";
+import Features from "@/components/home/features";
+
 export const Route = createFileRoute("/")({ component: App });
 
 function App() {
+
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900">
-      <section className="relative py-20 px-6 text-center overflow-hidden">
-        <h1 className="text-white font-semibold">
-          PLC Dashboard App Test Render
-        </h1>
+    <main className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-linear-to-br from-zinc-950 via-slate-900 to-cyan-950 text-slate-100">
+      <div className="pointer-events-none absolute -left-36 top-10 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-32 bottom-0 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
+
+      <section className="mx-auto grid w-full max-w-7xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-24">
+        <HeroTitle/>
+        <HeroPreview/>
       </section>
-    </div>
-  );
+        <Features/>
+    </main>
+  );    
 }
