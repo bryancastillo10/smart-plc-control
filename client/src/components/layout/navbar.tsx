@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Factory } from "lucide-react";
 
-import { Button } from "./button";
+import { Button } from "../ui/button";
 
 const Navbar = () => {
 	return (
@@ -24,12 +24,9 @@ const Navbar = () => {
 				</div>
 
 				<div className="flex items-center gap-2">
-					<Button asChild size="sm" variant="ghost">
+					<Button asChild size="sm" variant="default">
 						<Link to="/sign-in">Sign in</Link>
-					</Button>
-					<Button asChild size="sm">
-						<Link to="/sign-up">Sign up</Link>
-					</Button>
+					</Button>				
 				</div>
 			</div>
 		</header>
