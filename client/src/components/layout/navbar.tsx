@@ -1,10 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { Factory } from "lucide-react";
 
-import { Button } from "../ui/button";
-import SelectLanguage from "./select-language";
+import { Button } from "@/components/ui/button";
+import SelectLanguage from "@/components/layout/select-language";
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
+	const { t } = useTranslation();
+
 	return (
 		<header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/70">
 			<div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -16,17 +19,17 @@ const Navbar = () => {
 					</Link>
 					<div className="flex flex-col">
 						<span className="text-sm text-muted-foreground">
-							Smart PLC Control
+							{t("smartPlcControl")}
 						</span>
 						<h1 className="text-base font-semibold leading-tight text-foreground">
-							Dashboard
+							{t("dashboard")}
 						</h1>
 					</div>
 				</div>
 
 				<div className="flex items-center gap-2">
 					<Button asChild size="sm" variant="default">
-						<Link to="/sign-in">Sign in</Link>
+						<Link to="/sign-in">{t("signIn")}</Link>
 					</Button>	
 
 					<SelectLanguage/>
