@@ -26,7 +26,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
 	const isSignUp = mode === "sign-up";
 
 	return (
-		<main className="min-h-[calc(100vh-4rem)] bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 px-4 py-10 sm:px-6 lg:px-8">
+		<main className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 px-4 py-10 sm:px-6 lg:px-8">
 			<div className="mx-auto flex h-full w-full max-w-7xl items-center justify-center">
 				<Card className="w-full max-w-md border-slate-700/80 bg-slate-900/80 text-slate-50 backdrop-blur">
 					<CardHeader>

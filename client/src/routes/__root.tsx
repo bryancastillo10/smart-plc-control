@@ -2,7 +2,7 @@ import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 
-import Navbar from "../components/ui/Navbar";
+import Navbar from "@/components/layout/navbar";
 
 import appCss from "../styles.css?url";
 
