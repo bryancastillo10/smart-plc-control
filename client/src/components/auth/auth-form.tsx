@@ -1,16 +1,16 @@
-import { Link } from "@tanstack/react-router";
 import { useId } from "react";
 
-import { Button } from "../ui/button";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "../ui/card";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+} from "@/components/ui/card";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 type AuthFormMode = "sign-in" | "sign-up";
 
@@ -86,20 +86,10 @@ const AuthForm = ({ mode }: AuthFormProps) => {
 								</div>
 							) : null}
 
-							<Button className="w-full" type="submit">
+							<Button variant="secondary" className="w-full" type="submit">
 								{isSignUp ? "Sign up" : "Sign in"}
 							</Button>
 						</form>
-
-						<p className="mt-4 text-center text-sm text-slate-300">
-							{isSignUp ? "Already have an account?" : "Need an account?"}{" "}
-							<Link
-								className="font-medium text-sky-300 underline-offset-4 hover:underline"
-								to={isSignUp ? "/sign-in" : "/sign-up"}
-							>
-								{isSignUp ? "Sign in" : "Sign up"}
-							</Link>
-						</p>
 					</CardContent>
 				</Card>
 			</div>
