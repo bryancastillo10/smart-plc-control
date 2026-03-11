@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ChangeEvent, SubmitEvent, useState } from "react";
 import { signIn } from "@/api/auth-query";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +12,7 @@ const initialSignIn = {
 
 const useSignIn = () => {
 	const [signInData, setSignInData] = useState<SignInRequest>(initialSignIn);
+	const queryClient = useQueryClient();
 	const toast = useToast();
 
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -21,6 +22,7 @@ const useSignIn = () => {
 	const { mutate, isPending, isError } = useMutation({
 		mutationFn: signIn,
 		onSuccess: async () => {
+			await queryClient.invalidateQueries({queryKey: ["user"]});
 			toast.success("You are logged in.");
 		},
 		onError: (error) => {
