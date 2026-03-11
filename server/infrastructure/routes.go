@@ -5,6 +5,7 @@ import (
 	"plc-dashboard/internal/plant"
 	"plc-dashboard/internal/plantsettings"
 	"plc-dashboard/internal/sensorconfig"
+	"plc-dashboard/internal/user"
 	"plc-dashboard/internal/valve"
 
 	"plc-dashboard/internal/simulator"
@@ -18,6 +19,7 @@ func RegisterRoutes(r *gin.Engine) {
 	})
 
 	auth.RegisterAuthRoutes(r, DB)
+	user.RegisterUserRoutes(r, DB)
 	plant.RegisterPlantRoutes(r, DB)
 	plantsettings.RegisterPlantSettingsRoutes(r, DB)
 	valve.RegisterValveRoutes(r, DB)
