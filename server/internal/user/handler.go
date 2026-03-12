@@ -1,7 +1,6 @@
 package user
 
 import (
-	"log"
 	http_helper "plc-dashboard/pkg/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +10,7 @@ import (
 type Handler struct {
 	service *Service
 }
+
 func NewHandler(db *gorm.DB) *Handler {
 	repo := NewRepository(db)
 	service := NewService(repo)
@@ -24,7 +24,11 @@ func (h *Handler) GetUser(c *gin.Context) {
 		return
 	}
 
-	log.Println(userId)
+	user, err := h.service.GetUser(userId)
+	if err != nil {
+		c.Error(err)
+		return
+	}
 
-	c.JSON(200, userId)
+	c.JSON(200, user)
 }
