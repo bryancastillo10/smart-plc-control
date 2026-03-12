@@ -1,0 +1,34 @@
+package user
+
+import (
+	http_helper "plc-dashboard/pkg/http"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
+
+type Handler struct {
+	service *Service
+}
+
+func NewHandler(db *gorm.DB) *Handler {
+	repo := NewRepository(db)
+	service := NewService(repo)
+	return &Handler{service: service}
+}
+
+func (h *Handler) GetUser(c *gin.Context) {
+	userId, err := http_helper.ExtractUserIDFromContext(c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	user, err := h.service.GetUser(userId)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, user)
+}
