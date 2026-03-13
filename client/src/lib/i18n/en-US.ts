@@ -2,6 +2,8 @@ const enUS = {
 	smartPlcControl: "Smart PLC Control",
 	dashboard: "Dashboard",
 	signIn: "Sign in",
+	signOut: "Sign out",
+	signingOut:"Signing out",
 	language: "Language",
 	heroBadge: "Industrial Monitoring Platform",
 	heroTitle: "Operate your PLC systems with confidence and clarity.",

@@ -2,6 +2,8 @@ const zhTW = {
 	smartPlcControl: "聰PLC控台",
 	dashboard: "儀表板",
 	signIn: "登入",
+	signOut: "登出",
+	signingOut:"登出中",
 	language: "語言",
 	heroBadge: "工業監控平台",
 	heroTitle: "自信且清晰地操作您的 PLC 系統。",
