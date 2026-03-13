@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { type ChangeEvent, SubmitEvent, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { type ChangeEvent, type SubmitEvent, useState } from "react";
 import { signIn } from "@/api/auth-query";
-import { useToast } from "@/hooks/use-toast";
 
+import { getCurrentUserQueryOptions } from "@/hooks/use-get-user";
+import { useToast } from "@/hooks/use-toast";
 import type { SignInRequest } from "@/types/auth";
 
 const initialSignIn = {
@@ -13,6 +15,7 @@ const initialSignIn = {
 const useSignIn = () => {
 	const [signInData, setSignInData] = useState<SignInRequest>(initialSignIn);
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 	const toast = useToast();
 
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -22,8 +25,10 @@ const useSignIn = () => {
 	const { mutate, isPending, isError } = useMutation({
 		mutationFn: signIn,
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({queryKey: ["user"]});
+			await queryClient.fetchQuery(getCurrentUserQueryOptions());
 			toast.success("You are logged in.");
+
+			navigate({ to: "/dashboard" });
 		},
 		onError: (error) => {
 			const message =
@@ -37,6 +42,7 @@ const useSignIn = () => {
 
 		mutate(signInData);
 	};
+
 	return {
 		signInData,
 		loading: isPending,
