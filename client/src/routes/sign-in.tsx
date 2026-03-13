@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/sign-in")({
 
 function SignIn() {
 	const { signInData, loading, onChange, handleSubmit } = useSignIn();
+	const { t } = useTranslation();
 	const emailId = useId();
 	const passwordId = useId();
 
@@ -27,15 +29,13 @@ function SignIn() {
 			<div className="mx-auto flex h-full w-full max-w-7xl items-center justify-center">
 				<Card className="w-full max-w-md border-slate border-slate-700/80 bg-slate-900/80 text-slate-50 backdrop-blur">
 					<CardHeader className="">
-						<CardTitle>Welcome Back</CardTitle>
-						<CardDescription>
-							Sign in with your email and password
-						</CardDescription>
+						<CardTitle>{t("signInTitle")}</CardTitle>
+						<CardDescription>{t("signInDescription")}</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 							<div className="flex flex-col gap-3">
-								<Label htmlFor={emailId}>Email</Label>
+								<Label htmlFor={emailId}>{t("email")}</Label>
 								<Input
 									id={emailId}
 									name="email"
@@ -47,7 +47,7 @@ function SignIn() {
 							</div>
 
 							<div className="flex flex-col gap-3">
-								<Label htmlFor={passwordId}>Password</Label>
+								<Label htmlFor={passwordId}>{t("password")}</Label>
 								<Input
 									id={passwordId}
 									name="password"
@@ -64,7 +64,7 @@ function SignIn() {
 								className="w-full"
 								type="submit"
 							>
-								{loading ? "Signing In..." : "Sign In"}
+								{loading ? t("signingIn") : t("signIn")}
 							</Button>
 						</form>
 					</CardContent>
