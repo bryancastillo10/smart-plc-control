@@ -7,6 +7,8 @@ export function getContext() {
 	};
 }
 
+export type TanStackQueryContext = ReturnType<typeof getContext>;
+
 export function Provider({
 	children,
 	queryClient,

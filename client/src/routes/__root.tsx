@@ -1,20 +1,20 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import {
-	createRootRoute,
+	createRootRouteWithContext,
 	HeadContent,
 	Link,
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-
 import Navbar from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
+import type { TanStackQueryContext } from "@/lib/tanstack-query/provider";
 import "@/lib/i18n/init";
 
 import appCss from "../styles.css?url";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<TanStackQueryContext>()({
 	head: () => ({
 		meta: [
 			{
