@@ -26,9 +26,9 @@ const iconMap = {
 
 const containerVariants = {
 	success:
-		"border-emerald-500/40 bg-emerald-500/10 text-emerald-50 shadow-emerald-950/30",
-	error: "border-rose-500/40 bg-rose-500/10 text-rose-50 shadow-rose-950/30",
-	info: "border-cyan-500/40 bg-cyan-500/10 text-cyan-50 shadow-cyan-950/30",
+		"border-emerald-500/40 bg-emerald-500 text-emerald-50 shadow-emerald-950/30",
+	error: "border-rose-500/40 bg-rose-500 text-rose-50 text-rose-50 shadow-rose-950/30",
+	info: "border-cyan-500/40 bg-cyan-500 text-cyan-50 text-cyan-50 shadow-cyan-950/30",
 } satisfies Record<ToastStatus, string>;
 
 const iconVariants = {
