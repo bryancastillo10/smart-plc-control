@@ -1,18 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser } from "@/api/user-query";
+import { useUserStore } from "@/store/user";
 
 export const getCurrentUserQueryOptions = () => ({
 	queryKey: ["user"],
-	queryFn: getCurrentUser,
+	queryFn: async () => {
+		try {
+			const authUser = await getCurrentUser();
+			useUserStore.getState().setAuthUser(authUser);
+			return authUser;
+		} catch (error) {
+			useUserStore.getState().clearAuthUser();
+			throw error;
+		}
+	},
 	retry: false,
 });
 
 const useGetUser = ({ enabled = false }: { enabled?: boolean } = {}) => {
-	const {
-		data: authUser,
-		isPending,
-		isFetched,
-	} = useQuery({
+	const authUser = useUserStore((state) => state.authUser);
+	const { isPending, isFetched } = useQuery({
 		...getCurrentUserQueryOptions(),
 		enabled,
 	});

@@ -1,21 +1,8 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet} from "@tanstack/react-router";
 
 import Sidebar from "@/components/layout/sidebar";
-import { getCurrentUserQueryOptions } from "@/hooks/use-get-user";
 
 export const Route = createFileRoute("/(protected)")({
-	beforeLoad: async ({ context, location }) => {
-		try {
-			await context.queryClient.ensureQueryData(getCurrentUserQueryOptions());
-		} catch {
-			throw redirect({
-				to: "/sign-in",
-				search: {
-					redirect: location.href,
-				},
-			});
-		}
-	},
 	component: RouteComponent,
 });
 

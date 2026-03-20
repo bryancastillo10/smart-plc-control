@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { signOut } from "@/api/auth-query";
 import { useToast } from "@/hooks/use-toast";
+import { useUserStore } from "@/store/user";
 
 const useSignOut = () => {
 	const navigate = useNavigate();
@@ -14,6 +15,7 @@ const useSignOut = () => {
 	const { mutate, isPending, isError } = useMutation({
 		mutationFn: signOut,
 		onSuccess: async () => {
+			useUserStore.getState().clearAuthUser();
 			queryClient.setQueryData(["user"], null);
 			await queryClient.invalidateQueries({
 				queryKey: ["user"],
