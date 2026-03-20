@@ -8,7 +8,6 @@ export const Route = createFileRoute("/(protected)/dashboard")({
 function RouteComponent() {
 	const { authUser } = useGetUser();
 
-
 	return (
 		<div>
 			<h1>Dashboard Page</h1>
