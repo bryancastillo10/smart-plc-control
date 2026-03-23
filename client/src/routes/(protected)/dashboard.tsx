@@ -6,6 +6,7 @@ import {
 	Thermometer,
 	Waves,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
 	CartesianGrid,
 	Line,
@@ -16,6 +17,8 @@ import {
 	YAxis,
 } from "recharts";
 
+import MetricCard from "@/components/dashboard/MetricCard";
+import StatusBadge from "@/components/dashboard/StatusBadge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -27,41 +30,16 @@ import {
 } from "@/components/ui/card";
 import useGetUser from "@/hooks/use-get-user";
 import usePlcStream from "@/hooks/use-plc-stream";
-
+import type { StatusTone } from "@/types/plc";
 import { formatDate, formatTime } from "@/utils/formatDate";
 import { formatMetric } from "@/utils/formatMetric";
-import type { StatusTone } from "@/types/plc";
-
-import MetricCard from "@/components/dashboard/MetricCard";
-import StatusBadge from "@/components/dashboard/StatusBadge";
 
 export const Route = createFileRoute("/(protected)/dashboard")({
 	component: DashboardPage,
 });
 
-const streamStatusCopy: Record<
-	ReturnType<typeof usePlcStream>["status"],
-	{ label: string; tone: StatusTone }
-> = {
-	closed: {
-		label: "Reconnecting",
-		tone: "warning",
-	},
-	connecting: {
-		label: "Connecting",
-		tone: "muted",
-	},
-	error: {
-		label: "Stream error",
-		tone: "warning",
-	},
-	open: {
-		label: "Live stream",
-		tone: "live",
-	},
-};
-
 function DashboardPage() {
+	const { t } = useTranslation();
 	const { authUser } = useGetUser();
 	const {
 		currentReading,
@@ -73,30 +51,53 @@ function DashboardPage() {
 		status,
 	} = usePlcStream();
 
+	const streamStatusCopy: Record<
+		ReturnType<typeof usePlcStream>["status"],
+		{ label: string; tone: StatusTone }
+	> = {
+		closed: {
+			label: t("dashboardStatusReconnecting"),
+			tone: "warning",
+		},
+		connecting: {
+			label: t("dashboardStatusConnecting"),
+			tone: "muted",
+		},
+		error: {
+			label: t("dashboardStatusError"),
+			tone: "warning",
+		},
+		open: {
+			label: t("dashboardStatusLive"),
+			tone: "live",
+		},
+	};
+
 	const streamStatus = streamStatusCopy[status];
 	const recentReadings = [...history].reverse().slice(0, 5);
-	const operatorName = authUser?.username ?? authUser?.email ?? "operator";
+	const operatorName =
+		authUser?.username ?? authUser?.email ?? t("dashboardOperatorFallback");
 	const qualityWindows = [
 		{
-			label: "pH stability",
+			label: t("dashboardWindowPhStability"),
 			status:
 				currentReading && currentReading.pH >= 6.5 && currentReading.pH <= 8.2
-					? "Within expected band"
-					: "Watch adjustment",
+					? t("dashboardWindowPhStable")
+					: t("dashboardWindowPhWatch"),
 		},
 		{
-			label: "Turbidity",
+			label: t("dashboardWindowTurbidity"),
 			status:
 				currentReading && currentReading.turbidity <= 10
-					? "Stable for simulator"
-					: "Above current simulation band",
+					? t("dashboardWindowTurbidityStable")
+					: t("dashboardWindowTurbidityHigh"),
 		},
 		{
-			label: "Dissolved oxygen",
+			label: t("dashboardWindowDissolvedOxygen"),
 			status:
 				currentReading && currentReading.dissolvedOxygen >= 4
-					? "Aeration healthy"
-					: "Below target",
+					? t("dashboardWindowDissolvedOxygenStable")
+					: t("dashboardWindowDissolvedOxygenLow"),
 		},
 	];
 
@@ -109,56 +110,55 @@ function DashboardPage() {
 						<div className="flex flex-wrap items-center gap-3">
 							<StatusBadge tone={streamStatus.tone} />
 							<Badge className="border-white/15 bg-white/10 text-slate-100 hover:bg-white/10">
-								Simulator cadence: 2s
+								{t("dashboardSimulatorCadence")}
 							</Badge>
 						</div>
 						<div>
 							<p className="text-sm font-medium tracking-[0.28em] text-cyan-200 uppercase">
-								Plant telemetry desk
+								{t("dashboardHeroEyebrow")}
 							</p>
 							<h1 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-								Live PLC dashboard for {operatorName}
+								{t("dashboardHeroTitle", { operatorName })}
 							</h1>
 							<p className="mt-3 max-w-xl text-sm leading-6 text-slate-300 md:text-base">
-								The dashboard is now driven by websocket packets from
-								<span className="font-medium text-white"> /ws/plc</span>, giving
-								you a rolling view of water quality changes instead of a static
-								placeholder.
+								{t("dashboardHeroDescription", { endpoint: "/ws/plc" })}
 							</p>
 						</div>
 					</div>
 					<div className="grid gap-3 sm:grid-cols-3 lg:w-105 lg:grid-cols-1">
 						<div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
 							<p className="text-xs tracking-[0.24em] text-slate-300 uppercase">
-								Stream state
+								{t("dashboardStreamState")}
 							</p>
 							<p className="mt-2 text-2xl font-semibold text-white">
 								{streamStatus.label}
 							</p>
-							<p className="mt-1 text-sm text-slate-300">Endpoint: /ws/plc</p>
+							<p className="mt-1 text-sm text-slate-300">
+								{t("dashboardEndpointValue", { endpoint: "/ws/plc" })}
+							</p>
 						</div>
 						<div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
 							<p className="text-xs tracking-[0.24em] text-slate-300 uppercase">
-								Packets received
+								{t("dashboardPacketsReceived")}
 							</p>
 							<p className="mt-2 text-2xl font-semibold text-white">
 								{packetsReceived}
 							</p>
 							<p className="mt-1 text-sm text-slate-300">
-								Rolling buffer keeps the latest 12 readings.
+								{t("dashboardPacketsReceivedDescription")}
 							</p>
 						</div>
 						<div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
 							<p className="text-xs tracking-[0.24em] text-slate-300 uppercase">
-								Last update
+								{t("dashboardLastUpdate")}
 							</p>
 							<p className="mt-2 text-lg font-semibold text-white">
 								{lastUpdatedAt
 									? formatDate(lastUpdatedAt, true)
-									: "Waiting for data"}
+									: t("dashboardWaitingForData")}
 							</p>
 							<p className="mt-1 text-sm text-slate-300">
-								Newest PLC sample received by the browser.
+								{t("dashboardNewestSampleDescription")}
 							</p>
 						</div>
 					</div>
@@ -168,10 +168,10 @@ function DashboardPage() {
 			{error ? (
 				<Alert className="border-amber-500/30 bg-amber-500/10 text-amber-50">
 					<AlertTriangle className="size-4" />
-					<AlertTitle>Websocket status requires attention</AlertTitle>
+					<AlertTitle>{t("dashboardAlertTitle")}</AlertTitle>
 					<AlertDescription>
 						<p>{error}</p>
-						<p>The client will keep retrying the connection every 3 seconds.</p>
+						<p>{t("dashboardAlertDescription")}</p>
 					</AlertDescription>
 				</Alert>
 			) : null}
@@ -179,30 +179,30 @@ function DashboardPage() {
 			<section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<MetricCard
 					accentClassName="bg-cyan-400/15 text-cyan-200"
-					description="Main line throughput in cubic meters per second."
+					description={t("dashboardMetricFlowRateDescription")}
 					icon={Waves}
-					label="Flow rate"
+					label={t("dashboardMetricFlowRate")}
 					value={`${formatMetric(currentReading?.flowRate)} m3/s`}
 				/>
 				<MetricCard
 					accentClassName="bg-emerald-400/15 text-emerald-200"
-					description="Acidity window from the live PLC telemetry stream."
+					description={t("dashboardMetricPhBalanceDescription")}
 					icon={Activity}
-					label="pH balance"
+					label={t("dashboardMetricPhBalance")}
 					value={formatMetric(currentReading?.pH)}
 				/>
 				<MetricCard
 					accentClassName="bg-sky-400/15 text-sky-200"
-					description="Current turbidity reading expressed in NTU."
+					description={t("dashboardMetricTurbidityDescription")}
 					icon={Droplets}
-					label="Turbidity"
+					label={t("dashboardMetricTurbidity")}
 					value={`${formatMetric(currentReading?.turbidity)} NTU`}
 				/>
 				<MetricCard
 					accentClassName="bg-orange-400/15 text-orange-200"
-					description="Tank temperature sampled from the simulator feed."
+					description={t("dashboardMetricTemperatureDescription")}
 					icon={Thermometer}
-					label="Temperature"
+					label={t("dashboardMetricTemperature")}
 					value={`${formatMetric(currentReading?.temperature)} C`}
 				/>
 			</section>
@@ -210,10 +210,11 @@ function DashboardPage() {
 			<section className="grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.9fr)]">
 				<Card className="border-white/10 bg-slate-950/80 shadow-lg shadow-slate-950/10 backdrop-blur">
 					<CardHeader>
-						<CardTitle className="text-xl text-white">Trend monitor</CardTitle>
+						<CardTitle className="text-xl text-white">
+							{t("dashboardTrendTitle")}
+						</CardTitle>
 						<CardDescription className="text-slate-400">
-							Rolling view of the last 12 websocket messages received from the
-							PLC simulator.
+							{t("dashboardTrendDescription")}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -259,7 +260,7 @@ function DashboardPage() {
 										<Line
 											dataKey="pH"
 											dot={false}
-											name="pH"
+											name={t("dashboardSeriesPh")}
 											stroke="#34d399"
 											strokeWidth={2.5}
 											type="monotone"
@@ -267,7 +268,7 @@ function DashboardPage() {
 										<Line
 											dataKey="dissolvedOxygen"
 											dot={false}
-											name="Dissolved O2"
+											name={t("dashboardSeriesDissolvedOxygen")}
 											stroke="#38bdf8"
 											strokeWidth={2.5}
 											type="monotone"
@@ -275,7 +276,7 @@ function DashboardPage() {
 										<Line
 											dataKey="temperature"
 											dot={false}
-											name="Temperature"
+											name={t("dashboardSeriesTemperature")}
 											stroke="#fb923c"
 											strokeWidth={2.5}
 											type="monotone"
@@ -284,7 +285,7 @@ function DashboardPage() {
 								</ResponsiveContainer>
 							) : (
 								<div className="flex h-full items-center justify-center rounded-xl border border-dashed border-white/10 text-center text-sm text-slate-400">
-									Waiting for the first PLC websocket packet.
+									{t("dashboardTrendEmpty")}
 								</div>
 							)}
 						</div>
@@ -295,10 +296,10 @@ function DashboardPage() {
 					<Card className="border-white/10 bg-slate-950/80 shadow-lg shadow-slate-950/10 backdrop-blur">
 						<CardHeader>
 							<CardTitle className="text-xl text-white">
-								Operating windows
+								{t("dashboardOperatingWindowsTitle")}
 							</CardTitle>
 							<CardDescription className="text-slate-400">
-								Quick readouts derived from the most recent PLC message.
+								{t("dashboardOperatingWindowsDescription")}
 							</CardDescription>
 						</CardHeader>
 						<CardContent className="space-y-4">
@@ -321,10 +322,10 @@ function DashboardPage() {
 					<Card className="border-white/10 bg-slate-950/80 shadow-lg shadow-slate-950/10 backdrop-blur">
 						<CardHeader>
 							<CardTitle className="text-xl text-white">
-								Recent packets
+								{t("dashboardRecentPacketsTitle")}
 							</CardTitle>
 							<CardDescription className="text-slate-400">
-								Latest websocket samples received by the browser.
+								{t("dashboardRecentPacketsDescription")}
 							</CardDescription>
 						</CardHeader>
 						<CardContent className="space-y-3">
@@ -343,18 +344,32 @@ function DashboardPage() {
 											</Badge>
 										</div>
 										<div className="mt-3 grid grid-cols-2 gap-3 text-sm text-slate-300">
-											<p>pH {reading.pH.toFixed(2)}</p>
-											<p>Turbidity {reading.turbidity.toFixed(2)} NTU</p>
 											<p>
-												Dissolved O2 {reading.dissolvedOxygen.toFixed(2)} mg/L
+												{t("dashboardRecentPacketPh", {
+													value: reading.pH.toFixed(2),
+												})}
 											</p>
-											<p>Temperature {reading.temperature.toFixed(2)} C</p>
+											<p>
+												{t("dashboardRecentPacketTurbidity", {
+													value: reading.turbidity.toFixed(2),
+												})}
+											</p>
+											<p>
+												{t("dashboardRecentPacketDissolvedOxygen", {
+													value: reading.dissolvedOxygen.toFixed(2),
+												})}
+											</p>
+											<p>
+												{t("dashboardRecentPacketTemperature", {
+													value: reading.temperature.toFixed(2),
+												})}
+											</p>
 										</div>
 									</div>
 								))
 							) : (
 								<div className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">
-									No websocket packets yet.
+									{t("dashboardRecentPacketsEmpty")}
 								</div>
 							)}
 						</CardContent>
