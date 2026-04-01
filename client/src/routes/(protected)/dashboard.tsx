@@ -1,25 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
 	Activity,
-	AlertTriangle,
+	// AlertTriangle,
 	Droplets,
 	Thermometer,
 	Waves,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
-	CartesianGrid,
-	Line,
-	LineChart,
+	// CartesianGrid,
+	// Line,
+	// LineChart,
 	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis,
+	// Tooltip,
+	// XAxis,
+	// YAxis,
 } from "recharts";
 
 import MetricCard from "@/components/dashboard/MetricCard";
-import StatusBadge from "@/components/dashboard/StatusBadge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+// import StatusBadge from "@/components/dashboard/StatusBadge";
+// import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
 	Card,
@@ -29,10 +29,10 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import useGetUser from "@/hooks/use-get-user";
-import usePlcStream from "@/hooks/use-plc-stream";
-import type { StatusTone } from "@/types/plc";
-import { formatDate, formatTime } from "@/utils/formatDate";
-import { formatMetric } from "@/utils/formatMetric";
+// import usePlcStream from "@/hooks/use-plc-stream";
+// import type { StatusTone } from "@/types/plc";
+// import { formatDate, formatTime } from "@/utils/formatDate";
+// import { formatMetric } from "@/utils/formatMetric";
 
 export const Route = createFileRoute("/(protected)/dashboard")({
 	component: DashboardPage,
@@ -41,65 +41,68 @@ export const Route = createFileRoute("/(protected)/dashboard")({
 function DashboardPage() {
 	const { t } = useTranslation();
 	const { authUser } = useGetUser();
-	const {
-		currentReading,
-		error,
-		hasData,
-		history,
-		lastUpdatedAt,
-		packetsReceived,
-		status,
-	} = usePlcStream();
+	// const {
+	// 	currentReading,
+	// 	error,
+	// 	hasData,
+	// 	history,
+	// 	lastUpdatedAt,
+	// 	packetsReceived,
+	// 	status,
+	// } = usePlcStream();
 
-	const streamStatusCopy: Record<
-		ReturnType<typeof usePlcStream>["status"],
-		{ label: string; tone: StatusTone }
-	> = {
-		closed: {
-			label: t("dashboardStatusReconnecting"),
-			tone: "warning",
-		},
-		connecting: {
-			label: t("dashboardStatusConnecting"),
-			tone: "muted",
-		},
-		error: {
-			label: t("dashboardStatusError"),
-			tone: "warning",
-		},
-		open: {
-			label: t("dashboardStatusLive"),
-			tone: "live",
-		},
-	};
+	const hasData = false;
 
-	const streamStatus = streamStatusCopy[status];
-	const recentReadings = [...history].reverse().slice(0, 5);
+	// const streamStatusCopy: Record<
+	// 	ReturnType<typeof usePlcStream>["status"],
+	// 	{ label: string; tone: StatusTone }
+	// > = {
+	// 	closed: {
+	// 		label: t("dashboardStatusReconnecting"),
+	// 		tone: "warning",
+	// 	},
+	// 	connecting: {
+	// 		label: t("dashboardStatusConnecting"),
+	// 		tone: "muted",
+	// 	},
+	// 	error: {
+	// 		label: t("dashboardStatusError"),
+	// 		tone: "warning",
+	// 	},
+	// 	open: {
+	// 		label: t("dashboardStatusLive"),
+	// 		tone: "live",
+	// 	},
+	// };
+
+	// const streamStatus = streamStatusCopy[status];
+	// const recentReadings = [...history].reverse().slice(0, 5);
+
 	const operatorName =
 		authUser?.username ?? authUser?.email ?? t("dashboardOperatorFallback");
-	const qualityWindows = [
-		{
-			label: t("dashboardWindowPhStability"),
-			status:
-				currentReading && currentReading.pH >= 6.5 && currentReading.pH <= 8.2
-					? t("dashboardWindowPhStable")
-					: t("dashboardWindowPhWatch"),
-		},
-		{
-			label: t("dashboardWindowTurbidity"),
-			status:
-				currentReading && currentReading.turbidity <= 10
-					? t("dashboardWindowTurbidityStable")
-					: t("dashboardWindowTurbidityHigh"),
-		},
-		{
-			label: t("dashboardWindowDissolvedOxygen"),
-			status:
-				currentReading && currentReading.dissolvedOxygen >= 4
-					? t("dashboardWindowDissolvedOxygenStable")
-					: t("dashboardWindowDissolvedOxygenLow"),
-		},
-	];
+	// const qualityWindows = [
+	// 	{
+	// 		label: t("dashboardWindowPhStability"),
+	// 		status:
+	// 			currentReading && currentReading.pH >= 6.5 && currentReading.pH <= 8.2
+	// 				? t("dashboardWindowPhStable")
+	// 				: t("dashboardWindowPhWatch"),
+	// 	},
+	// 	{
+	// 		label: t("dashboardWindowTurbidity"),
+	// 		status:
+	// 			currentReading && currentReading.turbidity <= 10
+	// 				? t("dashboardWindowTurbidityStable")
+	// 				: t("dashboardWindowTurbidityHigh"),
+	// 	},
+	// 	{
+	// 		label: t("dashboardWindowDissolvedOxygen"),
+	// 		status:
+	// 			currentReading && currentReading.dissolvedOxygen >= 4
+	// 				? t("dashboardWindowDissolvedOxygenStable")
+	// 				: t("dashboardWindowDissolvedOxygenLow"),
+	// 	},
+	// ];
 
 	return (
 		<div className="space-y-6 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.14),transparent_38%),linear-gradient(180deg,rgba(2,6,23,0.02),rgba(2,6,23,0))] pb-6">
@@ -108,7 +111,7 @@ function DashboardPage() {
 				<div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
 					<div className="max-w-2xl space-y-4">
 						<div className="flex flex-wrap items-center gap-3">
-							<StatusBadge tone={streamStatus.tone} />
+							{/* <StatusBadge tone={streamStatus.tone} /> */}
 							<Badge className="border-white/15 bg-white/10 text-slate-100 hover:bg-white/10">
 								{t("dashboardSimulatorCadence")}
 							</Badge>
@@ -130,9 +133,9 @@ function DashboardPage() {
 							<p className="text-xs tracking-[0.24em] text-slate-300 uppercase">
 								{t("dashboardStreamState")}
 							</p>
-							<p className="mt-2 text-2xl font-semibold text-white">
+							{/* <p className="mt-2 text-2xl font-semibold text-white">
 								{streamStatus.label}
-							</p>
+							</p> */}
 							<p className="mt-1 text-sm text-slate-300">
 								{t("dashboardEndpointValue", { endpoint: "/ws/plc" })}
 							</p>
@@ -141,9 +144,9 @@ function DashboardPage() {
 							<p className="text-xs tracking-[0.24em] text-slate-300 uppercase">
 								{t("dashboardPacketsReceived")}
 							</p>
-							<p className="mt-2 text-2xl font-semibold text-white">
+							{/* <p className="mt-2 text-2xl font-semibold text-white">
 								{packetsReceived}
-							</p>
+							</p> */}
 							<p className="mt-1 text-sm text-slate-300">
 								{t("dashboardPacketsReceivedDescription")}
 							</p>
@@ -152,11 +155,11 @@ function DashboardPage() {
 							<p className="text-xs tracking-[0.24em] text-slate-300 uppercase">
 								{t("dashboardLastUpdate")}
 							</p>
-							<p className="mt-2 text-lg font-semibold text-white">
+							{/* <p className="mt-2 text-lg font-semibold text-white">
 								{lastUpdatedAt
 									? formatDate(lastUpdatedAt, true)
 									: t("dashboardWaitingForData")}
-							</p>
+							</p> */}
 							<p className="mt-1 text-sm text-slate-300">
 								{t("dashboardNewestSampleDescription")}
 							</p>
@@ -165,7 +168,7 @@ function DashboardPage() {
 				</div>
 			</section>
 
-			{error ? (
+			{/* {error ? (
 				<Alert className="border-amber-500/30 bg-amber-500/10 text-amber-50">
 					<AlertTriangle className="size-4" />
 					<AlertTitle>{t("dashboardAlertTitle")}</AlertTitle>
@@ -174,7 +177,7 @@ function DashboardPage() {
 						<p>{t("dashboardAlertDescription")}</p>
 					</AlertDescription>
 				</Alert>
-			) : null}
+			) : null} */}
 
 			<section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<MetricCard
@@ -182,28 +185,32 @@ function DashboardPage() {
 					description={t("dashboardMetricFlowRateDescription")}
 					icon={Waves}
 					label={t("dashboardMetricFlowRate")}
-					value={`${formatMetric(currentReading?.flowRate)} m3/s`}
+					// value={`${formatMetric(currentReading?.flowRate)} m3/s`}
+					value="m3/s"
 				/>
 				<MetricCard
 					accentClassName="bg-emerald-400/15 text-emerald-200"
 					description={t("dashboardMetricPhBalanceDescription")}
 					icon={Activity}
 					label={t("dashboardMetricPhBalance")}
-					value={formatMetric(currentReading?.pH)}
+					// value={formatMetric(currentReading?.pH)}
+					value=""
 				/>
 				<MetricCard
 					accentClassName="bg-sky-400/15 text-sky-200"
 					description={t("dashboardMetricTurbidityDescription")}
 					icon={Droplets}
 					label={t("dashboardMetricTurbidity")}
-					value={`${formatMetric(currentReading?.turbidity)} NTU`}
+					// value={`${formatMetric(currentReading?.turbidity)} NTU`}
+					value=""
 				/>
 				<MetricCard
 					accentClassName="bg-orange-400/15 text-orange-200"
 					description={t("dashboardMetricTemperatureDescription")}
 					icon={Thermometer}
 					label={t("dashboardMetricTemperature")}
-					value={`${formatMetric(currentReading?.temperature)} C`}
+					// value={`${formatMetric(currentReading?.temperature)} C`}
+					value="C"
 				/>
 			</section>
 
@@ -221,7 +228,7 @@ function DashboardPage() {
 						<div className="h-80 w-full rounded-2xl border border-white/8 bg-slate-900/80 p-3">
 							{hasData ? (
 								<ResponsiveContainer width="100%" height="100%">
-									<LineChart
+									{/* <LineChart
 										data={history}
 										margin={{ left: 0, right: 12, top: 8, bottom: 0 }}
 									>
@@ -281,7 +288,8 @@ function DashboardPage() {
 											strokeWidth={2.5}
 											type="monotone"
 										/>
-									</LineChart>
+									</LineChart> */}
+									<div className="">Placeholder</div>
 								</ResponsiveContainer>
 							) : (
 								<div className="flex h-full items-center justify-center rounded-xl border border-dashed border-white/10 text-center text-sm text-slate-400">
@@ -302,7 +310,7 @@ function DashboardPage() {
 								{t("dashboardOperatingWindowsDescription")}
 							</CardDescription>
 						</CardHeader>
-						<CardContent className="space-y-4">
+						{/* <CardContent className="space-y-4">
 							{qualityWindows.map((windowItem) => (
 								<div
 									key={windowItem.label}
@@ -316,7 +324,7 @@ function DashboardPage() {
 									</p>
 								</div>
 							))}
-						</CardContent>
+						</CardContent> */}
 					</Card>
 
 					<Card className="border-white/10 bg-slate-950/80 shadow-lg shadow-slate-950/10 backdrop-blur">
@@ -328,7 +336,7 @@ function DashboardPage() {
 								{t("dashboardRecentPacketsDescription")}
 							</CardDescription>
 						</CardHeader>
-						<CardContent className="space-y-3">
+						{/* <CardContent className="space-y-3">
 							{recentReadings.length > 0 ? (
 								recentReadings.map((reading) => (
 									<div
@@ -372,7 +380,7 @@ function DashboardPage() {
 									{t("dashboardRecentPacketsEmpty")}
 								</div>
 							)}
-						</CardContent>
+						</CardContent> */}
 					</Card>
 				</div>
 			</section>
