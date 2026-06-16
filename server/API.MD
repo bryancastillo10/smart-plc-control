@@ -1,0 +1,308 @@
+## API Endpoints
+
+The backend exposes a versioned REST API under:
+
+```text
+/api/v1
+```
+
+Protected endpoints require an authenticated user. Authorization is enforced by the backend according to the user's `ADMIN`, `OPERATOR`, or `VIEWER` role.
+
+### Authentication
+
+```text
+POST   /api/v1/auth/login
+POST   /api/v1/auth/logout
+POST   /api/v1/auth/register
+GET    /api/v1/auth/me
+```
+
+| Endpoint                     | Description                   | Access        |
+| ---------------------------- | ----------------------------- | ------------- |
+| `POST /api/v1/auth/login`    | Authenticate a user           | Public        |
+| `POST /api/v1/auth/logout`   | End the current session       | Authenticated |
+| `POST /api/v1/auth/register` | Create a new user account     | `ADMIN`       |
+| `GET /api/v1/auth/me`        | Return the authenticated user | Authenticated |
+
+Public self-registration is disabled. New users are created by an administrator.
+
+### Current User
+
+```text
+GET     /api/v1/users/me
+PUT   /api/v1/users/me
+```
+
+| Endpoint                 | Description                                        | Access        |
+| ------------------------ | -------------------------------------------------- | ------------- |
+| `GET /api/v1/users/me`   | Get the current user's profile                     | Authenticated |
+| `PUT /api/v1/users/me` | Update the current user's permitted profile fields | Authenticated |
+
+Users should not be allowed to change their own role through this endpoint.
+
+### User Administration
+
+```text
+GET      /api/v1/users
+GET      /api/v1/users/:userId
+PUT    /api/v1/users/:userId
+DELETE   /api/v1/users/:userId
+```
+
+| Endpoint                       | Description                                   | Access  |
+| ------------------------------ | --------------------------------------------- | ------- |
+| `GET /api/v1/users`            | List application users                        | `ADMIN` |
+| `GET /api/v1/users/:userId`    | Get a user by ID                              | `ADMIN` |
+| `PUT /api/v1/users/:userId`  | Update a user, including their role or status | `ADMIN` |
+| `DELETE /api/v1/users/:userId` | Delete or deactivate a user                   | `ADMIN` |
+
+An immutable user ID should be used instead of an email address when identifying users in URLs.
+
+For auditability, deactivating users may be preferable to permanently deleting them.
+
+### Plants
+
+```text
+POST     /api/v1/plants
+GET      /api/v1/plants
+GET      /api/v1/plants/:plantId
+PUT    /api/v1/plants/:plantId
+DELETE   /api/v1/plants/:plantId
+```
+
+| Endpoint                         | Description               | Access        |
+| -------------------------------- | ------------------------- | ------------- |
+| `POST /api/v1/plants`            | Create a plant            | `ADMIN`       |
+| `GET /api/v1/plants`             | List accessible plants    | Authenticated |
+| `GET /api/v1/plants/:plantId`    | Get plant details         | Authenticated |
+| `PUT /api/v1/plants/:plantId`  | Update a plant            | `ADMIN`       |
+| `DELETE /api/v1/plants/:plantId` | Delete or archive a plant | `ADMIN`       |
+
+### Devices
+
+```text
+POST     /api/v1/devices
+GET      /api/v1/devices
+GET      /api/v1/devices/:deviceId
+PUT    /api/v1/devices/:deviceId
+DELETE   /api/v1/devices/:deviceId
+
+POST     /api/v1/devices/:deviceId/connect
+POST     /api/v1/devices/:deviceId/disconnect
+```
+
+| Endpoint                                    | Description                      | Access              |
+| ------------------------------------------- | -------------------------------- | ------------------- |
+| `POST /api/v1/devices`                      | Create a PLC or simulated device | `ADMIN`             |
+| `GET /api/v1/devices`                       | List devices                     | Authenticated       |
+| `GET /api/v1/devices/:deviceId`             | Get device details               | Authenticated       |
+| `PUT /api/v1/devices/:deviceId`           | Update device configuration      | `ADMIN`             |
+| `DELETE /api/v1/devices/:deviceId`          | Delete a device                  | `ADMIN`             |
+| `POST /api/v1/devices/:deviceId/connect`    | Connect a device                 | `ADMIN`, `OPERATOR` |
+| `POST /api/v1/devices/:deviceId/disconnect` | Disconnect a device              | `ADMIN`, `OPERATOR` |
+
+Device connection actions are modeled as explicit commands because they cause operational state changes rather than ordinary resource updates.
+
+The device list may support filters:
+
+```text
+GET /api/v1/devices?plantId=:plantId&status=:status
+```
+
+### Tags
+
+```text
+POST     /api/v1/devices/:deviceId/tags
+GET      /api/v1/devices/:deviceId/tags
+
+GET      /api/v1/tags/:tagId
+PUT    /api/v1/tags/:tagId
+DELETE   /api/v1/tags/:tagId
+```
+
+| Endpoint                              | Description                          | Access        |
+| ------------------------------------- | ------------------------------------ | ------------- |
+| `POST /api/v1/devices/:deviceId/tags` | Create a tag for a device            | `ADMIN`       |
+| `GET /api/v1/devices/:deviceId/tags`  | List tags assigned to a device       | Authenticated |
+| `GET /api/v1/tags/:tagId`             | Get tag details and its latest value | Authenticated |
+| `PUT /api/v1/tags/:tagId`           | Update tag configuration             | `ADMIN`       |
+| `DELETE /api/v1/tags/:tagId`          | Delete a tag                         | `ADMIN`       |
+
+Tag writes should use a separate endpoint if control operations are added later:
+
+```text
+POST /api/v1/tags/:tagId/write
+```
+
+PLC write operations should require elevated authorization, validation, confirmation, and audit logging.
+
+### Readings and Historical Data
+
+```text
+GET   /api/v1/readings/latest
+GET   /api/v1/readings/history
+```
+
+Example requests:
+
+```text
+GET /api/v1/readings/latest?deviceId=:deviceId
+GET /api/v1/readings/latest?tagIds=:tagId1,:tagId2
+```
+
+```text
+GET /api/v1/readings/history
+    ?tagIds=:tagId1,:tagId2
+    &from=:startTimestamp
+    &to=:endTimestamp
+    &interval=:aggregationInterval
+```
+
+| Endpoint                       | Description                                           | Access        |
+| ------------------------------ | ----------------------------------------------------- | ------------- |
+| `GET /api/v1/readings/latest`  | Return the latest values for selected tags or devices | Authenticated |
+| `GET /api/v1/readings/history` | Return historical readings for a time range           | Authenticated |
+
+The history endpoint should require a bounded time range and enforce a maximum response size.
+
+### Alert Rules
+
+Alert rules define the conditions that produce alert events.
+
+```text
+POST     /api/v1/alert-rules
+GET      /api/v1/alert-rules
+GET      /api/v1/alert-rules/:ruleId
+PUT    /api/v1/alert-rules/:ruleId
+DELETE   /api/v1/alert-rules/:ruleId
+```
+
+| Endpoint                             | Description                 | Access        |
+| ------------------------------------ | --------------------------- | ------------- |
+| `POST /api/v1/alert-rules`           | Create an alert rule        | `ADMIN`       |
+| `GET /api/v1/alert-rules`            | List configured alert rules | Authenticated |
+| `GET /api/v1/alert-rules/:ruleId`    | Get an alert rule           | Authenticated |
+| `PUT /api/v1/alert-rules/:ruleId`  | Update an alert rule        | `ADMIN`       |
+| `DELETE /api/v1/alert-rules/:ruleId` | Delete an alert rule        | `ADMIN`       |
+
+### Alert Events
+
+Alerts represent actual events generated by the alert engine.
+
+```text
+GET    /api/v1/alerts
+GET    /api/v1/alerts/:alertId
+POST   /api/v1/alerts/:alertId/acknowledge
+```
+
+| Endpoint                                   | Description                       | Access              |
+| ------------------------------------------ | --------------------------------- | ------------------- |
+| `GET /api/v1/alerts`                       | List active and historical alerts | Authenticated       |
+| `GET /api/v1/alerts/:alertId`              | Get alert details                 | Authenticated       |
+| `POST /api/v1/alerts/:alertId/acknowledge` | Acknowledge an active alert       | `ADMIN`, `OPERATOR` |
+
+Example filters:
+
+```text
+GET /api/v1/alerts?status=ACTIVE
+GET /api/v1/alerts?severity=CRITICAL
+GET /api/v1/alerts?plantId=:plantId
+GET /api/v1/alerts?from=:startTimestamp&to=:endTimestamp
+```
+
+Alert resolution should normally be performed automatically by the alert engine when the triggering condition returns to a normal state.
+
+### Simulations
+
+```text
+POST   /api/v1/simulations
+GET    /api/v1/simulations
+GET    /api/v1/simulations/:simulationId
+
+POST   /api/v1/simulations/:simulationId/start
+POST   /api/v1/simulations/:simulationId/pause
+POST   /api/v1/simulations/:simulationId/stop
+
+GET    /api/v1/simulation-scenarios
+POST   /api/v1/simulations/:simulationId/scenarios/:scenarioId/trigger
+```
+
+| Endpoint                                                               | Description                         | Access              |
+| ---------------------------------------------------------------------- | ----------------------------------- | ------------------- |
+| `POST /api/v1/simulations`                                             | Create a simulation instance        | `ADMIN`             |
+| `GET /api/v1/simulations`                                              | List simulations and their statuses | Authenticated       |
+| `GET /api/v1/simulations/:simulationId`                                | Get simulation details              | Authenticated       |
+| `POST /api/v1/simulations/:simulationId/start`                         | Start a simulation                  | `ADMIN`, `OPERATOR` |
+| `POST /api/v1/simulations/:simulationId/pause`                         | Pause a simulation                  | `ADMIN`, `OPERATOR` |
+| `POST /api/v1/simulations/:simulationId/stop`                          | Stop a simulation                   | `ADMIN`, `OPERATOR` |
+| `GET /api/v1/simulation-scenarios`                                     | List available fault scenarios      | Authenticated       |
+| `POST /api/v1/simulations/:simulationId/scenarios/:scenarioId/trigger` | Trigger a scenario                  | `ADMIN`, `OPERATOR` |
+
+Using `simulationId` allows the application to support multiple plants or simulation instances later.
+
+For an MVP that only permits one global simulation, the simpler endpoints may initially be used:
+
+```text
+POST   /api/v1/simulations/start
+POST   /api/v1/simulations/pause
+POST   /api/v1/simulations/stop
+GET    /api/v1/simulations
+POST   /api/v1/simulations/scenarios/:scenarioId/trigger
+```
+
+### Audit Logs
+
+```text
+GET   /api/v1/audit-logs
+GET   /api/v1/audit-logs/:auditLogId
+```
+
+| Endpoint                             | Description                           | Access  |
+| ------------------------------------ | ------------------------------------- | ------- |
+| `GET /api/v1/audit-logs`             | List recorded user and system actions | `ADMIN` |
+| `GET /api/v1/audit-logs/:auditLogId` | Get an audit log entry                | `ADMIN` |
+
+Example filters:
+
+```text
+GET /api/v1/audit-logs?userId=:userId
+GET /api/v1/audit-logs?action=:action
+GET /api/v1/audit-logs?from=:startTimestamp&to=:endTimestamp
+```
+
+Audit logs should be append-only and should not expose update or deletion endpoints through the application API.
+
+### WebSocket
+
+```text
+GET /api/v1/ws/simulation
+```
+
+The simulation WebSocket broadcasts real-time events such as:
+
+```text
+tag.reading.updated
+device.status.changed
+alert.triggered
+alert.acknowledged
+alert.resolved
+simulation.started
+simulation.paused
+simulation.stopped
+```
+
+The client should retrieve initial state through the REST API and then use the WebSocket connection for incremental real-time updates.
+
+If the application later broadcasts events from both simulated and physical PLCs, the endpoint can be generalized to:
+
+```text
+GET /api/v1/ws
+```
+
+or:
+
+```text
+GET /api/v1/ws/realtime
+```
+
+This avoids tying the frontend real-time architecture exclusively to simulated data.
