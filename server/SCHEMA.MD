@@ -8,7 +8,6 @@ The schema assumes PostgreSQL and uses UUIDs for primary identifiers.
 
 ```mermaid
 erDiagram
-    USERS ||--o{ SESSIONS : has
     USERS ||--o{ ALERTS : acknowledges
     USERS ||--o{ AUDIT_LOGS : performs
 
@@ -40,7 +39,6 @@ Plant
     └── Simulation Scenarios
 
 User
-├── Sessions
 ├── Acknowledged Alerts
 └── Audit Logs
 ```
@@ -71,20 +69,7 @@ OPERATOR
 VIEWER
 ```
 
----
-
-## `sessions`
-
-Stores authenticated user sessions.
-
-| Field        | Type          | Constraints              |
-| ------------ | ------------- | ------------------------ |
-| `id`         | `UUID`        | Primary key              |
-| `user_id`    | `UUID`        | Foreign key → `users.id` |
-| `token_hash` | `TEXT`        | Not null                 |
-| `expires_at` | `TIMESTAMPTZ` | Not null                 |
-| `revoked_at` | `TIMESTAMPTZ` | Nullable                 |
-| `created_at` | `TIMESTAMPTZ` | Not null                 |
+Authentication uses stateless JWT access tokens. The backend validates the token on protected routes, and no database session table is required for the initial version.
 
 ---
 
@@ -408,7 +393,6 @@ Audit logs should be append-only.
 | Table                  | Purpose                               |
 | ---------------------- | ------------------------------------- |
 | `users`                | Application accounts and roles        |
-| `sessions`             | Authentication sessions               |
 | `plants`               | Monitored facilities                  |
 | `devices`              | PLCs and simulated controllers        |
 | `tags`                 | PLC variable definitions              |
