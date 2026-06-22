@@ -10,15 +10,15 @@ func SyncDatabase() {
 
 	err := DB.AutoMigrate(
 		&models.Users{},
-		// &models.Plant{},
-		// &models.Device{},
-		// &models.Tag{},
-		// &models.Reading{},
-		// &models.AlertRule{},
-		// &models.Alert{},
-		// &models.Simulation{},
-		// &models.SimulationScenario{},
-		// &models.AuditLog{},
+		&models.Plants{},
+		&models.Devices{},
+		&models.Tags{},
+		&models.TagReadings{},
+		&models.Alerts{},
+		&models.AlertRules{},
+		&models.Simulations{},
+		&models.SimulationScenarios{},
+		&models.AuditLogs{},
 	)
 	if err != nil {
 		log.Fatalf("failed to auto-migrate database schema: %v", err)
