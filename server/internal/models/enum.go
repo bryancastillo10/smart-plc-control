@@ -49,3 +49,30 @@ const (
 	Connecting   ConnectionStatus = "CONNECTING"
 	Error        ConnectionStatus = "ERROR"
 )
+
+type TagDataType string
+
+const (
+	BoolDataType   TagDataType = "BOOL"
+	IntDataType    TagDataType = "INT"
+	FloatDataType  TagDataType = "FLOAT"
+	StringDataType TagDataType = "STRING"
+)
+
+type ReadingQuality string
+
+const (
+	Good      ReadingQuality = "GOOD"
+	Uncertain ReadingQuality = "UNCERTAIN"
+	Bad       ReadingQuality = "BAD"
+	Stale     ReadingQuality = "STALE"
+)
+
+type ReadingSource string
+
+const (
+	SimulationSource ReadingSource = "SIMULATION"
+	ModbusSource     ReadingSource = "MODBUS"
+	OPCUASource      ReadingSource = "OPC_UA"
+	ManualSource     ReadingSource = "MANUAL"
+)
