@@ -20,11 +20,13 @@ GET    /api/v1/auth/me
 | Endpoint                     | Description                   | Access        |
 | ---------------------------- | ----------------------------- | ------------- |
 | `POST /api/v1/auth/login`    | Authenticate a user           | Public        |
-| `POST /api/v1/auth/logout`   | End the current session       | Authenticated |
+| `POST /api/v1/auth/logout`   | Log out the current user      | Authenticated |
 | `POST /api/v1/auth/register` | Create a new user account     | `ADMIN`       |
 | `GET /api/v1/auth/me`        | Return the authenticated user | Authenticated |
 
 Public self-registration is disabled. New users are created by an administrator.
+
+Because authentication uses stateless JWT access tokens, logout is primarily handled by the client removing the stored token. The backend may still record a `LOGOUT` audit event.
 
 ### Current User
 
@@ -53,12 +55,12 @@ DELETE   /api/v1/users/:userId
 | ------------------------------ | --------------------------------------------- | ------- |
 | `GET /api/v1/users`            | List application users                        | `ADMIN` |
 | `GET /api/v1/users/:userId`    | Get a user by ID                              | `ADMIN` |
-| `PUT /api/v1/users/:userId`  | Update a user, including their role or status | `ADMIN` |
-| `DELETE /api/v1/users/:userId` | Delete or deactivate a user                   | `ADMIN` |
+| `PUT /api/v1/users/:userId`  | Update a user, including their role and language | `ADMIN` |
+| `DELETE /api/v1/users/:userId` | Delete a user                                | `ADMIN` |
 
 An immutable user ID should be used instead of an email address when identifying users in URLs.
 
-For auditability, deactivating users may be preferable to permanently deleting them.
+For auditability, adding a future `is_active` field and deactivating users may be preferable to permanently deleting them.
 
 ### Plants
 
@@ -76,7 +78,30 @@ DELETE   /api/v1/plants/:plantId
 | `GET /api/v1/plants`             | List accessible plants    | Authenticated |
 | `GET /api/v1/plants/:plantId`    | Get plant details         | Authenticated |
 | `PUT /api/v1/plants/:plantId`  | Update a plant            | `ADMIN`       |
-| `DELETE /api/v1/plants/:plantId` | Delete or archive a plant | `ADMIN`       |
+| `DELETE /api/v1/plants/:plantId` | Delete a plant            | `ADMIN`       |
+
+### Process Units
+
+Process units represent physical or process areas inside a plant, such as tanks, reactors, clarifiers, membrane units, pump stations, or other treatment stages.
+
+```text
+POST     /api/v1/plants/:plantId/process-units
+GET      /api/v1/plants/:plantId/process-units
+
+GET      /api/v1/process-units/:processUnitId
+PUT      /api/v1/process-units/:processUnitId
+DELETE   /api/v1/process-units/:processUnitId
+```
+
+| Endpoint                                                | Description                       | Access        |
+| ------------------------------------------------------- | --------------------------------- | ------------- |
+| `POST /api/v1/plants/:plantId/process-units`            | Create a process unit for a plant | `ADMIN`       |
+| `GET /api/v1/plants/:plantId/process-units`             | List process units for a plant    | Authenticated |
+| `GET /api/v1/process-units/:processUnitId`              | Get process unit details          | Authenticated |
+| `PUT /api/v1/process-units/:processUnitId`              | Update a process unit             | `ADMIN`       |
+| `DELETE /api/v1/process-units/:processUnitId`           | Delete a process unit             | `ADMIN`       |
+
+Process unit `type` should be treated as a flexible string so the app can support different treatment systems, such as AD, AO, A2O, SBR, MBR, MBBR, or custom pilot processes.
 
 ### Devices
 
@@ -106,7 +131,7 @@ Device connection actions are modeled as explicit commands because they cause op
 The device list may support filters:
 
 ```text
-GET /api/v1/devices?plantId=:plantId&status=:status
+GET /api/v1/devices?plantId=:plantId&status=:status&type=:type&protocol=:protocol
 ```
 
 ### Tags
@@ -114,19 +139,31 @@ GET /api/v1/devices?plantId=:plantId&status=:status
 ```text
 POST     /api/v1/devices/:deviceId/tags
 GET      /api/v1/devices/:deviceId/tags
+GET      /api/v1/process-units/:processUnitId/tags
+GET      /api/v1/tags
 
 GET      /api/v1/tags/:tagId
 PUT    /api/v1/tags/:tagId
 DELETE   /api/v1/tags/:tagId
 ```
 
-| Endpoint                              | Description                          | Access        |
-| ------------------------------------- | ------------------------------------ | ------------- |
-| `POST /api/v1/devices/:deviceId/tags` | Create a tag for a device            | `ADMIN`       |
-| `GET /api/v1/devices/:deviceId/tags`  | List tags assigned to a device       | Authenticated |
-| `GET /api/v1/tags/:tagId`             | Get tag details and its latest value | Authenticated |
-| `PUT /api/v1/tags/:tagId`           | Update tag configuration             | `ADMIN`       |
-| `DELETE /api/v1/tags/:tagId`          | Delete a tag                         | `ADMIN`       |
+| Endpoint                                            | Description                          | Access        |
+| --------------------------------------------------- | ------------------------------------ | ------------- |
+| `POST /api/v1/devices/:deviceId/tags`               | Create a tag for a device            | `ADMIN`       |
+| `GET /api/v1/devices/:deviceId/tags`                | List tags assigned to a device       | Authenticated |
+| `GET /api/v1/process-units/:processUnitId/tags`     | List tags grouped under a process unit | Authenticated |
+| `GET /api/v1/tags`                                  | List tags with optional filters      | Authenticated |
+| `GET /api/v1/tags/:tagId`                           | Get tag details and its latest value | Authenticated |
+| `PUT /api/v1/tags/:tagId`                           | Update tag configuration             | `ADMIN`       |
+| `DELETE /api/v1/tags/:tagId`                        | Delete a tag                         | `ADMIN`       |
+
+The tag list may support filters:
+
+```text
+GET /api/v1/tags?plantId=:plantId&deviceId=:deviceId&processUnitId=:processUnitId&enabled=:enabled
+```
+
+When creating or updating a tag, `deviceId` is required and `processUnitId` is optional.
 
 Tag writes should use a separate endpoint if control operations are added later:
 
@@ -147,6 +184,7 @@ Example requests:
 
 ```text
 GET /api/v1/readings/latest?deviceId=:deviceId
+GET /api/v1/readings/latest?processUnitId=:processUnitId
 GET /api/v1/readings/latest?tagIds=:tagId1,:tagId2
 ```
 
@@ -193,6 +231,7 @@ Alerts represent actual events generated by the alert engine.
 GET    /api/v1/alerts
 GET    /api/v1/alerts/:alertId
 POST   /api/v1/alerts/:alertId/acknowledge
+POST   /api/v1/alerts/:alertId/resolve
 ```
 
 | Endpoint                                   | Description                       | Access              |
@@ -200,6 +239,7 @@ POST   /api/v1/alerts/:alertId/acknowledge
 | `GET /api/v1/alerts`                       | List active and historical alerts | Authenticated       |
 | `GET /api/v1/alerts/:alertId`              | Get alert details                 | Authenticated       |
 | `POST /api/v1/alerts/:alertId/acknowledge` | Acknowledge an active alert       | `ADMIN`, `OPERATOR` |
+| `POST /api/v1/alerts/:alertId/resolve`     | Manually resolve an alert         | `ADMIN`, `OPERATOR` |
 
 Example filters:
 
@@ -210,7 +250,7 @@ GET /api/v1/alerts?plantId=:plantId
 GET /api/v1/alerts?from=:startTimestamp&to=:endTimestamp
 ```
 
-Alert resolution should normally be performed automatically by the alert engine when the triggering condition returns to a normal state.
+Alert resolution should normally be performed automatically by the alert engine when the triggering condition returns to a normal state. The manual resolve endpoint is useful for simulated workflows or administrative correction.
 
 ### Simulations
 
@@ -218,12 +258,18 @@ Alert resolution should normally be performed automatically by the alert engine 
 POST   /api/v1/simulations
 GET    /api/v1/simulations
 GET    /api/v1/simulations/:simulationId
+PUT    /api/v1/simulations/:simulationId
+DELETE /api/v1/simulations/:simulationId
 
 POST   /api/v1/simulations/:simulationId/start
 POST   /api/v1/simulations/:simulationId/pause
 POST   /api/v1/simulations/:simulationId/stop
 
 GET    /api/v1/simulation-scenarios
+POST   /api/v1/simulations/:simulationId/scenarios
+GET    /api/v1/simulation-scenarios/:scenarioId
+PUT    /api/v1/simulation-scenarios/:scenarioId
+DELETE /api/v1/simulation-scenarios/:scenarioId
 POST   /api/v1/simulations/:simulationId/scenarios/:scenarioId/trigger
 ```
 
@@ -232,10 +278,16 @@ POST   /api/v1/simulations/:simulationId/scenarios/:scenarioId/trigger
 | `POST /api/v1/simulations`                                             | Create a simulation instance        | `ADMIN`             |
 | `GET /api/v1/simulations`                                              | List simulations and their statuses | Authenticated       |
 | `GET /api/v1/simulations/:simulationId`                                | Get simulation details              | Authenticated       |
+| `PUT /api/v1/simulations/:simulationId`                                | Update simulation configuration     | `ADMIN`             |
+| `DELETE /api/v1/simulations/:simulationId`                             | Delete a simulation                 | `ADMIN`             |
 | `POST /api/v1/simulations/:simulationId/start`                         | Start a simulation                  | `ADMIN`, `OPERATOR` |
 | `POST /api/v1/simulations/:simulationId/pause`                         | Pause a simulation                  | `ADMIN`, `OPERATOR` |
 | `POST /api/v1/simulations/:simulationId/stop`                          | Stop a simulation                   | `ADMIN`, `OPERATOR` |
 | `GET /api/v1/simulation-scenarios`                                     | List available fault scenarios      | Authenticated       |
+| `POST /api/v1/simulations/:simulationId/scenarios`                     | Create a scenario for a simulation  | `ADMIN`             |
+| `GET /api/v1/simulation-scenarios/:scenarioId`                         | Get scenario details                | Authenticated       |
+| `PUT /api/v1/simulation-scenarios/:scenarioId`                         | Update a scenario                   | `ADMIN`             |
+| `DELETE /api/v1/simulation-scenarios/:scenarioId`                      | Delete a scenario                   | `ADMIN`             |
 | `POST /api/v1/simulations/:simulationId/scenarios/:scenarioId/trigger` | Trigger a scenario                  | `ADMIN`, `OPERATOR` |
 
 Using `simulationId` allows the application to support multiple plants or simulation instances later.
