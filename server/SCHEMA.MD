@@ -118,23 +118,12 @@ For an anaerobic digestion plant, examples include influent tank, acid reactor, 
 | `id` | `UUID` | Primary key |
 | `plant_id` | `UUID` | Foreign key -> `plants.id` |
 | `name` | `VARCHAR(120)` | Not null |
-| `type` | `VARCHAR(40)` | Not null |
+| `type` | `VARCHAR(80)` | Not null |
 | `description` | `TEXT` | Nullable |
 | `status` | `VARCHAR(20)` | Not null, default `ACTIVE` |
 | `created_at` | `TIMESTAMPTZ` | Not null |
 | `updated_at` | `TIMESTAMPTZ` | Not null |
 
-Allowed process unit types:
-
-```text
-INFLUENT_TANK
-ACID_REACTOR
-METHANE_REACTOR
-GAS_STORAGE
-EFFLUENT_TANK
-PUMP_STATION
-OTHER
-```
 
 Allowed statuses:
 
