@@ -6,6 +6,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	"smart-plc-control-server/internal/middleware"
 )
 
 func RunGin(config cors.Config) {
@@ -25,7 +27,7 @@ func RunGin(config cors.Config) {
 		}
 	}
 
-	// r.Use(middleware.ErrorHandler())
+	r.Use(middleware.ErrorHandler())
 
 	RegisterRoutes(r)
 
