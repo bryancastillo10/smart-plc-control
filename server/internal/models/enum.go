@@ -76,3 +76,31 @@ const (
 	OPCUASource      ReadingSource = "OPC_UA"
 	ManualSource     ReadingSource = "MANUAL"
 )
+
+type AlertOperator string
+
+const (
+	GreaterThan          AlertOperator = "GT"
+	GreaterThanOrEqualTo AlertOperator = "GTE"
+	LessThan             AlertOperator = "LT"
+	LessThanOrEqualTo    AlertOperator = "LTE"
+	EqualTo              AlertOperator = "EQ"
+	NotEqualTo           AlertOperator = "NEQ"
+)
+
+type AlertSeverity string
+
+const (
+	LowSeverity      AlertSeverity = "LOW"
+	MediumSeverity   AlertSeverity = "MEDIUM"
+	HighSeverity     AlertSeverity = "HIGH"
+	CriticalSeverity AlertSeverity = "CRITICAL"
+)
+
+type AlertStatus string
+
+const (
+	AlertActive       AlertStatus = "ACTIVE"
+	AlertAcknowledged AlertStatus = "ACKNOWLEDGED"
+	AlertResolved     AlertStatus = "RESOLVED"
+)
