@@ -9,6 +9,9 @@ import (
 func main() {
 	config.LoadEnvVariables()
 
+	// add --migrate in running Go if it needs db migration
+	config.HandleMigrationFlag()
+
 	database.ConnectDb()
 
 	bootstrap.RunGin(config.CORS())

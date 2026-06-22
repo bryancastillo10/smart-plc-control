@@ -15,7 +15,7 @@ func HandleMigrationFlag() {
 		database.ConnectDb()
 
 		log.Println("Starting automigrate...")
-		// database.SyncDatabase()
+		database.SyncDatabase()
 
 		log.Println("Migration complete... exiting...")
 		os.Exit(0)
