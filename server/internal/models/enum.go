@@ -104,3 +104,12 @@ const (
 	AlertAcknowledged AlertStatus = "ACKNOWLEDGED"
 	AlertResolved     AlertStatus = "RESOLVED"
 )
+
+type SimulationStatus string
+
+const (
+	SimulationIdle    SimulationStatus = "IDLE"
+	SimulationRunning SimulationStatus = "RUNNING"
+	SimulationPaused  SimulationStatus = "PAUSED"
+	SimulationStopped SimulationStatus = "STOPPED"
+)
