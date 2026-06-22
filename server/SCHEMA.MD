@@ -57,7 +57,6 @@ Stores application users and their assigned roles.
 | `password_hash` | `TEXT`         | Not null                 |
 | `role`          | `VARCHAR(20)`  | Not null                 |
 | `language`      | `VARCHAR(10)`  | Not null, default `EN`   |
-| `is_active`     | `BOOLEAN`      | Not null, default `TRUE` |
 | `created_at`    | `TIMESTAMPTZ`  | Not null                 |
 | `updated_at`    | `TIMESTAMPTZ`  | Not null                 |
 

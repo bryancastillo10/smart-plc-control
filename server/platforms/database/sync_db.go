@@ -2,13 +2,14 @@ package database
 
 import (
 	"log"
+	"smart-plc-control-server/internal/models"
 )
 
 func SyncDatabase() {
 	log.Println("Syncing declared database schema...")
 
 	err := DB.AutoMigrate(
-		// &models.User{},
+		&models.Users{},
 		// &models.Plant{},
 		// &models.Device{},
 		// &models.Tag{},
