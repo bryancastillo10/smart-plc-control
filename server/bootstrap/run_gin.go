@@ -7,9 +7,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
- 
 
-func RunGin (config cors.Config) {
+func RunGin(config cors.Config) {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
