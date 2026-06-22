@@ -80,7 +80,7 @@ Stores monitored plants or facilities.
 | ------------- | -------------- | -------------------------- |
 | `id`          | `UUID`         | Primary key                |
 | `name`        | `VARCHAR(120)` | Not null                   |
-| `location`    | `VARCHAR(255)` | Nullable                   |
+| `location`    | `VARCHAR(200)` | Nullable                   |
 | `description` | `TEXT`         | Nullable                   |
 | `status`      | `VARCHAR(20)`  | Not null, default `ACTIVE` |
 | `created_at`  | `TIMESTAMPTZ`  | Not null                   |
