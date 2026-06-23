@@ -1,0 +1,27 @@
+export const zhTW = {
+	login: {
+		appName: "ProcessPulse",
+		kicker: "廢水處理程序控制",
+		title: "登入控制平台",
+		subtitle: "安全存取廢水處理監控、PLC 連線、警報與操作管理。",
+		username: "使用者名稱",
+		usernamePlaceholder: "admin",
+		password: "密碼",
+		passwordPlaceholder: "輸入密碼",
+		language: "語言",
+		signIn: "登入",
+		signingIn: "登入中...",
+		notice: "帳號由管理員建立，不開放公開註冊。",
+		adminOnly: "管理員建立帳號",
+		processes: "支援 AD、AO、A2O、SBR、MBR 與試驗程序",
+		role: "依角色授權",
+		roleText: "API 會控管管理員、操作員與檢視者權限。",
+		control: "PLC 就緒",
+		controlText: "適用於設備、標籤、即時讀值、警報與稽核紀錄。",
+		required: "請輸入使用者名稱與密碼。",
+		unavailable:
+			"登入服務尚未啟用。前端已準備串接 POST /api/v1/auth/login。",
+		failed: "無法登入，請確認帳號密碼後再試一次。",
+		success: "登入成功。",
+	},
+}
