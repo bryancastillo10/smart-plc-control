@@ -1,6 +1,9 @@
 package auth
 
-import "smart-plc-control-server/internal/models"
+import (
+	"smart-plc-control-server/internal/models"
+	"time"
+)
 
 type SignUpRequest struct {
 	UserName        string      `json:"username" binding:"required,min=3,max=100"`
@@ -23,4 +26,13 @@ type JWTAuthResponse struct {
 
 type ErrorResponse struct {
 	Error string `json:"error"`
+}
+
+type CurrentUserResponse struct {
+	UserName  string          `json:"username"`
+	Email     string          `json:"email"`
+	Role      models.Role     `json:"role"`
+	Language  models.Language `json:"language"`
+	CreatedAt time.Time       `json:"created_at"`
+	UpdatedAt time.Time       `json:"updated_at"`
 }
