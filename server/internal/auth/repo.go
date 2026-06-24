@@ -1,9 +1,6 @@
 package auth
 
 import (
-	"context"
-	"errors"
-
 	"smart-plc-control-server/internal/models"
 
 	"gorm.io/gorm"
@@ -17,24 +14,21 @@ func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) ExistsByEmail(ctx context.Context, email string) (bool, error) {
+func (r *Repository) FindUserByEmail(email string) (*models.Users, error) {
 	var user models.Users
-	err := r.db.WithContext(ctx).
-		Select("id").
-		Where("email = ?", email).
-		First(&user).
-		Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return false, nil
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
 	}
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return &user, nil
 }
 
-func (r *Repository) CreateUser(ctx context.Context, user *models.Users) error {
-	return r.db.WithContext(ctx).Create(user).Error
+func (r *Repository) CreateUser(user *models.Users) (*models.Users, error) {
+	if err := r.db.Create(user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
