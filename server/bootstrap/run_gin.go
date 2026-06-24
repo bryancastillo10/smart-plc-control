@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"smart-plc-control-server/internal/middleware"
+	"smart-plc-control-server/platforms/database"
 )
 
 func RunGin(config cors.Config) {
@@ -29,7 +30,7 @@ func RunGin(config cors.Config) {
 
 	r.Use(middleware.ErrorHandler())
 
-	RegisterRoutes(r)
+	RegisterRoutes(r, database.DB)
 
 	err := r.Run("0.0.0.0:" + port)
 	if err != nil {

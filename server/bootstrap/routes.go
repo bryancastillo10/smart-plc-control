@@ -1,17 +1,37 @@
 package bootstrap
 
 import (
-	"smart-plc-control-server/internal/auth"
-	"smart-plc-control-server/platforms/database"
-
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
+	"smart-plc-control-server/internal/auth"
 )
 
-func RegisterRoutes(r *gin.Engine) {
-	api := r.Group("/api/v1")
+func RegisterRoutes(r *gin.Engine, DB *gorm.DB) {
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "🔧 Smart PLC Control Server is running"})
+	})
 
-	authRepo := auth.NewRepository(database.DB)
-	authService := auth.NewService(authRepo)
-	authHandler := auth.NewHandler(authService)
-	authHandler.RegisterRoutes(api)
+	v1 := r.Group("/api/v1")
+
+	// Baseline Feature Routes
+	registerAuth(v1, DB)
+}
+
+func registerAuth(r *gin.RouterGroup, DB *gorm.DB) {
+	auth := auth.NewHandler(DB)
+
+	authGrp := r.Group("/auth")
+	{
+		// TODO: Restrict registration to ADMIN users after the initial admin/bootstrap flow exists.
+		authGrp.POST("/register", auth.SignUp)
+	}
+}
+
+func registerUser(r *gin.RouterGroup) {
+
+}
+
+func registerPlant(r *gin.RouterGroup) {
+
 }
