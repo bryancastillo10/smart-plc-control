@@ -11,11 +11,12 @@ func SyncDatabase() {
 	err := DB.AutoMigrate(
 		&models.Users{},
 		&models.Plants{},
+		&models.ProcessUnits{},
 		&models.Devices{},
 		&models.Tags{},
 		&models.TagReadings{},
-		&models.Alerts{},
 		&models.AlertRules{},
+		&models.Alerts{},
 		&models.Simulations{},
 		&models.SimulationScenarios{},
 		&models.AuditLogs{},

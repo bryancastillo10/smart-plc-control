@@ -22,7 +22,11 @@ func ConnectDb() {
 		log.Fatal("Unkown DB_NAME")
 	}
 
-	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dbUrl,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
+
 	if err != nil {
 		log.Fatalf("%v is connected successfully", err)
 	}
