@@ -32,3 +32,14 @@ func (r *Repository) CreateUser(user *models.Users) (*models.Users, error) {
 
 	return user, nil
 }
+
+func (r *Repository) FindUserByID(userID string) (*models.Users, error) {
+	var user models.Users
+	if err := r.db.Where("id = ?", userID).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
+}
