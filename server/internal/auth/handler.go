@@ -38,3 +38,28 @@ func (h *Handler) SignUp(c *gin.Context) {
 		"user":    user,
 	})
 }
+
+func (h *Handler) LogIn(c *gin.Context) {
+	req, err := http.BindJSON[SignInRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	user, token, err := h.service.LogIn(*req)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	utils.SetCookie(c, token, 3600*5)
+
+	c.JSON(200, gin.H{
+		"message": "Signed In Successfully",
+		"user":    user,
+	})
+}
+
+func (h *Handler) SignOut(c *gin.Context) {
+
+}
