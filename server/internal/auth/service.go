@@ -21,17 +21,13 @@ func (s *Service) SignUp(req SignUpRequest) (*JWTAuthResponse, string, error) {
 	}
 
 	// Existing User Validation
-	user, err := s.repo.FindUserByEmail(req.Email)
+	existingUser, err := s.repo.FindUserByEmail(req.Email)
 	if err != nil {
-		return nil, "", appErr.NewNotFound("Failed to verify if user exists", err)
-	}
-	if user == nil {
-		return nil, "", appErr.NewBadRequest("Invalid email or password", nil)
+		return nil, "", appErr.NewBadRequest("Failed to verify if the email exists", err)
 	}
 
-	// Password Validation
-	if err := utils.ValidatePassword(user.PasswordHash, req.Password); err != nil {
-		return nil, "", appErr.NewBadRequest("Invalid email or password", nil)
+	if existingUser != nil {
+		return nil, "", appErr.NewBadRequest("User with that email already exists", nil)
 	}
 
 	// Role Validation
@@ -95,6 +91,10 @@ func (s *Service) LogIn(req SignInRequest) (*JWTAuthResponse, string, error) {
 		return nil, "", appErr.NewBadRequest("Invalid email or password", nil)
 	}
 
+	if err := utils.ValidatePassword(user.PasswordHash, req.Password); err != nil {
+		return nil, "", appErr.NewBadRequest("Invalid email or password", nil)
+	}
+
 	// JWT Token Generation
 	token, err := utils.GenerateJWT(user)
 	if err != nil {
@@ -108,4 +108,27 @@ func (s *Service) LogIn(req SignInRequest) (*JWTAuthResponse, string, error) {
 	}
 
 	return &userResp, token, nil
+}
+
+func (s *Service) GetCurrentUser(userID string) (*CurrentUserResponse, error) {
+	if userID == "" {
+		return nil, appErr.NewUnauthorized("Missing authenticated user", nil)
+	}
+
+	user, err := s.repo.FindUserByID(userID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get current user", err)
+	}
+	if user == nil {
+		return nil, appErr.NewNotFound("User not found", nil)
+	}
+
+	return &CurrentUserResponse{
+		UserName:  user.UserName,
+		Email:     user.Email,
+		Role:      user.Role,
+		Language:  user.Language,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}, nil
 }
