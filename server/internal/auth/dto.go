@@ -1,27 +1,24 @@
 package auth
 
-import (
-	"time"
+import "smart-plc-control-server/internal/models"
 
-	"github.com/google/uuid"
-)
-
-type RegisterRequest struct {
-	UserName string `json:"username" binding:"required,min=3,max=100"`
-	Email    string `json:"email" binding:"required,email,max=255"`
-	Password string `json:"password" binding:"required,min=8"`
-	Role     string `json:"role" binding:"omitempty,oneof=ADMIN OPERATOR VIEWER"`
-	Language string `json:"language" binding:"omitempty,oneof=EN ZH-TW"`
+type SignUpRequest struct {
+	UserName        string      `json:"username" binding:"required,min=3,max=100"`
+	Email           string      `json:"email" binding:"required,email,max=255"`
+	Password        string      `json:"password" binding:"required"`
+	ConfirmPassword string      `json:"confirmPassword" binding:"required"`
+	Role            models.Role `json:"role"`
+	Language        string      `json:"language" binding:"omitempty,oneof=EN ZH-TW"`
 }
 
-type UserResponse struct {
-	ID        uuid.UUID `json:"id"`
-	UserName  string    `json:"username"`
-	Email     string    `json:"email"`
-	Role      string    `json:"role"`
-	Language  string    `json:"language"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+type SignInRequest struct {
+	Email    string `json:"email" binding:"required,email,max=255"`
+	Password string `json:"password" binding:"required"`
+}
+
+type JWTAuthResponse struct {
+	ID   string `json:"id"`
+	Role string `json:"role" binding:"omitempty,oneof=ADMIN OPERATOR VIEWER"`
 }
 
 type ErrorResponse struct {
