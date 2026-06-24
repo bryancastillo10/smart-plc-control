@@ -1,20 +1,9 @@
 package auth
 
 import (
-	"context"
-	"errors"
-	"strings"
-
 	"smart-plc-control-server/internal/models"
-
-	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
-)
-
-var (
-	ErrEmailAlreadyExists = errors.New("email already exists")
-	ErrInvalidRole        = errors.New("invalid role")
-	ErrInvalidLanguage    = errors.New("invalid language")
+	appErr "smart-plc-control-server/pkg/errors"
+	"smart-plc-control-server/pkg/utils"
 )
 
 type Service struct {
@@ -25,83 +14,64 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) Register(ctx context.Context, req RegisterRequest) (*UserResponse, error) {
-	email := strings.ToLower(strings.TrimSpace(req.Email))
-	exists, err := s.repo.ExistsByEmail(ctx, email)
+func (s *Service) SignUp(req SignUpRequest) (*JWTAuthResponse, string, error) {
+	// Missing Required Validation
+	if req.Email == "" || req.UserName == "" || req.Role == "" {
+		return nil, "", appErr.NewBadRequest("Missing required fields", nil)
+	}
+
+	// Existing User Validation
+	existingUser, err := s.repo.FindUserByEmail(req.Email)
 	if err != nil {
-		return nil, err
-	}
-	if exists {
-		return nil, ErrEmailAlreadyExists
+		return nil, "", appErr.NewBadRequest("Failed to verify if the email exists", err)
 	}
 
-	role, err := normalizeRole(req.Role)
+	if existingUser != nil {
+		return nil, "", appErr.NewBadRequest("User with that email already exists", nil)
+	}
+
+	// Role Validation
+	if req.Role != "ADMIN" && req.Role != "OPERATOR" && req.Role != "VIEWER" {
+		return nil, "", appErr.NewBadRequest("Invalid Role", nil)
+	}
+
+	// Password Validation
+	if req.Password != req.ConfirmPassword {
+		return nil, "", appErr.NewBadRequest("Password does not match", nil)
+	}
+
+	// Password Hashing
+	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
-		return nil, err
+		return nil, "", appErr.NewInternal("Failed to hash the password", nil)
 	}
 
-	language, err := normalizeLanguage(req.Language)
+	// Register User Data Preparation
+	userId := utils.GenerateUUID()
+
+	newUser := &models.Users{
+		ID:           userId,
+		UserName:     req.UserName,
+		Email:        req.Email,
+		PasswordHash: hashedPassword,
+		Role:         req.Role,
+		Language:     "EN",
+	}
+
+	createdUser, err := s.repo.CreateUser(newUser)
 	if err != nil {
-		return nil, err
+		return nil, "", appErr.NewInternal("Failed to create the user", err)
 	}
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	registeredUserRes := JWTAuthResponse{
+		ID:   createdUser.ID.String(),
+		Role: string(createdUser.Role),
+	}
+
+	token, err := utils.GenerateJWT(createdUser)
 	if err != nil {
-		return nil, err
+		return nil, "", appErr.NewInternal("Failed to generate token", err)
 	}
 
-	user := &models.Users{
-		ID:           uuid.New(),
-		UserName:     strings.TrimSpace(req.UserName),
-		Email:        email,
-		PasswordHash: string(passwordHash),
-		Role:         role,
-		Language:     language,
-	}
-
-	if err := s.repo.CreateUser(ctx, user); err != nil {
-		return nil, err
-	}
-
-	return toUserResponse(user), nil
-}
-
-func normalizeRole(value string) (models.Role, error) {
-	switch models.Role(strings.ToUpper(strings.TrimSpace(value))) {
-	case "":
-		return models.Viewer, nil
-	case models.Admin:
-		return models.Admin, nil
-	case models.Operator:
-		return models.Operator, nil
-	case models.Viewer:
-		return models.Viewer, nil
-	default:
-		return "", ErrInvalidRole
-	}
-}
-
-func normalizeLanguage(value string) (models.Language, error) {
-	switch models.Language(strings.ToUpper(strings.TrimSpace(value))) {
-	case "":
-		return models.English, nil
-	case models.English:
-		return models.English, nil
-	case models.Chinese:
-		return models.Chinese, nil
-	default:
-		return "", ErrInvalidLanguage
-	}
-}
-
-func toUserResponse(user *models.Users) *UserResponse {
-	return &UserResponse{
-		ID:        user.ID,
-		UserName:  user.UserName,
-		Email:     user.Email,
-		Role:      string(user.Role),
-		Language:  string(user.Language),
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-	}
+	return &registeredUserRes, token, nil
 }
