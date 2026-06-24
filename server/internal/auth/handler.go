@@ -60,6 +60,14 @@ func (h *Handler) LogIn(c *gin.Context) {
 	})
 }
 
-func (h *Handler) SignOut(c *gin.Context) {
+func (h *Handler) LogOut(c *gin.Context) {
+	utils.ClearCookie(c)
+
+	c.JSON(200, gin.H{
+		"message": "You have signed out successfully",
+	})
+}
+
+func (h *Handler) GetCurrentUser(c *gin.Context) {
 
 }
