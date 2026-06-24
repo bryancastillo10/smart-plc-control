@@ -1,6 +1,7 @@
-package auth
+﻿package auth
 
 import (
+	appErr "smart-plc-control-server/pkg/errors"
 	"smart-plc-control-server/pkg/http"
 	"smart-plc-control-server/pkg/utils"
 
@@ -69,5 +70,23 @@ func (h *Handler) LogOut(c *gin.Context) {
 }
 
 func (h *Handler) GetCurrentUser(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.Error(appErr.NewUnauthorized("Missing authenticated user", nil))
+		return
+	}
 
+	userIDStr, ok := userID.(string)
+	if !ok || userIDStr == "" {
+		c.Error(appErr.NewUnauthorized("Invalid authenticated user", nil))
+		return
+	}
+
+	user, err := h.service.GetCurrentUser(userIDStr)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, user)
 }
