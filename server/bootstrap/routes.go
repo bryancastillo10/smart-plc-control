@@ -25,6 +25,9 @@ func registerAuth(r *gin.RouterGroup, DB *gorm.DB) {
 	{
 		// TODO: Restrict registration to ADMIN users after the initial admin/bootstrap flow exists.
 		authGrp.POST("/register", auth.SignUp)
+		authGrp.POST("/login")
+		authGrp.POST("/logout")
+		authGrp.GET("/me")
 	}
 }
 
