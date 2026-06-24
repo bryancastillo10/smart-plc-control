@@ -15,19 +15,23 @@ func NewService(repo *Repository) *Service {
 }
 
 func (s *Service) SignUp(req SignUpRequest) (*JWTAuthResponse, string, error) {
-	// Missing Required Validation
+	// Missing Required Field Validation
 	if req.Email == "" || req.UserName == "" || req.Role == "" {
 		return nil, "", appErr.NewBadRequest("Missing required fields", nil)
 	}
 
 	// Existing User Validation
-	existingUser, err := s.repo.FindUserByEmail(req.Email)
+	user, err := s.repo.FindUserByEmail(req.Email)
 	if err != nil {
-		return nil, "", appErr.NewBadRequest("Failed to verify if the email exists", err)
+		return nil, "", appErr.NewNotFound("Failed to verify if user exists", err)
+	}
+	if user == nil {
+		return nil, "", appErr.NewBadRequest("Invalid email or password", nil)
 	}
 
-	if existingUser != nil {
-		return nil, "", appErr.NewBadRequest("User with that email already exists", nil)
+	// Password Validation
+	if err := utils.ValidatePassword(user.PasswordHash, req.Password); err != nil {
+		return nil, "", appErr.NewBadRequest("Invalid email or password", nil)
 	}
 
 	// Role Validation
@@ -74,4 +78,34 @@ func (s *Service) SignUp(req SignUpRequest) (*JWTAuthResponse, string, error) {
 	}
 
 	return &registeredUserRes, token, nil
+}
+
+func (s *Service) LogIn(req SignInRequest) (*JWTAuthResponse, string, error) {
+	// Missing Required Field Validation
+	if req.Email == "" || req.Password == "" {
+		return nil, "", appErr.NewBadRequest("Missing required fields", nil)
+	}
+
+	// Validate if user exists
+	user, err := s.repo.FindUserByEmail(req.Email)
+	if err != nil {
+		return nil, "", appErr.NewNotFound("Failed to verify if user exists", err)
+	}
+	if user == nil {
+		return nil, "", appErr.NewBadRequest("Invalid email or password", nil)
+	}
+
+	// JWT Token Generation
+	token, err := utils.GenerateJWT(user)
+	if err != nil {
+		return nil, "", appErr.NewInternal("Failed to generate token", err)
+	}
+
+	// Return Data
+	userResp := JWTAuthResponse{
+		ID:   user.ID.String(),
+		Role: string(user.Role),
+	}
+
+	return &userResp, token, nil
 }
