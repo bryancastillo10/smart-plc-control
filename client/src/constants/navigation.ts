@@ -1,3 +1,4 @@
+﻿import type { LucideIcon } from "lucide-react";
 import {
 	BellRing,
 	ChartNoAxesCombined,
@@ -5,49 +6,50 @@ import {
 	Settings,
 	SlidersHorizontal,
 	Tags,
-
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
 export type SidebarNavItem = {
 	label: string;
 	description: string;
 	icon: LucideIcon;
-	href?: string;
-	isActive?: boolean;
+	href: string;
 };
 
-export const navigationItems: SidebarNavItem[] = [
+export const navigationItems = [
 	{
 		label: "Dashboard",
 		description: "System overview",
 		icon: ChartNoAxesCombined,
 		href: "/dashboard",
-		isActive: true,
 	},
 	{
 		label: "PLC Control",
 		description: "Live operations",
 		icon: SlidersHorizontal,
+		href: "/plc",
 	},
 	{
 		label: "Equipment",
 		description: "Devices and stations",
 		icon: Gauge,
+		href: "/equipment",
 	},
 	{
 		label: "Tags",
 		description: "Signals and readings",
 		icon: Tags,
+		href: "/tags",
 	},
 	{
 		label: "Alarms",
 		description: "Active events",
 		icon: BellRing,
+		href: "/alarms",
 	},
 	{
 		label: "Settings",
 		description: "System preferences",
 		icon: Settings,
+		href: "/settings",
 	},
-];
+] as const satisfies readonly SidebarNavItem[];
