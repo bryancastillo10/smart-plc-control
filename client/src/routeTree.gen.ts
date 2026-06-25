@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTagsRouteImport } from './routes/_authenticated/tags'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedPlcRouteImport } from './routes/_authenticated/plc'
+import { Route as AuthenticatedPlantSetupRouteImport } from './routes/_authenticated/plant-setup'
 import { Route as AuthenticatedEquipmentRouteImport } from './routes/_authenticated/equipment'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAlarmsRouteImport } from './routes/_authenticated/alarms'
@@ -42,6 +43,11 @@ const AuthenticatedPlcRoute = AuthenticatedPlcRouteImport.update({
   path: '/plc',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPlantSetupRoute = AuthenticatedPlantSetupRouteImport.update({
+  id: '/plant-setup',
+  path: '/plant-setup',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedEquipmentRoute = AuthenticatedEquipmentRouteImport.update({
   id: '/equipment',
   path: '/equipment',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/alarms': typeof AuthenticatedAlarmsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/equipment': typeof AuthenticatedEquipmentRoute
+  '/plant-setup': typeof AuthenticatedPlantSetupRoute
   '/plc': typeof AuthenticatedPlcRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tags': typeof AuthenticatedTagsRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByTo {
   '/alarms': typeof AuthenticatedAlarmsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/equipment': typeof AuthenticatedEquipmentRoute
+  '/plant-setup': typeof AuthenticatedPlantSetupRoute
   '/plc': typeof AuthenticatedPlcRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tags': typeof AuthenticatedTagsRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/equipment': typeof AuthenticatedEquipmentRoute
+  '/_authenticated/plant-setup': typeof AuthenticatedPlantSetupRoute
   '/_authenticated/plc': typeof AuthenticatedPlcRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tags': typeof AuthenticatedTagsRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
     | '/alarms'
     | '/dashboard'
     | '/equipment'
+    | '/plant-setup'
     | '/plc'
     | '/settings'
     | '/tags'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/alarms'
     | '/dashboard'
     | '/equipment'
+    | '/plant-setup'
     | '/plc'
     | '/settings'
     | '/tags'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/_authenticated/alarms'
     | '/_authenticated/dashboard'
     | '/_authenticated/equipment'
+    | '/_authenticated/plant-setup'
     | '/_authenticated/plc'
     | '/_authenticated/settings'
     | '/_authenticated/tags'
@@ -160,6 +172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlcRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/plant-setup': {
+      id: '/_authenticated/plant-setup'
+      path: '/plant-setup'
+      fullPath: '/plant-setup'
+      preLoaderRoute: typeof AuthenticatedPlantSetupRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/equipment': {
       id: '/_authenticated/equipment'
       path: '/equipment'
@@ -188,6 +207,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAlarmsRoute: typeof AuthenticatedAlarmsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEquipmentRoute: typeof AuthenticatedEquipmentRoute
+  AuthenticatedPlantSetupRoute: typeof AuthenticatedPlantSetupRoute
   AuthenticatedPlcRoute: typeof AuthenticatedPlcRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTagsRoute: typeof AuthenticatedTagsRoute
@@ -197,6 +217,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAlarmsRoute: AuthenticatedAlarmsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEquipmentRoute: AuthenticatedEquipmentRoute,
+  AuthenticatedPlantSetupRoute: AuthenticatedPlantSetupRoute,
   AuthenticatedPlcRoute: AuthenticatedPlcRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTagsRoute: AuthenticatedTagsRoute,

@@ -1,6 +1,7 @@
 ﻿import type { LucideIcon } from "lucide-react";
 import {
 	BellRing,
+	Building2,
 	ChartNoAxesCombined,
 	Gauge,
 	Settings,
@@ -16,6 +17,12 @@ export type SidebarNavItem = {
 };
 
 export const navigationItems = [
+	{
+		label: "Plant Setup",
+		description: "First-run access",
+		icon: Building2,
+		href: "/plant-setup",
+	},
 	{
 		label: "Dashboard",
 		description: "System overview",
