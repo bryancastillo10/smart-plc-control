@@ -1,6 +1,6 @@
 import { cva } from "@/utils/utils";
 
-export const appLayout = {
+export const homeLayout = {
 	page: "min-h-screen px-4 py-6 text-brand-ink sm:px-6 lg:px-8",
 	viewport:
 		"mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-6xl items-center",
@@ -140,3 +140,50 @@ export const appFeedbackVariants = cva(
 		},
 	},
 );
+
+export const appLayout = {
+	root: "flex min-h-screen bg-background text-foreground",
+	contentColumn: "flex min-w-0 flex-1 flex-col",
+	navbar:
+		"flex min-h-20 items-center justify-between gap-6 border-b border-line-subtle bg-white/45 px-6 py-4 backdrop-blur",
+	navbarKicker:
+		"text-xs font-bold uppercase tracking-[0.16em] text-brand-kicker",
+	navbarTitle: "mt-1 text-2xl font-bold text-brand-ink",
+	navbarDescription:
+		"hidden max-w-md text-right text-sm leading-6 text-brand-muted lg:block",
+	main: "min-w-0 flex-1 px-6 py-6",
+} as const;
+
+export const appSidebar = {
+	root: "flex min-h-screen w-72 shrink-0 flex-col border-r border-line-subtle bg-surface-strong/85 px-4 py-5 shadow-sm backdrop-blur",
+	brandBlock: "flex items-center gap-3 px-2 pb-5",
+	brandIcon:
+		"flex size-10 items-center justify-center rounded-md bg-brand-control text-white shadow-sm",
+	brandTitle: "truncate text-sm font-bold text-brand-ink",
+	brandSubtitle: "truncate text-xs font-medium text-brand-muted",
+	nav: "flex flex-1 flex-col gap-1 py-3",
+	navItem: cva(
+		"flex items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors",
+		{
+			variants: {
+				state: {
+					active: "bg-chip text-brand-ink shadow-sm ring-1 ring-chip-line",
+					idle: "text-brand-muted hover:bg-chip hover:text-brand-ink",
+					disabled: "cursor-not-allowed text-brand-muted/55 opacity-70",
+				},
+			},
+			defaultVariants: {
+				state: "idle",
+			},
+		},
+	),
+	navLabel: "block truncate text-sm font-semibold",
+	navDescription: "mt-0.5 block truncate text-xs text-brand-muted",
+	authPanel:
+		"mt-auto rounded-md border border-line-subtle bg-white/55 p-3 shadow-sm backdrop-blur",
+	userRow: "mb-3 flex items-center gap-3",
+	userIcon: "flex size-9 items-center justify-center rounded-md bg-white/75",
+	userName: "truncate text-sm font-bold text-brand-ink",
+	userMeta: "truncate text-xs text-brand-muted",
+	logoutButton: "w-full justify-start bg-white/60",
+} as const;
