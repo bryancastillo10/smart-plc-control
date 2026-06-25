@@ -27,7 +27,7 @@ import {
 	appControl,
 	appFeedbackVariants,
 	appIconVariants,
-	appLayout,
+	homeLayout,
 	appSurfaceVariants,
 	appTextVariants,
 } from "@/styles/recipes";
@@ -102,16 +102,16 @@ const LoginPage = () => {
 	}
 
 	return (
-		<main className={appLayout.page}>
-			<div className={appLayout.viewport}>
-				<section className={appLayout.splitGrid}>
-					<div className={appLayout.primaryColumn}>
-						<div className={appLayout.stackLg}>
+		<main className={homeLayout.page}>
+			<div className={homeLayout.viewport}>
+				<section className={homeLayout.splitGrid}>
+					<div className={homeLayout.primaryColumn}>
+						<div className={homeLayout.stackLg}>
 							<div className={appBadgeVariants()}>
 								<Activity className="size-4" aria-hidden="true" />
 								{t("kicker")}
 							</div>
-							<div className={appLayout.stackMd}>
+							<div className={homeLayout.stackMd}>
 								<h1 className={appTextVariants({ role: "pageTitle" })}>
 									{t("appName")}
 								</h1>
@@ -121,7 +121,7 @@ const LoginPage = () => {
 							</div>
 						</div>
 
-						<div className={appLayout.responsiveGrid3}>
+						<div className={homeLayout.responsiveGrid3}>
 							<InfoTile
 								icon={BadgeCheck}
 								title={t("adminOnly")}
@@ -144,9 +144,9 @@ const LoginPage = () => {
 						</div>
 					</div>
 
-					<div className={appLayout.secondaryColumn}>
+					<div className={homeLayout.secondaryColumn}>
 						<div className={appSurfaceVariants({ variant: "panel" })}>
-							<div className={appLayout.headerRow}>
+							<div className={homeLayout.headerRow}>
 								<div>
 									<p className="island-kicker mb-2">{t("language")}</p>
 									<h2 className={appTextVariants({ role: "sectionTitle" })}>
@@ -171,10 +171,10 @@ const LoginPage = () => {
 								</Select>
 							</div>
 
-							<form className={appLayout.form} onSubmit={handleSubmit}>
-								<div className={appLayout.field}>
+							<form className={homeLayout.form} onSubmit={handleSubmit}>
+								<div className={homeLayout.field}>
 									<Label htmlFor="username">{t("username")}</Label>
-									<div className={appLayout.iconField}>
+									<div className={homeLayout.iconField}>
 										<UserRound
 											className={appIconVariants({
 												tone: "muted",
@@ -193,9 +193,9 @@ const LoginPage = () => {
 									</div>
 								</div>
 
-								<div className={appLayout.field}>
+								<div className={homeLayout.field}>
 									<Label htmlFor="password">{t("password")}</Label>
-									<div className={appLayout.iconField}>
+									<div className={homeLayout.iconField}>
 										<LockKeyhole
 											className={appIconVariants({
 												tone: "muted",
