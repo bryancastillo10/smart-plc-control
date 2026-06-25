@@ -1,4 +1,9 @@
 import type { LucideIcon } from "lucide-react";
+import {
+	appIconVariants,
+	appSurfaceVariants,
+	appTextVariants,
+} from "@/styles/recipes";
 
 interface InfoTileProps {
 	icon: LucideIcon;
@@ -6,21 +11,18 @@ interface InfoTileProps {
 	text: string;
 }
 
-
-const InfoTile = ({icon: Icon,
-	title,
-	text,}: InfoTileProps) => {
- return (
-		<div className="feature-card rounded-md border border-(--line) p-4">
-			<div className="mb-3 flex size-9 items-center justify-center rounded-md bg-white/75 text-(--palm)">
-				<Icon className="size-4" aria-hidden={true} />
+const InfoTile = ({ icon: Icon, title, text }: InfoTileProps) => {
+	return (
+		<div className={appSurfaceVariants({ variant: "card" })}>
+			<div className={appSurfaceVariants({ variant: "iconTile" })}>
+				<Icon className={appIconVariants()} aria-hidden={true} />
 			</div>
-			<h3 className="mb-2 text-sm font-bold text-(--sea-ink)">
+			<h3 className={appTextVariants({ role: "cardTitle", spacing: "tight" })}>
 				{title}
 			</h3>
-			<p className="text-sm leading-6 text-(--sea-ink-soft)">{text}</p>
+			<p className={appTextVariants({ role: "body" })}>{text}</p>
 		</div>
-	)
-}
+	);
+};
 
 export default InfoTile;
