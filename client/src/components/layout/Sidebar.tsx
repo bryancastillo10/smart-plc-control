@@ -1,14 +1,14 @@
-import { Link } from "@tanstack/react-router";
-
-
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Activity, LogOut, UserRound } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import { appIconVariants, appSidebar } from "@/styles/recipes";
 import { navigationItems, type SidebarNavItem } from "@/constants/navigation";
-
+import { appIconVariants, appSidebar } from "@/styles/recipes";
 
 export function Sidebar() {
+	const pathname = useRouterState({
+		select: (state) => state.location.pathname,
+	});
+
 	return (
 		<aside className={appSidebar.root}>
 			<div className={appSidebar.brandBlock}>
@@ -23,7 +23,11 @@ export function Sidebar() {
 
 			<nav className={appSidebar.nav} aria-label="Main navigation">
 				{navigationItems.map((item) => (
-					<SidebarNavItem key={item.label} item={item} />
+					<SidebarNavLink
+						key={item.href}
+						item={item}
+						isActive={pathname === item.href}
+					/>
 				))}
 			</nav>
 
@@ -46,39 +50,27 @@ export function Sidebar() {
 	);
 }
 
-function SidebarNavItem({ item }: { item: SidebarNavItem }) {
+function SidebarNavLink({
+	item,
+	isActive,
+}: {
+	item: SidebarNavItem;
+	isActive: boolean;
+}) {
 	const Icon = item.icon;
-	const content = (
-		<>
+
+	return (
+		<Link
+			to={item.href}
+			className={appSidebar.navItem({ state: isActive ? "active" : "idle" })}
+		>
 			<Icon
-				className={appIconVariants({ tone: item.isActive ? "brand" : "muted" })}
+				className={appIconVariants({ tone: isActive ? "brand" : "muted" })}
 			/>
 			<span className="min-w-0">
 				<span className={appSidebar.navLabel}>{item.label}</span>
 				<span className={appSidebar.navDescription}>{item.description}</span>
 			</span>
-		</>
-	);
-
-	if (!item.href) {
-		return (
-			<div
-				className={appSidebar.navItem({ state: "disabled" })}
-				aria-disabled="true"
-			>
-				{content}
-			</div>
-		);
-	}
-
-	return (
-		<Link
-			to={item.href}
-			className={appSidebar.navItem({
-				state: item.isActive ? "active" : "idle",
-			})}
-		>
-			{content}
 		</Link>
 	);
 }
