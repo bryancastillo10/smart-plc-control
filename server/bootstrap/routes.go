@@ -6,6 +6,8 @@ import (
 
 	"smart-plc-control-server/internal/auth"
 	"smart-plc-control-server/internal/middleware"
+	"smart-plc-control-server/internal/models"
+	"smart-plc-control-server/internal/users"
 )
 
 func RegisterRoutes(r *gin.Engine, DB *gorm.DB) {
@@ -17,6 +19,18 @@ func RegisterRoutes(r *gin.Engine, DB *gorm.DB) {
 
 	// Baseline Feature Routes
 	registerAuth(v1, DB)
+	registerUsers(v1, DB)
+	registerPlants(v1, DB)
+	registerProcessUnits(v1, DB)
+	registerDevices(v1, DB)
+	registerTags(v1, DB)
+	registerReadings(v1, DB)
+	registerAlertRules(v1, DB)
+	registerAlerts(v1, DB)
+	registerSimulations(v1, DB)
+	registerSimulationScenarios(v1, DB)
+	registerAuditLogs(v1, DB)
+	registerWebSockets(v1, DB)
 }
 
 func registerAuth(r *gin.RouterGroup, DB *gorm.DB) {
@@ -32,10 +46,166 @@ func registerAuth(r *gin.RouterGroup, DB *gorm.DB) {
 	}
 }
 
-func registerUser(r *gin.RouterGroup) {
+func registerUsers(r *gin.RouterGroup, DB *gorm.DB) {
+	user := users.NewHandler(DB)
 
+	userGrp := r.Group("/users", middleware.JWTAuthMiddleware())
+	{
+		userGrp.GET("", middleware.RequireRoles(models.Admin), user.GetAllUsers)
+		userGrp.DELETE("", middleware.RequireRoles(models.Admin), user.DeleteUser)
+		userGrp.DELETE("/", middleware.RequireRoles(models.Admin), user.DeleteUser)
+	}
 }
 
-func registerPlant(r *gin.RouterGroup) {
+func registerPlants(r *gin.RouterGroup, DB *gorm.DB) {
+	// plant := plants.NewHandler(DB)
 
+	plantGrp := r.Group("/plants")
+	{
+		plantGrp.POST("")
+		plantGrp.GET("")
+		plantGrp.GET("/:plantId")
+		plantGrp.PUT("/:plantId")
+		plantGrp.DELETE("/:plantId")
+	}
+}
+
+func registerProcessUnits(r *gin.RouterGroup, DB *gorm.DB) {
+	// processUnit := process_units.NewHandler(DB)
+
+	plantProcessUnitGrp := r.Group("/plants/:plantId/process-units")
+	{
+		plantProcessUnitGrp.POST("")
+		plantProcessUnitGrp.GET("")
+	}
+
+	processUnitGrp := r.Group("/process-units")
+	{
+		processUnitGrp.GET("/:processUnitId")
+		processUnitGrp.PUT("/:processUnitId")
+		processUnitGrp.DELETE("/:processUnitId")
+	}
+}
+
+func registerDevices(r *gin.RouterGroup, DB *gorm.DB) {
+	// device := devices.NewHandler(DB)
+
+	deviceGrp := r.Group("/devices")
+	{
+		deviceGrp.POST("")
+		deviceGrp.GET("")
+		deviceGrp.GET("/:deviceId")
+		deviceGrp.PUT("/:deviceId")
+		deviceGrp.DELETE("/:deviceId")
+		deviceGrp.POST("/:deviceId/connect")
+		deviceGrp.POST("/:deviceId/disconnect")
+	}
+}
+
+func registerTags(r *gin.RouterGroup, DB *gorm.DB) {
+	// tag := tags.NewHandler(DB)
+
+	deviceTagGrp := r.Group("/devices/:deviceId/tags")
+	{
+		deviceTagGrp.POST("")
+		deviceTagGrp.GET("")
+	}
+
+	processUnitTagGrp := r.Group("/process-units/:processUnitId/tags")
+	{
+		processUnitTagGrp.GET("")
+	}
+
+	tagGrp := r.Group("/tags")
+	{
+		tagGrp.GET("")
+		tagGrp.GET("/:tagId")
+		tagGrp.PUT("/:tagId")
+		tagGrp.DELETE("/:tagId")
+		tagGrp.POST("/:tagId/write")
+	}
+}
+
+func registerReadings(r *gin.RouterGroup, DB *gorm.DB) {
+	// reading := tag_readings.NewHandler(DB)
+
+	readingGrp := r.Group("/readings")
+	{
+		readingGrp.GET("/latest")
+		readingGrp.GET("/history")
+	}
+}
+
+func registerAlertRules(r *gin.RouterGroup, DB *gorm.DB) {
+	// alertRule := alert_rules.NewHandler(DB)
+
+	alertRuleGrp := r.Group("/alert-rules")
+	{
+		alertRuleGrp.POST("")
+		alertRuleGrp.GET("")
+		alertRuleGrp.GET("/:ruleId")
+		alertRuleGrp.PUT("/:ruleId")
+		alertRuleGrp.DELETE("/:ruleId")
+	}
+}
+
+func registerAlerts(r *gin.RouterGroup, DB *gorm.DB) {
+	// alert := alerts.NewHandler(DB)
+
+	alertGrp := r.Group("/alerts")
+	{
+		alertGrp.GET("")
+		alertGrp.GET("/:alertId")
+		alertGrp.POST("/:alertId/acknowledge")
+		alertGrp.POST("/:alertId/resolve")
+	}
+}
+
+func registerSimulations(r *gin.RouterGroup, DB *gorm.DB) {
+	// simulation := simulations.NewHandler(DB)
+
+	simulationGrp := r.Group("/simulations")
+	{
+		simulationGrp.POST("")
+		simulationGrp.GET("")
+		simulationGrp.GET("/:simulationId")
+		simulationGrp.PUT("/:simulationId")
+		simulationGrp.DELETE("/:simulationId")
+		simulationGrp.POST("/:simulationId/start")
+		simulationGrp.POST("/:simulationId/pause")
+		simulationGrp.POST("/:simulationId/stop")
+		simulationGrp.POST("/:simulationId/scenarios")
+		simulationGrp.POST("/:simulationId/scenarios/:scenarioId/trigger")
+	}
+}
+
+func registerSimulationScenarios(r *gin.RouterGroup, DB *gorm.DB) {
+	// simulationScenario := simulation_scenarios.NewHandler(DB)
+
+	simulationScenarioGrp := r.Group("/simulation-scenarios")
+	{
+		simulationScenarioGrp.GET("")
+		simulationScenarioGrp.GET("/:scenarioId")
+		simulationScenarioGrp.PUT("/:scenarioId")
+		simulationScenarioGrp.DELETE("/:scenarioId")
+	}
+}
+
+func registerAuditLogs(r *gin.RouterGroup, DB *gorm.DB) {
+	// auditLog := audit_logs.NewHandler(DB)
+
+	auditLogGrp := r.Group("/audit-logs")
+	{
+		auditLogGrp.GET("")
+		auditLogGrp.GET("/:auditLogId")
+	}
+}
+
+func registerWebSockets(r *gin.RouterGroup, DB *gorm.DB) {
+	// websocket := websockets.NewHandler(DB)
+
+	wsGrp := r.Group("/ws")
+	{
+		wsGrp.GET("/simulation")
+	}
 }
