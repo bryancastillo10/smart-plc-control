@@ -1,7 +1,6 @@
 package users
 
 import (
-	appErr "smart-plc-control-server/pkg/errors"
 	"smart-plc-control-server/pkg/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +28,11 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
-	userID := c.Param("userId")
+	userID, err := http.ExtractUserIDFromContext(c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
 
 	req, err := http.BindJSON[UpdateUserRequest](c)
 	if err != nil {
@@ -47,15 +50,19 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 }
 
 func (h *Handler) DeleteUser(c *gin.Context) {
-	userID := c.Param("userId")
-
-	var req DeleteUserRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
-		c.Error(appErr.NewBadRequest("Invalid delete user query parameters", err))
+	userID, err := http.ExtractUserIDFromContext(c)
+	if err != nil {
+		c.Error(err)
 		return
 	}
 
-	if err := h.service.DeleteUser(userID, req); err != nil {
+	req, err := http.BindQuery[DeleteUserRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	if err := h.service.DeleteUser(userID, *req); err != nil {
 		c.Error(err)
 		return
 	}
