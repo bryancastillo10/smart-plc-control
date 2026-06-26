@@ -16,6 +16,15 @@ func BindJSON[T any](c *gin.Context) (*T, error) {
 	return &req, nil
 }
 
+func BindQuery[T any](c *gin.Context) (*T, error) {
+	var req T
+	if err := c.ShouldBindQuery(&req); err != nil {
+		return nil, appErr.NewBadRequest("Invalid query parameters", err)
+	}
+
+	return &req, nil
+}
+
 func BindFormJSON[T any](c *gin.Context, field string) (*T, error) {
 	var req T
 
