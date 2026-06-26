@@ -11,6 +11,10 @@ type UpdateUserRequest struct {
 	Language models.Language `json:"language" binding:"omitempty,oneof=EN ZH-TW"`
 }
 
+type DeleteUserRequest struct {
+	Email string `form:"email" binding:"required,email,max=255"`
+}
+
 type UserResponse struct {
 	ID        string          `json:"id"`
 	UserName  string          `json:"username"`
