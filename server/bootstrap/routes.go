@@ -6,6 +6,8 @@ import (
 
 	"smart-plc-control-server/internal/auth"
 	"smart-plc-control-server/internal/middleware"
+	"smart-plc-control-server/internal/models"
+	"smart-plc-control-server/internal/users"
 )
 
 func RegisterRoutes(r *gin.Engine, DB *gorm.DB) {
@@ -45,16 +47,13 @@ func registerAuth(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerUsers(r *gin.RouterGroup, DB *gorm.DB) {
-	// user := users.NewHandler(DB)
+	user := users.NewHandler(DB)
 
-	userGrp := r.Group("/users")
+	userGrp := r.Group("/users", middleware.JWTAuthMiddleware())
 	{
-		userGrp.GET("/me")
-		userGrp.PUT("/me")
-		userGrp.GET("")
-		userGrp.GET("/:userId")
-		userGrp.PUT("/:userId")
-		userGrp.DELETE("/:userId")
+		userGrp.GET("", middleware.RequireRoles(models.Admin), user.GetAllUsers)
+		userGrp.PUT("/:userId", middleware.RequireRoles(models.Admin), user.UpdateUser)
+		// userGrp.DELETE("/:userId")
 	}
 }
 
