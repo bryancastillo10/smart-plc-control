@@ -3,6 +3,7 @@ package users
 import (
 	"smart-plc-control-server/internal/models"
 	appErr "smart-plc-control-server/pkg/errors"
+	"smart-plc-control-server/pkg/utils"
 )
 
 type Service struct {
@@ -52,15 +53,9 @@ func (s *Service) UpdateUser(userID string, req UpdateUserRequest) (*UserRespons
 		return nil, appErr.NewNotFound("User not found", nil)
 	}
 
-	if req.UserName != "" {
-		user.UserName = req.UserName
-	}
-	if req.Role != "" {
-		user.Role = req.Role
-	}
-	if req.Language != "" {
-		user.Language = req.Language
-	}
+	utils.PatchIfNotZero(&user.UserName, req.UserName)
+	utils.PatchIfNotZero(&user.Role, req.Role)
+	utils.PatchIfNotZero(&user.Language, req.Language)
 
 	updatedUser, err := s.repo.UpdateUser(user)
 	if err != nil {
