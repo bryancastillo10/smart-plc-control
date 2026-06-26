@@ -53,7 +53,7 @@ func registerUsers(r *gin.RouterGroup, DB *gorm.DB) {
 	{
 		userGrp.GET("", middleware.RequireRoles(models.Admin), user.GetAllUsers)
 		userGrp.PUT("/:userId", middleware.RequireRoles(models.Admin), user.UpdateUser)
-		// userGrp.DELETE("/:userId")
+		userGrp.DELETE("/:userId", middleware.RequireRoles(models.Admin), user.DeleteUser)
 	}
 }
 

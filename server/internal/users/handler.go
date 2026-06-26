@@ -1,6 +1,7 @@
 package users
 
 import (
+	appErr "smart-plc-control-server/pkg/errors"
 	"smart-plc-control-server/pkg/http"
 
 	"github.com/gin-gonic/gin"
@@ -43,4 +44,21 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	}
 
 	c.JSON(200, user)
+}
+
+func (h *Handler) DeleteUser(c *gin.Context) {
+	userID := c.Param("userId")
+
+	var req DeleteUserRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.Error(appErr.NewBadRequest("Invalid delete user query parameters", err))
+		return
+	}
+
+	if err := h.service.DeleteUser(userID, req); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "User deleted successfully"})
 }
