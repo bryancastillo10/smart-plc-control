@@ -1,0 +1,12 @@
+### GET All Users
+GET http://localhost:8080/api/v1/users
+
+### Update User By ID
+PUT http://localhost:8080/api/v1/users/1b603f0a-6e83-46ad-82c7-6a9ce960cdb3
+Content-Type: application/json
+
+{
+	"username":"admin1",
+	"role":"ADMIN",
+	"language":"ZH-TW"
+}
