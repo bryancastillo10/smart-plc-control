@@ -4,6 +4,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	appErr "smart-plc-control-server/pkg/errors"
 	"smart-plc-control-server/pkg/utils"
+	"strings"
 )
 
 type Service struct {
@@ -64,6 +65,34 @@ func (s *Service) UpdateUser(userID string, req UpdateUserRequest) (*UserRespons
 
 	res := toUserResponse(*updatedUser)
 	return &res, nil
+}
+
+func (s *Service) DeleteUser(userID string, req DeleteUserRequest) error {
+	if userID == "" {
+		return appErr.NewBadRequest("Missing user ID", nil)
+	}
+
+	if req.Email == "" {
+		return appErr.NewBadRequest("Missing user email confirmation", nil)
+	}
+
+	user, err := s.repo.FindUserByID(userID)
+	if err != nil {
+		return appErr.NewInternal("Failed to find user", err)
+	}
+	if user == nil {
+		return appErr.NewNotFound("User not found", nil)
+	}
+
+	if !strings.EqualFold(user.Email, req.Email) {
+		return appErr.NewBadRequest("Email confirmation does not match user", nil)
+	}
+
+	if err := s.repo.DeleteUser(user); err != nil {
+		return appErr.NewInternal("Failed to delete user", err)
+	}
+
+	return nil
 }
 
 func toUserResponse(user models.Users) UserResponse {
