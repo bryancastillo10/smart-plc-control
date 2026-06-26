@@ -42,3 +42,7 @@ func (r *Repository) UpdateUser(user *models.Users) (*models.Users, error) {
 
 	return user, nil
 }
+
+func (r *Repository) DeleteUser(user *models.Users) error {
+	return r.db.Delete(user).Error
+}
