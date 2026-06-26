@@ -52,8 +52,8 @@ func registerUsers(r *gin.RouterGroup, DB *gorm.DB) {
 	userGrp := r.Group("/users", middleware.JWTAuthMiddleware())
 	{
 		userGrp.GET("", middleware.RequireRoles(models.Admin), user.GetAllUsers)
-		userGrp.PUT("/:userId", middleware.RequireRoles(models.Admin), user.UpdateUser)
-		userGrp.DELETE("/:userId", middleware.RequireRoles(models.Admin), user.DeleteUser)
+		userGrp.DELETE("", middleware.RequireRoles(models.Admin), user.DeleteUser)
+		userGrp.DELETE("/", middleware.RequireRoles(models.Admin), user.DeleteUser)
 	}
 }
 
