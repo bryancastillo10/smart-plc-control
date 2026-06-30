@@ -42,3 +42,11 @@ func (r *Repository) FindPlantByID(plantID string) (*models.Plants, error) {
 
 	return &plant, nil
 }
+
+func (r *Repository) UpdatePlant(plant *models.Plants) (*models.Plants, error) {
+	if err := r.db.Save(plant).Error; err != nil {
+		return nil, err
+	}
+
+	return plant, nil
+}
