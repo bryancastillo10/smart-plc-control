@@ -72,3 +72,20 @@ func (h *Handler) UpdatePlant(c *gin.Context) {
 
 	c.JSON(200, plant)
 }
+
+func (h *Handler) DeletePlant(c *gin.Context) {
+	plantID := c.Param("plantId")
+
+	req, err := http.BindJSON[DeletePlantRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	if err := h.service.DeletePlant(plantID, *req); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Plant deleted successfully"})
+}
