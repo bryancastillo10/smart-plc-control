@@ -64,7 +64,7 @@ func registerPlants(r *gin.RouterGroup, DB *gorm.DB) {
 	plantGrp := r.Group("/plants", middleware.JWTAuthMiddleware())
 	{
 		plantGrp.POST("", middleware.RequireRoles(models.Admin), plant.CreatePlant)
-		plantGrp.GET("")
+		plantGrp.GET("", plant.GetAllPlants)
 		plantGrp.GET("/:plantId")
 		plantGrp.PUT("/:plantId")
 		plantGrp.DELETE("/:plantId")
