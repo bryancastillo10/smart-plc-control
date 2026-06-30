@@ -110,6 +110,30 @@ func (s *Service) UpdatePlant(plantID string, req UpdatePlantRequest) (*PlantRes
 	return &res, nil
 }
 
+func (s *Service) DeletePlant(plantID string, req DeletePlantRequest) error {
+	if plantID == "" {
+		return appErr.NewBadRequest("Missing plant ID", nil)
+	}
+
+	if req.Action != "delete" {
+		return appErr.NewBadRequest("Delete confirmation must be exactly 'delete'", nil)
+	}
+
+	plant, err := s.repo.FindPlantByID(plantID)
+	if err != nil {
+		return appErr.NewInternal("Failed to find plant", err)
+	}
+	if plant == nil {
+		return appErr.NewNotFound("Plant not found", nil)
+	}
+
+	if err := s.repo.DeletePlant(plant); err != nil {
+		return appErr.NewInternal("Failed to delete plant", err)
+	}
+
+	return nil
+}
+
 func toPlantResponse(plant models.Plants) PlantResponse {
 	return PlantResponse{
 		ID:          plant.ID.String(),
