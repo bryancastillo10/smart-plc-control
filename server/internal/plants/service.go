@@ -14,6 +14,20 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
+func (s *Service) GetAllPlants() ([]PlantResponse, error) {
+	plants, err := s.repo.FindAllPlants()
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get plants", err)
+	}
+
+	res := make([]PlantResponse, 0, len(plants))
+	for _, plant := range plants {
+		res = append(res, toPlantResponse(plant))
+	}
+
+	return res, nil
+}
+
 func (s *Service) CreatePlant(req CreatePlantRequest) (*PlantResponse, error) {
 	if req.Name == "" || req.Location == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
