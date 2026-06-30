@@ -16,3 +16,12 @@ Content-Type: application/json
 @plantId = 264dbd8e-ce3e-4652-bddf-1a739e5b6c7f
 GET http://localhost:8080/api/v1/plants/{{plantId}}
 
+### Update Plant By ID
+PUT http://localhost:8080/api/v1/plants/{{plantId}}
+Content-Type: application/json
+
+{
+	"name":"Updated Plant",
+	"status":"INACTIVE"
+}
+
