@@ -19,6 +19,10 @@ type UpdatePlantRequest struct {
 	Status      models.PlantStatus `json:"status" binding:"omitempty,oneof=ACTIVE INACTIVE MAINTENANCE"`
 }
 
+type DeletePlantRequest struct {
+	Action string `json:"action" binding:"required"`
+}
+
 type PlantResponse struct {
 	ID          string             `json:"id"`
 	Name        string             `json:"name"`
