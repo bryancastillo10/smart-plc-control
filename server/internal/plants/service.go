@@ -75,6 +75,41 @@ func (s *Service) CreatePlant(req CreatePlantRequest) (*PlantResponse, error) {
 	return &res, nil
 }
 
+func (s *Service) UpdatePlant(plantID string, req UpdatePlantRequest) (*PlantResponse, error) {
+	if plantID == "" {
+		return nil, appErr.NewBadRequest("Missing plant ID", nil)
+	}
+
+	if req.Name == "" && req.Location == "" && req.Description == "" && req.Status == "" {
+		return nil, appErr.NewBadRequest("Missing plant details to update", nil)
+	}
+
+	if req.Status != "" && req.Status != models.Active && req.Status != models.Inactive && req.Status != models.Maintenance {
+		return nil, appErr.NewBadRequest("Invalid plant status", nil)
+	}
+
+	plant, err := s.repo.FindPlantByID(plantID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find plant", err)
+	}
+	if plant == nil {
+		return nil, appErr.NewNotFound("Plant not found", nil)
+	}
+
+	utils.PatchIfNotZero(&plant.Name, req.Name)
+	utils.PatchIfNotZero(&plant.Location, req.Location)
+	utils.PatchIfNotZero(&plant.Description, req.Description)
+	utils.PatchIfNotZero(&plant.Status, req.Status)
+
+	updatedPlant, err := s.repo.UpdatePlant(plant)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to update plant", err)
+	}
+
+	res := toPlantResponse(*updatedPlant)
+	return &res, nil
+}
+
 func toPlantResponse(plant models.Plants) PlantResponse {
 	return PlantResponse{
 		ID:          plant.ID.String(),
