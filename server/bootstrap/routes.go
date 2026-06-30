@@ -65,7 +65,7 @@ func registerPlants(r *gin.RouterGroup, DB *gorm.DB) {
 	{
 		plantGrp.POST("", middleware.RequireRoles(models.Admin), plant.CreatePlant)
 		plantGrp.GET("", plant.GetAllPlants)
-		plantGrp.GET("/:plantId")
+		plantGrp.GET("/:plantId", plant.GetPlantByID)
 		plantGrp.PUT("/:plantId")
 		plantGrp.DELETE("/:plantId")
 	}
