@@ -12,6 +12,13 @@ type CreatePlantRequest struct {
 	Status      models.PlantStatus `json:"status" binding:"omitempty,oneof=ACTIVE INACTIVE MAINTENANCE"`
 }
 
+type UpdatePlantRequest struct {
+	Name        string             `json:"name" binding:"omitempty,min=1,max=120"`
+	Location    string             `json:"location" binding:"omitempty,min=1,max=200"`
+	Description string             `json:"description" binding:"omitempty"`
+	Status      models.PlantStatus `json:"status" binding:"omitempty,oneof=ACTIVE INACTIVE MAINTENANCE"`
+}
+
 type PlantResponse struct {
 	ID          string             `json:"id"`
 	Name        string             `json:"name"`
