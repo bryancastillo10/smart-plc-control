@@ -9,6 +9,7 @@ import (
 type TagReadings struct {
 	ID           uint64         `gorm:"primaryKey;autoIncrement" json:"id"`
 	TagID        uuid.UUID      `gorm:"type:uuid;not null;index:idx_tag_readings_tag_recorded_at" json:"tagId"`
+	Tag          *Tags          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	ValueNumeric *float64       `gorm:"type:numeric(16,4)" json:"valueNumeric"`
 	ValueText    string         `gorm:"type:text" json:"valueText"`
 	ValueBool    *bool          `json:"valueBool"`

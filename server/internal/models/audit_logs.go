@@ -9,6 +9,7 @@ import (
 type AuditLogs struct {
 	ID         uint64                 `gorm:"primaryKey;autoIncrement" json:"id"`
 	UserID     *uuid.UUID             `gorm:"type:uuid;index" json:"userId"`
+	User       *Users                 `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
 	Action     string                 `gorm:"type:varchar(50);not null" json:"action"`
 	EntityType string                 `gorm:"type:varchar(50);not null" json:"entityType"`
 	EntityID   *uuid.UUID             `gorm:"type:uuid;index" json:"entityId"`

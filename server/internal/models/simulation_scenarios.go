@@ -9,6 +9,7 @@ import (
 type SimulationScenarios struct {
 	ID           uuid.UUID              `gorm:"primaryKey;type:uuid" json:"id"`
 	SimulationID uuid.UUID              `gorm:"type:uuid;not null;index" json:"simulationId"`
+	Simulation   *Simulations           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	Name         string                 `gorm:"type:varchar(120);not null" json:"name"`
 	Description  string                 `gorm:"type:text" json:"description"`
 	Config       map[string]interface{} `gorm:"type:jsonb;not null;serializer:json" json:"config"`

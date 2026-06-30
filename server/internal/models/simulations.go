@@ -9,6 +9,7 @@ import (
 type Simulations struct {
 	ID               uuid.UUID        `gorm:"primaryKey;type:uuid" json:"id"`
 	PlantID          uuid.UUID        `gorm:"type:uuid;not null;index" json:"plantId"`
+	Plant            *Plants          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	Name             string           `gorm:"type:varchar(120);not null" json:"name"`
 	Status           SimulationStatus `gorm:"type:varchar(20);not null;default:IDLE" json:"status"`
 	UpdateIntervalMS int              `gorm:"not null;default:1000" json:"updateIntervalMs"`
