@@ -30,3 +30,15 @@ func (r *Repository) FindAllPlants() ([]models.Plants, error) {
 
 	return plants, nil
 }
+
+func (r *Repository) FindPlantByID(plantID string) (*models.Plants, error) {
+	var plant models.Plants
+	if err := r.db.Where("id = ?", plantID).First(&plant).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &plant, nil
+}
