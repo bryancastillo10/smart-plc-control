@@ -50,3 +50,7 @@ func (r *Repository) UpdatePlant(plant *models.Plants) (*models.Plants, error) {
 
 	return plant, nil
 }
+
+func (r *Repository) DeletePlant(plant *models.Plants) error {
+	return r.db.Delete(plant).Error
+}
