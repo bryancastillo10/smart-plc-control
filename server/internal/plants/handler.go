@@ -42,3 +42,15 @@ func (h *Handler) GetAllPlants(c *gin.Context) {
 
 	c.JSON(200, plants)
 }
+
+func (h *Handler) GetPlantByID(c *gin.Context) {
+	plantID := c.Param("plantId")
+
+	plant, err := h.service.GetPlantByID(plantID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, plant)
+}
