@@ -9,6 +9,7 @@ import (
 type AlertRules struct {
 	ID               uuid.UUID     `gorm:"primaryKey;type:uuid" json:"id"`
 	TagID            uuid.UUID     `gorm:"type:uuid;not null;index" json:"tagId"`
+	Tag              *Tags         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	Name             string        `gorm:"type:varchar(120);not null" json:"name"`
 	Operator         AlertOperator `gorm:"type:varchar(10);not null" json:"operator"`
 	ThresholdNumeric *float64      `gorm:"type:numeric(16,4)" json:"thresholdNumeric"`

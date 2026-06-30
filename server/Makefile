@@ -9,3 +9,6 @@ test:
 
 fmt:
 	gofmt -w .
+
+dev:
+	air -c air.toml
