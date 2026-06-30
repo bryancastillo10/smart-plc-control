@@ -54,3 +54,21 @@ func (h *Handler) GetPlantByID(c *gin.Context) {
 
 	c.JSON(200, plant)
 }
+
+func (h *Handler) UpdatePlant(c *gin.Context) {
+	plantID := c.Param("plantId")
+
+	req, err := http.BindJSON[UpdatePlantRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	plant, err := h.service.UpdatePlant(plantID, *req)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, plant)
+}
