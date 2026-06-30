@@ -28,6 +28,23 @@ func (s *Service) GetAllPlants() ([]PlantResponse, error) {
 	return res, nil
 }
 
+func (s *Service) GetPlantByID(plantID string) (*PlantResponse, error) {
+	if plantID == "" {
+		return nil, appErr.NewBadRequest("Missing plant ID", nil)
+	}
+
+	plant, err := s.repo.FindPlantByID(plantID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get plant", err)
+	}
+	if plant == nil {
+		return nil, appErr.NewNotFound("Plant not found", nil)
+	}
+
+	res := toPlantResponse(*plant)
+	return &res, nil
+}
+
 func (s *Service) CreatePlant(req CreatePlantRequest) (*PlantResponse, error) {
 	if req.Name == "" || req.Location == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
