@@ -32,3 +32,13 @@ func (h *Handler) CreatePlant(c *gin.Context) {
 
 	c.JSON(201, plant)
 }
+
+func (h *Handler) GetAllPlants(c *gin.Context) {
+	plants, err := h.service.GetAllPlants()
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, plants)
+}
