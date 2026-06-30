@@ -21,3 +21,12 @@ func (r *Repository) CreatePlant(plant *models.Plants) (*models.Plants, error) {
 
 	return plant, nil
 }
+
+func (r *Repository) FindAllPlants() ([]models.Plants, error) {
+	var plants []models.Plants
+	if err := r.db.Order("created_at DESC").Find(&plants).Error; err != nil {
+		return nil, err
+	}
+
+	return plants, nil
+}
