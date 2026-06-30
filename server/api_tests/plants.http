@@ -1,0 +1,10 @@
+### Create Plant
+POST http://localhost:8080/api/v1/plants
+Content-Type: "application/json"
+
+{
+	"name":"Anaerobic Digestion Plant",
+	"location":"Hsinchu City, Taiwan",
+	"description":"Pilot Plant",
+	"status":"ACTIVE"
+}
