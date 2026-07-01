@@ -26,3 +26,6 @@ Content-Type: application/json
 	"protocol": "SIMULATOR",
 	"enabled": true
 }
+
+### Get All Devices
+GET http://localhost:8080/api/v1/devices
