@@ -32,3 +32,13 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 
 	c.JSON(201, device)
 }
+
+func (h *Handler) GetAllDevices(c *gin.Context) {
+	devices, err := h.service.GetAllDevices()
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, devices)
+}
