@@ -1,0 +1,28 @@
+### Create PLC Device
+@plantId = 86ca5d65-3c1e-4dbd-9c5a-46ea68a897be
+POST http://localhost:8080/api/v1/devices
+Content-Type: application/json
+
+{
+	"plantId": "{{plantId}}",
+	"name": "Main Digester PLC",
+	"type": "PLC",
+	"description": "PLC controller for anaerobic digester feed, mixing, heating, and gas handling IO.",
+	"protocol": "MODBUS_TCP",
+	"host": "192.168.10.25",
+	"port": 502,
+	"enabled": true
+}
+
+### Create Simulated Device
+POST http://localhost:8080/api/v1/devices
+Content-Type: application/json
+
+{
+	"plantId": "{{plantId}}",
+	"name": "Anaerobic Digestion Simulator",
+	"type": "SIMULATOR",
+	"description": "Simulated device for methane tank temperature, pH, biogas flow, and pressure signals.",
+	"protocol": "SIMULATOR",
+	"enabled": true
+}
