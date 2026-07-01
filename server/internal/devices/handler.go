@@ -54,3 +54,21 @@ func (h *Handler) GetDeviceByID(c *gin.Context) {
 
 	c.JSON(200, device)
 }
+
+func (h *Handler) UpdateDevice(c *gin.Context) {
+	deviceID := c.Param("deviceId")
+
+	req, err := http.BindJSON[UpdateDeviceRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	device, err := h.service.UpdateDevice(deviceID, *req)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, device)
+}
