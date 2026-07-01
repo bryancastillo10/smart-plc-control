@@ -27,6 +27,15 @@ func (r *Repository) FindPlantByID(plantID uuid.UUID) (*models.Plants, error) {
 	return &plant, nil
 }
 
+func (r *Repository) FindAllDevices() ([]models.Devices, error) {
+	var devices []models.Devices
+	if err := r.db.Order("created_at DESC").Find(&devices).Error; err != nil {
+		return nil, err
+	}
+
+	return devices, nil
+}
+
 func (r *Repository) CreateDevice(device *models.Devices) (*models.Devices, error) {
 	if err := r.db.Create(device).Error; err != nil {
 		return nil, err
