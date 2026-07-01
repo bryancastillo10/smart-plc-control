@@ -97,7 +97,7 @@ func registerDevices(r *gin.RouterGroup, DB *gorm.DB) {
 	{
 		deviceGrp.POST("", middleware.RequireRoles(models.Admin), device.CreateDevice)
 		deviceGrp.GET("", device.GetAllDevices)
-		deviceGrp.GET("/:deviceId")
+		deviceGrp.GET("/:deviceId", device.GetDeviceByID)
 		deviceGrp.PUT("/:deviceId")
 		deviceGrp.DELETE("/:deviceId")
 		deviceGrp.POST("/:deviceId/connect")
