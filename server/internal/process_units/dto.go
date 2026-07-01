@@ -19,6 +19,10 @@ type UpdateProcessUnitRequest struct {
 	Status      models.PlantStatus `json:"status" binding:"omitempty,oneof=ACTIVE INACTIVE MAINTENANCE"`
 }
 
+type DeleteProcessUnitRequest struct {
+	Action string `json:"action" binding:"required"`
+}
+
 type ProcessUnitResponse struct {
 	ID          string             `json:"id"`
 	PlantID     string             `json:"plantId"`
