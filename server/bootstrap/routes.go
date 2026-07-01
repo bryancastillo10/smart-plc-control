@@ -83,6 +83,7 @@ func registerProcessUnits(r *gin.RouterGroup, DB *gorm.DB) {
 
 	processUnitGrp := r.Group("/process-units", middleware.JWTAuthMiddleware())
 	{
+		processUnitGrp.GET("/:processUnitId", processUnit.GetProcessUnitByID)
 		processUnitGrp.PUT("/:processUnitId", middleware.RequireRoles(models.Admin), processUnit.UpdateProcessUnit)
 		processUnitGrp.DELETE("/:processUnitId", middleware.RequireRoles(models.Admin), processUnit.DeleteProcessUnit)
 	}
