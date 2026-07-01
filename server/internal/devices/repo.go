@@ -55,3 +55,11 @@ func (r *Repository) CreateDevice(device *models.Devices) (*models.Devices, erro
 
 	return device, nil
 }
+
+func (r *Repository) UpdateDevice(device *models.Devices) (*models.Devices, error) {
+	if err := r.db.Save(device).Error; err != nil {
+		return nil, err
+	}
+
+	return device, nil
+}
