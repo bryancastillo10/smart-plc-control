@@ -93,6 +93,28 @@ func (s *Service) GetProcessUnitsByPlantID(plantID string) ([]ProcessUnitRespons
 	return res, nil
 }
 
+func (s *Service) GetProcessUnitByID(processUnitID string) (*ProcessUnitResponse, error) {
+	if processUnitID == "" {
+		return nil, appErr.NewBadRequest("Missing process unit ID", nil)
+	}
+
+	parsedProcessUnitID, err := utils.ParseId(processUnitID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid process unit ID", err)
+	}
+
+	processUnit, err := s.repo.FindProcessUnitByID(parsedProcessUnitID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find process unit", err)
+	}
+	if processUnit == nil {
+		return nil, appErr.NewNotFound("Process unit not found", nil)
+	}
+
+	res := toProcessUnitResponse(*processUnit)
+	return &res, nil
+}
+
 func (s *Service) UpdateProcessUnit(processUnitID string, req UpdateProcessUnitRequest) (*ProcessUnitResponse, error) {
 	if processUnitID == "" {
 		return nil, appErr.NewBadRequest("Missing process unit ID", nil)
