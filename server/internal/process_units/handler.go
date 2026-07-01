@@ -64,3 +64,20 @@ func (h *Handler) UpdateProcessUnit(c *gin.Context) {
 
 	c.JSON(200, processUnit)
 }
+
+func (h *Handler) DeleteProcessUnit(c *gin.Context) {
+	processUnitID := c.Param("processUnitId")
+
+	req, err := http.BindJSON[DeleteProcessUnitRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	if err := h.service.DeleteProcessUnit(processUnitID, *req); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Process unit deleted successfully"})
+}
