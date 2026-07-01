@@ -14,6 +14,20 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
+func (s *Service) GetAllDevices() ([]DeviceResponse, error) {
+	devices, err := s.repo.FindAllDevices()
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get devices", err)
+	}
+
+	res := make([]DeviceResponse, 0, len(devices))
+	for _, device := range devices {
+		res = append(res, toDeviceResponse(device))
+	}
+
+	return res, nil
+}
+
 func (s *Service) CreateDevice(req CreateDeviceRequest) (*DeviceResponse, error) {
 	if req.PlantID == "" || req.Name == "" || req.Type == "" || req.Protocol == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
