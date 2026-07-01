@@ -42,3 +42,15 @@ func (h *Handler) GetAllDevices(c *gin.Context) {
 
 	c.JSON(200, devices)
 }
+
+func (h *Handler) GetDeviceByID(c *gin.Context) {
+	deviceID := c.Param("deviceId")
+
+	device, err := h.service.GetDeviceByID(deviceID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, device)
+}
