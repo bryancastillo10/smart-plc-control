@@ -28,6 +28,28 @@ func (s *Service) GetAllDevices() ([]DeviceResponse, error) {
 	return res, nil
 }
 
+func (s *Service) GetDeviceByID(deviceID string) (*DeviceResponse, error) {
+	if deviceID == "" {
+		return nil, appErr.NewBadRequest("Missing device ID", nil)
+	}
+
+	parsedDeviceID, err := utils.ParseId(deviceID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid device ID", err)
+	}
+
+	device, err := s.repo.FindDeviceByID(parsedDeviceID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find device", err)
+	}
+	if device == nil {
+		return nil, appErr.NewNotFound("Device not found", nil)
+	}
+
+	res := toDeviceResponse(*device)
+	return &res, nil
+}
+
 func (s *Service) CreateDevice(req CreateDeviceRequest) (*DeviceResponse, error) {
 	if req.PlantID == "" || req.Name == "" || req.Type == "" || req.Protocol == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
