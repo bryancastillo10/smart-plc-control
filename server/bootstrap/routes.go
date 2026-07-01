@@ -80,6 +80,11 @@ func registerProcessUnits(r *gin.RouterGroup, DB *gorm.DB) {
 		plantProcessUnitGrp.POST("", middleware.RequireRoles(models.Admin), processUnit.CreateProcessUnit)
 		plantProcessUnitGrp.GET("", processUnit.GetProcessUnitsByPlantID)
 	}
+
+	processUnitGrp := r.Group("/process-units", middleware.JWTAuthMiddleware())
+	{
+		processUnitGrp.PUT("/:processUnitId", middleware.RequireRoles(models.Admin), processUnit.UpdateProcessUnit)
+	}
 }
 
 func registerDevices(r *gin.RouterGroup, DB *gorm.DB) {
