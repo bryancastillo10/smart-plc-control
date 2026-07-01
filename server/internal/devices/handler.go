@@ -83,3 +83,27 @@ func (h *Handler) DeleteDevice(c *gin.Context) {
 
 	c.JSON(200, gin.H{"message": "Device deleted successfully"})
 }
+
+func (h *Handler) ConnectDevice(c *gin.Context) {
+	deviceID := c.Param("deviceId")
+
+	device, err := h.service.ConnectDevice(deviceID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, device)
+}
+
+func (h *Handler) DisconnectDevice(c *gin.Context) {
+	deviceID := c.Param("deviceId")
+
+	device, err := h.service.DisconnectDevice(deviceID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, device)
+}
