@@ -1,9 +1,7 @@
 ### Create Process Unit for Anaerobic Digestion Plant
 @plantId = 86ca5d65-3c1e-4dbd-9c5a-46ea68a897be
-@adminToken = <paste-admin-jwt-here>
 POST http://localhost:8080/api/v1/plants/{{plantId}}/process-units
 Content-Type: application/json
-Authorization: Bearer {{adminToken}}
 
 {
 	"name": "Methane Tank",
@@ -14,17 +12,14 @@ Authorization: Bearer {{adminToken}}
 
 ### Get Process Units for Anaerobic Digestion Plant
 GET http://localhost:8080/api/v1/plants/{{plantId}}/process-units
-Authorization: Bearer {{adminToken}}
 
 ### Get Process Unit Details
 @processUnitId = 6a22788f-7ce7-4ac1-8b08-58ec18708e7f
 GET http://localhost:8080/api/v1/process-units/{{processUnitId}}
-Authorization: Bearer {{adminToken}}
 
 ### Update Process Unit
 PUT http://localhost:8080/api/v1/process-units/{{processUnitId}}
 Content-Type: application/json
-Authorization: Bearer {{adminToken}}
 
 {
 	"name": "Methane Reactor",
@@ -36,7 +31,6 @@ Authorization: Bearer {{adminToken}}
 ### Delete Process Unit
 DELETE http://localhost:8080/api/v1/process-units/{{processUnitId}}
 Content-Type: application/json
-Authorization: Bearer {{adminToken}}
 
 {
 	"action": "delete"
