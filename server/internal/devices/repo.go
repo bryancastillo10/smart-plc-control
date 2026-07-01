@@ -63,3 +63,7 @@ func (r *Repository) UpdateDevice(device *models.Devices) (*models.Devices, erro
 
 	return device, nil
 }
+
+func (r *Repository) DeleteDevice(device *models.Devices) error {
+	return r.db.Delete(device).Error
+}
