@@ -24,3 +24,11 @@ Content-Type: application/json
 	"description": "Updated methanogenesis process unit for methane production stabilization and biogas quality monitoring.",
 	"status": "MAINTENANCE"
 }
+
+### Delete Process Unit
+DELETE http://localhost:8080/api/v1/process-units/{{processUnitId}}
+Content-Type: application/json
+
+{
+	"action": "delete"
+}
