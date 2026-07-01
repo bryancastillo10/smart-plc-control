@@ -1,6 +1,8 @@
 package devices
 
 import (
+	"time"
+
 	"smart-plc-control-server/internal/models"
 	appErr "smart-plc-control-server/pkg/errors"
 	"smart-plc-control-server/pkg/utils"
@@ -214,6 +216,69 @@ func (s *Service) DeleteDevice(deviceID string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) ConnectDevice(deviceID string) (*DeviceResponse, error) {
+	if deviceID == "" {
+		return nil, appErr.NewBadRequest("Missing device ID", nil)
+	}
+
+	parsedDeviceID, err := utils.ParseId(deviceID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid device ID", err)
+	}
+
+	device, err := s.repo.FindDeviceByID(parsedDeviceID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find device", err)
+	}
+	if device == nil {
+		return nil, appErr.NewNotFound("Device not found", nil)
+	}
+	if !device.Enabled {
+		return nil, appErr.NewBadRequest("Device is disabled", nil)
+	}
+
+	now := time.Now()
+	device.ConnectionStatus = models.Connected
+	device.LastConnectedAt = &now
+
+	updatedDevice, err := s.repo.UpdateDevice(device)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to connect device", err)
+	}
+
+	res := toDeviceResponse(*updatedDevice)
+	return &res, nil
+}
+
+func (s *Service) DisconnectDevice(deviceID string) (*DeviceResponse, error) {
+	if deviceID == "" {
+		return nil, appErr.NewBadRequest("Missing device ID", nil)
+	}
+
+	parsedDeviceID, err := utils.ParseId(deviceID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid device ID", err)
+	}
+
+	device, err := s.repo.FindDeviceByID(parsedDeviceID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find device", err)
+	}
+	if device == nil {
+		return nil, appErr.NewNotFound("Device not found", nil)
+	}
+
+	device.ConnectionStatus = models.Disconnected
+
+	updatedDevice, err := s.repo.UpdateDevice(device)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to disconnect device", err)
+	}
+
+	res := toDeviceResponse(*updatedDevice)
+	return &res, nil
 }
 
 func toDeviceResponse(device models.Devices) DeviceResponse {
