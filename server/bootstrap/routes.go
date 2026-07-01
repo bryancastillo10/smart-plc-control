@@ -8,6 +8,7 @@ import (
 	"smart-plc-control-server/internal/middleware"
 	"smart-plc-control-server/internal/models"
 	"smart-plc-control-server/internal/plants"
+	"smart-plc-control-server/internal/process_units"
 	"smart-plc-control-server/internal/users"
 )
 
@@ -72,19 +73,11 @@ func registerPlants(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerProcessUnits(r *gin.RouterGroup, DB *gorm.DB) {
-	// processUnit := process_units.NewHandler(DB)
+	processUnit := process_units.NewHandler(DB)
 
-	plantProcessUnitGrp := r.Group("/plants/:plantId/process-units")
+	plantProcessUnitGrp := r.Group("/plants/:plantId/process-units", middleware.JWTAuthMiddleware())
 	{
-		plantProcessUnitGrp.POST("")
-		plantProcessUnitGrp.GET("")
-	}
-
-	processUnitGrp := r.Group("/process-units")
-	{
-		processUnitGrp.GET("/:processUnitId")
-		processUnitGrp.PUT("/:processUnitId")
-		processUnitGrp.DELETE("/:processUnitId")
+		plantProcessUnitGrp.POST("", middleware.RequireRoles(models.Admin), processUnit.CreateProcessUnit)
 	}
 }
 
