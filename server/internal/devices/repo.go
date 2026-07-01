@@ -36,6 +36,18 @@ func (r *Repository) FindAllDevices() ([]models.Devices, error) {
 	return devices, nil
 }
 
+func (r *Repository) FindDeviceByID(deviceID uuid.UUID) (*models.Devices, error) {
+	var device models.Devices
+	if err := r.db.Where("id = ?", deviceID).First(&device).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &device, nil
+}
+
 func (r *Repository) CreateDevice(device *models.Devices) (*models.Devices, error) {
 	if err := r.db.Create(device).Error; err != nil {
 		return nil, err
