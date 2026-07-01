@@ -93,6 +93,46 @@ func (s *Service) GetProcessUnitsByPlantID(plantID string) ([]ProcessUnitRespons
 	return res, nil
 }
 
+func (s *Service) UpdateProcessUnit(processUnitID string, req UpdateProcessUnitRequest) (*ProcessUnitResponse, error) {
+	if processUnitID == "" {
+		return nil, appErr.NewBadRequest("Missing process unit ID", nil)
+	}
+
+	if req.Name == "" && req.Type == "" && req.Description == "" && req.Status == "" {
+		return nil, appErr.NewBadRequest("Missing process unit fields to update", nil)
+	}
+
+	if req.Status != "" && req.Status != models.Active && req.Status != models.Inactive && req.Status != models.Maintenance {
+		return nil, appErr.NewBadRequest("Invalid process unit status", nil)
+	}
+
+	parsedProcessUnitID, err := utils.ParseId(processUnitID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid process unit ID", err)
+	}
+
+	processUnit, err := s.repo.FindProcessUnitByID(parsedProcessUnitID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find process unit", err)
+	}
+	if processUnit == nil {
+		return nil, appErr.NewNotFound("Process unit not found", nil)
+	}
+
+	utils.PatchIfNotZero(&processUnit.Name, req.Name)
+	utils.PatchIfNotZero(&processUnit.Type, req.Type)
+	utils.PatchIfNotZero(&processUnit.Description, req.Description)
+	utils.PatchIfNotZero(&processUnit.Status, req.Status)
+
+	updatedProcessUnit, err := s.repo.UpdateProcessUnit(processUnit)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to update process unit", err)
+	}
+
+	res := toProcessUnitResponse(*updatedProcessUnit)
+	return &res, nil
+}
+
 func toProcessUnitResponse(processUnit models.ProcessUnits) ProcessUnitResponse {
 	return ProcessUnitResponse{
 		ID:          processUnit.ID.String(),
