@@ -34,3 +34,12 @@ func (r *Repository) CreateProcessUnit(processUnit *models.ProcessUnits) (*model
 
 	return processUnit, nil
 }
+
+func (r *Repository) FindProcessUnitsByPlantID(plantID uuid.UUID) ([]models.ProcessUnits, error) {
+	var processUnits []models.ProcessUnits
+	if err := r.db.Where("plant_id = ?", plantID).Order("created_at DESC").Find(&processUnits).Error; err != nil {
+		return nil, err
+	}
+
+	return processUnits, nil
+}
