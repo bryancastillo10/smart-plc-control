@@ -46,3 +46,21 @@ func (h *Handler) GetProcessUnitsByPlantID(c *gin.Context) {
 
 	c.JSON(200, processUnits)
 }
+
+func (h *Handler) UpdateProcessUnit(c *gin.Context) {
+	processUnitID := c.Param("processUnitId")
+
+	req, err := http.BindJSON[UpdateProcessUnitRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	processUnit, err := h.service.UpdateProcessUnit(processUnitID, *req)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, processUnit)
+}
