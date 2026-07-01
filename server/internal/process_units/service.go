@@ -62,6 +62,37 @@ func (s *Service) CreateProcessUnit(plantID string, req CreateProcessUnitRequest
 	return &res, nil
 }
 
+func (s *Service) GetProcessUnitsByPlantID(plantID string) ([]ProcessUnitResponse, error) {
+	if plantID == "" {
+		return nil, appErr.NewBadRequest("Missing plant ID", nil)
+	}
+
+	parsedPlantID, err := utils.ParseId(plantID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid plant ID", err)
+	}
+
+	plant, err := s.repo.FindPlantByID(parsedPlantID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find plant", err)
+	}
+	if plant == nil {
+		return nil, appErr.NewNotFound("Plant not found", nil)
+	}
+
+	processUnits, err := s.repo.FindProcessUnitsByPlantID(parsedPlantID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get process units", err)
+	}
+
+	res := make([]ProcessUnitResponse, 0, len(processUnits))
+	for _, processUnit := range processUnits {
+		res = append(res, toProcessUnitResponse(processUnit))
+	}
+
+	return res, nil
+}
+
 func toProcessUnitResponse(processUnit models.ProcessUnits) ProcessUnitResponse {
 	return ProcessUnitResponse{
 		ID:          processUnit.ID.String(),
