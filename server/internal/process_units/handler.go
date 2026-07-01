@@ -34,3 +34,15 @@ func (h *Handler) CreateProcessUnit(c *gin.Context) {
 
 	c.JSON(201, processUnit)
 }
+
+func (h *Handler) GetProcessUnitsByPlantID(c *gin.Context) {
+	plantID := c.Param("plantId")
+
+	processUnits, err := h.service.GetProcessUnitsByPlantID(plantID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, processUnits)
+}
