@@ -72,3 +72,14 @@ func (h *Handler) UpdateDevice(c *gin.Context) {
 
 	c.JSON(200, device)
 }
+
+func (h *Handler) DeleteDevice(c *gin.Context) {
+	deviceID := c.Param("deviceId")
+
+	if err := h.service.DeleteDevice(deviceID); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Device deleted successfully"})
+}
