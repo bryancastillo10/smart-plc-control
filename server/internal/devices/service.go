@@ -123,6 +123,74 @@ func (s *Service) CreateDevice(req CreateDeviceRequest) (*DeviceResponse, error)
 	return &res, nil
 }
 
+func (s *Service) UpdateDevice(deviceID string, req UpdateDeviceRequest) (*DeviceResponse, error) {
+	if deviceID == "" {
+		return nil, appErr.NewBadRequest("Missing device ID", nil)
+	}
+
+	if req.Name == "" && req.Type == "" && req.Description == "" && req.Protocol == "" && req.Host == "" && req.Port == nil && req.ConnectionStatus == "" && req.Enabled == nil {
+		return nil, appErr.NewBadRequest("Missing device fields to update", nil)
+	}
+
+	if req.Type != "" && req.Type != models.PLC && req.Type != models.DeviceSimulator {
+		return nil, appErr.NewBadRequest("Invalid device type", nil)
+	}
+
+	if req.Protocol != "" && req.Protocol != models.Simulator && req.Protocol != models.ModbusTCP && req.Protocol != models.OPCUA {
+		return nil, appErr.NewBadRequest("Invalid device protocol", nil)
+	}
+
+	if req.ConnectionStatus != "" && req.ConnectionStatus != models.Connected && req.ConnectionStatus != models.Disconnected && req.ConnectionStatus != models.Connecting && req.ConnectionStatus != models.Error {
+		return nil, appErr.NewBadRequest("Invalid device connection status", nil)
+	}
+
+	if req.Port != nil && (*req.Port < 1 || *req.Port > 65535) {
+		return nil, appErr.NewBadRequest("Invalid device port", nil)
+	}
+
+	parsedDeviceID, err := utils.ParseId(deviceID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid device ID", err)
+	}
+
+	device, err := s.repo.FindDeviceByID(parsedDeviceID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find device", err)
+	}
+	if device == nil {
+		return nil, appErr.NewNotFound("Device not found", nil)
+	}
+
+	utils.PatchIfNotZero(&device.Name, req.Name)
+	utils.PatchIfNotZero(&device.Type, req.Type)
+	utils.PatchIfNotZero(&device.Description, req.Description)
+	utils.PatchIfNotZero(&device.Protocol, req.Protocol)
+	utils.PatchIfNotZero(&device.Host, req.Host)
+	utils.PatchIfNotZero(&device.ConnectionStatus, req.ConnectionStatus)
+
+	if req.Port != nil {
+		device.Port = req.Port
+	}
+	if req.Enabled != nil {
+		device.Enabled = *req.Enabled
+	}
+
+	if device.Type == models.DeviceSimulator && device.Protocol != models.Simulator {
+		return nil, appErr.NewBadRequest("Simulated devices must use SIMULATOR protocol", nil)
+	}
+	if device.Type == models.PLC && device.Protocol == models.Simulator {
+		return nil, appErr.NewBadRequest("PLC devices must use a PLC protocol", nil)
+	}
+
+	updatedDevice, err := s.repo.UpdateDevice(device)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to update device", err)
+	}
+
+	res := toDeviceResponse(*updatedDevice)
+	return &res, nil
+}
+
 func toDeviceResponse(device models.Devices) DeviceResponse {
 	return DeviceResponse{
 		ID:               device.ID.String(),
