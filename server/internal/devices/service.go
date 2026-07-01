@@ -191,6 +191,31 @@ func (s *Service) UpdateDevice(deviceID string, req UpdateDeviceRequest) (*Devic
 	return &res, nil
 }
 
+func (s *Service) DeleteDevice(deviceID string) error {
+	if deviceID == "" {
+		return appErr.NewBadRequest("Missing device ID", nil)
+	}
+
+	parsedDeviceID, err := utils.ParseId(deviceID)
+	if err != nil {
+		return appErr.NewBadRequest("Invalid device ID", err)
+	}
+
+	device, err := s.repo.FindDeviceByID(parsedDeviceID)
+	if err != nil {
+		return appErr.NewInternal("Failed to find device", err)
+	}
+	if device == nil {
+		return appErr.NewNotFound("Device not found", nil)
+	}
+
+	if err := s.repo.DeleteDevice(device); err != nil {
+		return appErr.NewInternal("Failed to delete device", err)
+	}
+
+	return nil
+}
+
 func toDeviceResponse(device models.Devices) DeviceResponse {
 	return DeviceResponse{
 		ID:               device.ID.String(),
