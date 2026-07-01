@@ -63,3 +63,7 @@ func (r *Repository) UpdateProcessUnit(processUnit *models.ProcessUnits) (*model
 
 	return processUnit, nil
 }
+
+func (r *Repository) DeleteProcessUnit(processUnit *models.ProcessUnits) error {
+	return r.db.Delete(processUnit).Error
+}
