@@ -133,6 +133,35 @@ func (s *Service) UpdateProcessUnit(processUnitID string, req UpdateProcessUnitR
 	return &res, nil
 }
 
+func (s *Service) DeleteProcessUnit(processUnitID string, req DeleteProcessUnitRequest) error {
+	if processUnitID == "" {
+		return appErr.NewBadRequest("Missing process unit ID", nil)
+	}
+
+	if req.Action != "delete" {
+		return appErr.NewBadRequest("Delete confirmation must be exactly 'delete'", nil)
+	}
+
+	parsedProcessUnitID, err := utils.ParseId(processUnitID)
+	if err != nil {
+		return appErr.NewBadRequest("Invalid process unit ID", err)
+	}
+
+	processUnit, err := s.repo.FindProcessUnitByID(parsedProcessUnitID)
+	if err != nil {
+		return appErr.NewInternal("Failed to find process unit", err)
+	}
+	if processUnit == nil {
+		return appErr.NewNotFound("Process unit not found", nil)
+	}
+
+	if err := s.repo.DeleteProcessUnit(processUnit); err != nil {
+		return appErr.NewInternal("Failed to delete process unit", err)
+	}
+
+	return nil
+}
+
 func toProcessUnitResponse(processUnit models.ProcessUnits) ProcessUnitResponse {
 	return ProcessUnitResponse{
 		ID:          processUnit.ID.String(),
