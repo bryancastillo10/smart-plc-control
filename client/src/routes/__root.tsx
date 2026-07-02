@@ -1,4 +1,4 @@
-import {
+﻿import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
@@ -6,6 +6,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
+import { AppToaster } from '@/integrations/sonner'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
@@ -48,6 +49,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <AppToaster />
         <TanStackDevtools
           config={{
             position: 'bottom-right',
