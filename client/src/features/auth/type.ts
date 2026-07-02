@@ -18,3 +18,7 @@ export interface SignInResponse {
 export interface SignInVariables extends SignInRequest {
 	language: Language;
 }
+
+export interface LogoutResponse {
+	message: string;
+}
