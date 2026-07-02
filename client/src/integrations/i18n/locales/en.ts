@@ -6,7 +6,9 @@ export const en = {
 		subtitle:
 			"Secure access for wastewater treatment monitoring, PLC connectivity, alarms, and process operations.",
 		username: "Username",
-		usernamePlaceholder: "admin",
+		usernamePlaceholder: "your username",
+		email: "Email",
+		emailPlaceholder:"your_email@domain.com",
 		password: "Password",
 		passwordPlaceholder: "Enter password",
 		language: "Language",
@@ -19,7 +21,7 @@ export const en = {
 		roleText: "Admin, operator and viewer permissions are enforced by the API.",
 		control: "PLC-ready",
 		controlText: "Designed for devices, tags, live readings, alarms and audit trails.",
-		required: "Enter both username and password.",
+		required: "Enter both email and password",
 		unavailable:
 			"Login service is not available yet. The client is ready for POST /api/v1/auth/login.",
 		failed: "Unable to sign in. Check your credentials and try again.",
