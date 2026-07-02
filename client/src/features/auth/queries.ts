@@ -1,4 +1,8 @@
-﻿import type { SignInResponse, SignInVariables } from "@/features/auth/type";
+﻿import type {
+	LogoutResponse,
+	SignInResponse,
+	SignInVariables,
+} from "@/features/auth/type";
 import { apiFetch } from "@/utils/fetch";
 
 export function signIn({ language, ...body }: SignInVariables) {
@@ -9,5 +13,12 @@ export function signIn({ language, ...body }: SignInVariables) {
 		headers: {
 			"Accept-Language": language,
 		},
+	});
+}
+
+export function logout() {
+	return apiFetch<LogoutResponse>("/auth/logout", {
+		method: "POST",
+		credentials: "include",
 	});
 }
