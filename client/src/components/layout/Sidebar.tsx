@@ -1,13 +1,15 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+﻿import { Link, useRouterState } from "@tanstack/react-router";
 import { Activity, LogOut, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { navigationItems, type SidebarNavItem } from "@/constants/navigation";
+import { useLogout } from "@/features/auth/useLogout";
 import { appIconVariants, appSidebar } from "@/styles/recipes";
 
 export function Sidebar() {
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
+	const { logout, logoutLoading } = useLogout();
 
 	return (
 		<aside className={appSidebar.root}>
@@ -41,9 +43,15 @@ export function Sidebar() {
 						<p className={appSidebar.userMeta}>Authenticated session</p>
 					</div>
 				</div>
-				<Button variant="outline" size="sm" className={appSidebar.logoutButton}>
+				<Button
+					variant="outline"
+					size="sm"
+					className={appSidebar.logoutButton}
+					disabled={logoutLoading}
+					onClick={() => logout()}
+				>
 					<LogOut className={appIconVariants({ tone: "muted" })} />
-					Sign out
+					{logoutLoading ? "Signing out..." : "Sign out"}
 				</Button>
 			</div>
 		</aside>
