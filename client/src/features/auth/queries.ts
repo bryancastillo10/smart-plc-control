@@ -1,4 +1,5 @@
 ﻿import type {
+	CurrentUserResponse,
 	LogoutResponse,
 	SignInResponse,
 	SignInVariables,
@@ -19,6 +20,13 @@ export function signIn({ language, ...body }: SignInVariables) {
 export function logout() {
 	return apiFetch<LogoutResponse>("/auth/logout", {
 		method: "POST",
+		credentials: "include",
+	});
+}
+
+export function currentUser() {
+	return apiFetch<CurrentUserResponse>("/auth/me", {
+		method: "GET",
 		credentials: "include",
 	});
 }
