@@ -103,7 +103,7 @@ const LoginPage = () => {
 
 							<form className={homeLayout.form} onSubmit={handleSubmit}>
 								<div className={homeLayout.field}>
-									<Label htmlFor="email">{t("username")}</Label>
+									<Label htmlFor="email">{t("email")}</Label>
 									<div className={homeLayout.iconField}>
 										<UserRound
 											className={appIconVariants({ tone: "muted", placement: "input" })}
@@ -112,10 +112,10 @@ const LoginPage = () => {
 										<Input
 											id="email"
 											type="email"
-											autoComplete="username"
+											autoComplete="email"
 											value={signInData.email}
 											onChange={onChange}
-											placeholder={t("usernamePlaceholder")}
+											placeholder={t("emailPlaceholder")}
 											className={appControl.inputWithIcon}
 										/>
 									</div>
