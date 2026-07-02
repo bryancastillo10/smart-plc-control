@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button.tsx";
+﻿import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import {
@@ -8,24 +8,26 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select.tsx";
+import useSignin from "@/features/auth/useSignin";
 import "@/integrations/i18n";
+import type { Language } from "@/types/enum";
+import { cn } from "@/utils/utils";
 import {
 	Activity,
 	BadgeCheck,
 	Building2,
+	Eye,
+	EyeOff,
 	Globe2,
 	LockKeyhole,
 	ShieldCheck,
 	UserRound,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { i18nLanguageByApiLanguage, type Language } from "@/integrations/i18n";
 import {
 	appBadgeVariants,
 	appButtonVariants,
 	appControl,
-	appFeedbackVariants,
 	appIconVariants,
 	homeLayout,
 	appSurfaceVariants,
@@ -33,73 +35,18 @@ import {
 } from "@/styles/recipes";
 import InfoTile from "./InfoTile";
 
-const API_BASE_PATH = "/api/v1";
-
 const LoginPage = () => {
-	const { i18n, t } = useTranslation();
-	const [language, setLanguage] = useState<Language>("EN");
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const [message, setMessage] = useState("");
-	const [messageType, setMessageType] = useState<"error" | "success">("error");
-	const [isSubmitting, setIsSubmitting] = useState(false);
-
-	useEffect(() => {
-		i18n.changeLanguage(i18nLanguageByApiLanguage[language]);
-		if (typeof document !== "undefined") {
-			document.documentElement.lang = language === "ZH-TW" ? "zh-TW" : "en";
-		}
-	}, [i18n, language]);
-
-	async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
-		event.preventDefault();
-
-		if (!username.trim() || !password) {
-			setMessageType("error");
-			setMessage(t("required"));
-			return;
-		}
-
-		setIsSubmitting(true);
-		setMessage("");
-
-		try {
-			const response = await fetch(`${API_BASE_PATH}/auth/login`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					"Accept-Language": language,
-				},
-				body: JSON.stringify({
-					username: username.trim(),
-					password,
-				}),
-			});
-
-			if (response.status === 404 || response.status === 405) {
-				throw new Error("LOGIN_ENDPOINT_UNAVAILABLE");
-			}
-
-			const payload = await response.json().catch(() => null);
-
-			if (!response.ok) {
-				throw new Error(payload?.error ?? "LOGIN_FAILED");
-			}
-
-			setMessageType("success");
-			setMessage(t("success"));
-			setPassword("");
-		} catch (error) {
-			setMessageType("error");
-			setMessage(
-				error instanceof Error && error.message === "LOGIN_ENDPOINT_UNAVAILABLE"
-					? t("unavailable")
-					: t("failed"),
-			);
-		} finally {
-			setIsSubmitting(false);
-		}
-	}
+	const { t } = useTranslation();
+	const {
+		language,
+		setLanguage,
+		signInData,
+		showPassword,
+		onChange,
+		handleRevealPassword,
+		handleSubmit,
+		signInLoading,
+	} = useSignin();
 
 	return (
 		<main className={homeLayout.page}>
@@ -122,21 +69,9 @@ const LoginPage = () => {
 						</div>
 
 						<div className={homeLayout.responsiveGrid3}>
-							<InfoTile
-								icon={BadgeCheck}
-								title={t("adminOnly")}
-								text={t("notice")}
-							/>
-							<InfoTile
-								icon={ShieldCheck}
-								title={t("role")}
-								text={t("roleText")}
-							/>
-							<InfoTile
-								icon={Building2}
-								title={t("control")}
-								text={t("controlText")}
-							/>
+							<InfoTile icon={BadgeCheck} title={t("adminOnly")} text={t("notice")} />
+							<InfoTile icon={ShieldCheck} title={t("role")} text={t("roleText")} />
+							<InfoTile icon={Building2} title={t("control")} text={t("controlText")} />
 						</div>
 
 						<div className={appSurfaceVariants({ variant: "notice" })}>
@@ -173,21 +108,19 @@ const LoginPage = () => {
 
 							<form className={homeLayout.form} onSubmit={handleSubmit}>
 								<div className={homeLayout.field}>
-									<Label htmlFor="username">{t("username")}</Label>
+									<Label htmlFor="email">{t("email")}</Label>
 									<div className={homeLayout.iconField}>
 										<UserRound
-											className={appIconVariants({
-												tone: "muted",
-												placement: "input",
-											})}
+											className={appIconVariants({ tone: "muted", placement: "input" })}
 											aria-hidden="true"
 										/>
 										<Input
-											id="username"
-											autoComplete="username"
-											value={username}
-											onChange={(event) => setUsername(event.target.value)}
-											placeholder={t("usernamePlaceholder")}
+											id="email"
+											type="email"
+											autoComplete="email"
+											value={signInData.email}
+											onChange={onChange}
+											placeholder={t("emailPlaceholder")}
 											className={appControl.inputWithIcon}
 										/>
 									</div>
@@ -197,49 +130,45 @@ const LoginPage = () => {
 									<Label htmlFor="password">{t("password")}</Label>
 									<div className={homeLayout.iconField}>
 										<LockKeyhole
-											className={appIconVariants({
-												tone: "muted",
-												placement: "input",
-											})}
+											className={appIconVariants({ tone: "muted", placement: "input" })}
 											aria-hidden="true"
 										/>
 										<Input
 											id="password"
-											type="password"
+											type={showPassword ? "text" : "password"}
 											autoComplete="current-password"
-											value={password}
-											onChange={(event) => setPassword(event.target.value)}
+											value={signInData.password}
+											onChange={onChange}
 											placeholder={t("passwordPlaceholder")}
-											className={appControl.inputWithIcon}
+											className={cn(appControl.inputWithIcon, "pr-11")}
 										/>
+										<button
+											type="button"
+											className="absolute right-3 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-brand-muted transition-colors hover:text-brand-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+											aria-label={showPassword ? "Hide password" : "Show password"}
+											aria-pressed={showPassword}
+											onClick={handleRevealPassword}
+										>
+											{showPassword ? (
+												<EyeOff className="size-4" aria-hidden="true" />
+											) : (
+												<Eye className="size-4" aria-hidden="true" />
+											)}
+										</button>
 									</div>
 								</div>
 
 								<Button
 									type="submit"
 									size="lg"
-									disabled={isSubmitting}
+									disabled={signInLoading}
 									className={appButtonVariants({ size: "form", width: "full" })}
 								>
 									<ShieldCheck className="size-4" aria-hidden="true" />
-									{isSubmitting ? t("signingIn") : t("signIn")}
+									{signInLoading ? t("signingIn") : t("signIn")}
 								</Button>
 
-								{message ? (
-									<p
-										className={appFeedbackVariants({ tone: messageType })}
-										role={messageType === "error" ? "alert" : "status"}
-									>
-										{message}
-									</p>
-								) : null}
-
-								<p
-									className={appTextVariants({
-										role: "helper",
-										align: "center",
-									})}
-								>
+								<p className={appTextVariants({ role: "helper", align: "center" })}>
 									{t("notice")}
 								</p>
 							</form>
@@ -252,3 +181,5 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+

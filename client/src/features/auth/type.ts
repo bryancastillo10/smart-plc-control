@@ -18,3 +18,16 @@ export interface SignInResponse {
 export interface SignInVariables extends SignInRequest {
 	language: Language;
 }
+
+export interface LogoutResponse {
+	message: string;
+}
+
+export interface CurrentUserResponse {
+	username: string;
+	email: string;
+	role: Role;
+	language: Language;
+	created_at: string;
+	updated_at: string;
+}
