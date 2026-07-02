@@ -1,4 +1,5 @@
 ﻿import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 
 import { logout } from "@/features/auth/queries";
 import { useToast } from "@/integrations/sonner";
@@ -8,14 +9,16 @@ const logoutSuccessMessage = "Signed out successfully.";
 const logoutErrorMessage = "Unable to sign out. Please try again.";
 
 export function useLogout() {
+	const navigate = useNavigate();
 	const toast = useToast();
 	const clearUser = useUserStore((state) => state.clearUser);
 
 	const logoutMutation = useMutation({
 		mutationFn: logout,
-		onSuccess: (response) => {
+		onSuccess: async (response) => {
 			clearUser();
 			toast.success(response.message || logoutSuccessMessage);
+			await navigate({ to: "/" });
 		},
 		onError: (error) => {
 			toast.error(error, logoutErrorMessage);

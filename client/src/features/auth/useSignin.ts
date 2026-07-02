@@ -1,4 +1,5 @@
 ﻿import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -15,6 +16,7 @@ const initialSignIn: SignInRequest = {
 
 const useSignin = () => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 	const toast = useToast();
 	const language = useLanguageStore((state) => state.language);
 	const setLanguage = useLanguageStore((state) => state.setLanguage);
@@ -22,9 +24,10 @@ const useSignin = () => {
 
 	const signInMutation = useMutation({
 		mutationFn: signIn,
-		onSuccess: () => {
+		onSuccess: async () => {
 			toast.success(t("success"));
 			setSignInData(initialSignIn);
+			await navigate({ to: "/dashboard" });
 		},
 		onError: (error) => {
 			toast.error(getErrorMessage(error, t("failed")));
@@ -40,6 +43,8 @@ const useSignin = () => {
 
 	const handleSubmit = (event: SubmitEvent) => {
 		event.preventDefault();
+
+		console.log("Data Received")
 
 		if (!signInData.email.trim() || !signInData.password) {
 			toast.error(null, t("required"));
