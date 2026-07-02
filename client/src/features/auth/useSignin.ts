@@ -1,11 +1,12 @@
 ﻿import { useMutation } from "@tanstack/react-query";
-import { useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { signIn } from "@/features/auth/queries";
 import type { SignInRequest } from "@/features/auth/type";
 import { useToast } from "@/integrations/sonner";
 import { useLanguageStore } from "@/store/language";
+import { getErrorMessage } from "@/utils/error";
 
 const initialSignIn: SignInRequest = {
 	email: "",
@@ -26,7 +27,7 @@ const useSignin = () => {
 			setSignInData(initialSignIn);
 		},
 		onError: (error) => {
-			toast.error(error);
+			toast.error(getErrorMessage(error, t("failed")));
 		},
 	});
 
