@@ -1,6 +1,6 @@
 ﻿import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useState, type ChangeEvent, type SubmitEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { signIn } from "@/features/auth/queries";
@@ -21,12 +21,14 @@ const useSignin = () => {
 	const language = useLanguageStore((state) => state.language);
 	const setLanguage = useLanguageStore((state) => state.setLanguage);
 	const [signInData, setSignInData] = useState<SignInRequest>(initialSignIn);
+	const [showPassword, setShowPassword] = useState(false);
 
 	const signInMutation = useMutation({
 		mutationFn: signIn,
 		onSuccess: async () => {
 			toast.success(t("success"));
 			setSignInData(initialSignIn);
+			setShowPassword(false);
 			await navigate({ to: "/dashboard" });
 		},
 		onError: (error) => {
@@ -41,10 +43,12 @@ const useSignin = () => {
 		}));
 	};
 
-	const handleSubmit = (event: SubmitEvent) => {
-		event.preventDefault();
+	const handleRevealPassword = () => {
+		setShowPassword((current) => !current);
+	};
 
-		console.log("Data Received")
+	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
 
 		if (!signInData.email.trim() || !signInData.password) {
 			toast.error(null, t("required"));
@@ -62,7 +66,9 @@ const useSignin = () => {
 		language,
 		setLanguage,
 		signInData,
+		showPassword,
 		onChange,
+		handleRevealPassword,
 		handleSubmit,
 		signInLoading: signInMutation.isPending,
 		signInResponse: signInMutation.data,
