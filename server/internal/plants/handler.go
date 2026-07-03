@@ -18,13 +18,19 @@ func NewHandler(db *gorm.DB) *Handler {
 }
 
 func (h *Handler) CreatePlant(c *gin.Context) {
+	userID, err := http.ExtractUserIDFromContext(c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
 	req, err := http.BindJSON[CreatePlantRequest](c)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
-	plant, err := h.service.CreatePlant(*req)
+	plant, err := h.service.CreatePlant(userID, *req)
 	if err != nil {
 		c.Error(err)
 		return
