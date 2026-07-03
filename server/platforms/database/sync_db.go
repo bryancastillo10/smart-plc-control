@@ -12,6 +12,7 @@ func SyncDatabase() {
 		&models.Users{},
 		&models.Plants{},
 		&models.ProcessUnits{},
+		&models.ProcessUnitConnections{},
 		&models.Devices{},
 		&models.Tags{},
 		&models.TagReadings{},

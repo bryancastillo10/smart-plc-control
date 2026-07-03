@@ -113,3 +113,15 @@ const (
 	SimulationPaused  SimulationStatus = "PAUSED"
 	SimulationStopped SimulationStatus = "STOPPED"
 )
+
+type FlowType string
+
+const (
+	WaterFlow       FlowType = "WATER"
+	WastewaterFlow  FlowType = "WASTEWATER"
+	SludgeFlow      FlowType = "SLUDGE"
+	GasFlow         FlowType = "GAS"
+	ChemicalFlow    FlowType = "CHEMICAL"
+	RawMaterialFlow FlowType = "RAW_MATERIAL"
+	OthersFlow      FlowType = "OTHERS"
+)
