@@ -114,6 +114,7 @@ func (s *Service) CreateDevice(req CreateDeviceRequest) (*DeviceResponse, error)
 		Port:             req.Port,
 		ConnectionStatus: req.ConnectionStatus,
 		Enabled:          enabled,
+		Position:         getPosition(req.Position),
 	}
 
 	createdDevice, err := s.repo.CreateDevice(device)
@@ -130,7 +131,7 @@ func (s *Service) UpdateDevice(deviceID string, req UpdateDeviceRequest) (*Devic
 		return nil, appErr.NewBadRequest("Missing device ID", nil)
 	}
 
-	if req.Name == "" && req.Type == "" && req.Description == "" && req.Protocol == "" && req.Host == "" && req.Port == nil && req.ConnectionStatus == "" && req.Enabled == nil {
+	if req.Name == "" && req.Type == "" && req.Description == "" && req.Protocol == "" && req.Host == "" && req.Port == nil && req.ConnectionStatus == "" && req.Enabled == nil && req.Position == nil {
 		return nil, appErr.NewBadRequest("Missing device fields to update", nil)
 	}
 
@@ -175,6 +176,9 @@ func (s *Service) UpdateDevice(deviceID string, req UpdateDeviceRequest) (*Devic
 	}
 	if req.Enabled != nil {
 		device.Enabled = *req.Enabled
+	}
+	if req.Position != nil {
+		device.Position = *req.Position
 	}
 
 	if device.Type == models.DeviceSimulator && device.Protocol != models.Simulator {
@@ -294,7 +298,16 @@ func toDeviceResponse(device models.Devices) DeviceResponse {
 		ConnectionStatus: device.ConnectionStatus,
 		Enabled:          device.Enabled,
 		LastConnectedAt:  device.LastConnectedAt,
+		Position:         device.Position,
 		CreatedAt:        device.CreatedAt,
 		UpdatedAt:        device.UpdatedAt,
 	}
+}
+
+func getPosition(position *models.Position) models.Position {
+	if position == nil {
+		return models.Position{}
+	}
+
+	return *position
 }

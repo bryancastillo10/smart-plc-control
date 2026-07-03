@@ -17,14 +17,16 @@ POST   /api/v1/auth/register
 GET    /api/v1/auth/me
 ```
 
-| Endpoint                     | Description                   | Access        |
-| ---------------------------- | ----------------------------- | ------------- |
+| Endpoint                     | Description                                         | Access        |
+| ---------------------------- | --------------------------------------------------- | ------------- |
 | `POST /api/v1/auth/login`    | Authenticate a user           | Public        |
 | `POST /api/v1/auth/logout`   | Log out the current user      | Authenticated |
 | `POST /api/v1/auth/register` | Create a new user account     | `ADMIN`       |
-| `GET /api/v1/auth/me`        | Return the authenticated user | Authenticated |
+| `GET /api/v1/auth/me`        | Return the authenticated user, including `hasOwnedPlant` | Authenticated |
 
 Public self-registration is disabled. New users are created by an administrator.
+
+`GET /api/v1/auth/me` includes `hasOwnedPlant`, which is `true` when the current user has at least one plant in a plant `accessibleBy` list.
 
 Because authentication uses stateless JWT access tokens, logout is primarily handled by the client removing the stored token. The backend may still record a `LOGOUT` audit event.
 
@@ -72,9 +74,9 @@ PUT    /api/v1/plants/:plantId
 DELETE   /api/v1/plants/:plantId
 ```
 
-| Endpoint                         | Description               | Access        |
-| -------------------------------- | ------------------------- | ------------- |
-| `POST /api/v1/plants`            | Create a plant            | `ADMIN`       |
+| Endpoint                         | Description                                  | Access        |
+| -------------------------------- | -------------------------------------------- | ------------- |
+| `POST /api/v1/plants`            | Create a plant and assign initial admin access | `ADMIN`       |
 | `GET /api/v1/plants`             | List accessible plants    | Authenticated |
 | `GET /api/v1/plants/:plantId`    | Get plant details         | Authenticated |
 | `PUT /api/v1/plants/:plantId`  | Update a plant            | `ADMIN`       |
@@ -93,15 +95,81 @@ PUT      /api/v1/process-units/:processUnitId
 DELETE   /api/v1/process-units/:processUnitId
 ```
 
-| Endpoint                                                | Description                       | Access        |
-| ------------------------------------------------------- | --------------------------------- | ------------- |
-| `POST /api/v1/plants/:plantId/process-units`            | Create a process unit for a plant | `ADMIN`       |
-| `GET /api/v1/plants/:plantId/process-units`             | List process units for a plant    | Authenticated |
-| `GET /api/v1/process-units/:processUnitId`              | Get process unit details          | Authenticated |
-| `PUT /api/v1/process-units/:processUnitId`              | Update a process unit             | `ADMIN`       |
-| `DELETE /api/v1/process-units/:processUnitId`           | Delete a process unit             | `ADMIN`       |
+| Endpoint                                      | Description                                   | Access        |
+| --------------------------------------------- | --------------------------------------------- | ------------- |
+| `POST /api/v1/plants/:plantId/process-units`  | Create a process unit for a plant             | `ADMIN`       |
+| `GET /api/v1/plants/:plantId/process-units`   | List process units for a plant                | Authenticated |
+| `GET /api/v1/process-units/:processUnitId`    | Get process unit details                      | Authenticated |
+| `PUT /api/v1/process-units/:processUnitId`    | Update a process unit                         | `ADMIN`       |
+| `DELETE /api/v1/process-units/:processUnitId` | Delete a process unit and related connections | `ADMIN`       |
+
+Create and update requests may include `position` and `ports`:
+
+```json
+{
+  "name": "Methane Reactor",
+  "type": "Anaerobic Digestion",
+  "description": "Methanogenesis process unit",
+  "status": "ACTIVE",
+  "position": { "x": 320, "y": 120 },
+  "ports": [
+    { "id": "in", "label": "In", "direction": "IN" },
+    { "id": "out", "label": "Out", "direction": "OUT" }
+  ]
+}
+```
+
+When `ports` is omitted, the backend assigns default `in` and `out` ports. `position` is stored as JSON with `x` and `y` values for UI diagram placement.
+
+Process unit create, update, and delete return a mutation response so the client can refresh its diagram state in one step:
+
+```json
+{
+  "processUnit": {},
+  "deletedProcessUnitId": "only-present-on-delete",
+  "connections": []
+}
+```
+
+`processUnit` includes the unit `ports` and `position`. Delete responses omit `processUnit`, include `deletedProcessUnitId`, and return remaining plant connections after connections involving the deleted unit are removed.
 
 Process unit `type` should be treated as a flexible string so the app can support different treatment systems, such as AD, AO, A2O, SBR, MBR, MBBR, or custom pilot processes.
+
+### Process Unit Connections
+
+Process unit connections represent diagram arrows between source and target process-unit ports.
+
+```text
+POST     /api/v1/plants/:plantId/process-unit-connections
+GET      /api/v1/plants/:plantId/process-unit-connections
+
+GET      /api/v1/process-unit-connections/:connectionId
+PUT      /api/v1/process-unit-connections/:connectionId
+DELETE   /api/v1/process-unit-connections/:connectionId
+```
+
+| Endpoint                                                | Description                               | Access        |
+| ------------------------------------------------------- | ----------------------------------------- | ------------- |
+| `POST /api/v1/plants/:plantId/process-unit-connections` | Create a connection between process units | `ADMIN`       |
+| `GET /api/v1/plants/:plantId/process-unit-connections`  | List process-unit connections for a plant | Authenticated |
+| `GET /api/v1/process-unit-connections/:connectionId`    | Get process-unit connection details       | Authenticated |
+| `PUT /api/v1/process-unit-connections/:connectionId`    | Update a process-unit connection          | `ADMIN`       |
+| `DELETE /api/v1/process-unit-connections/:connectionId` | Delete a process-unit connection          | `ADMIN`       |
+
+Connection create requests require both unit IDs and both port IDs:
+
+```json
+{
+  "sourceUnitId": "source-process-unit-id",
+  "sourcePortId": "out",
+  "targetUnitId": "target-process-unit-id",
+  "targetPortId": "in",
+  "label": "Acid Tank to Methane Reactor",
+  "flowType": "WASTEWATER"
+}
+```
+
+Allowed `flowType` values are `WATER`, `WASTEWATER`, `SLUDGE`, `GAS`, `CHEMICAL`, `RAW_MATERIAL`, and `OTHERS`.
 
 ### Devices
 
@@ -125,6 +193,8 @@ POST     /api/v1/devices/:deviceId/disconnect
 | `DELETE /api/v1/devices/:deviceId`          | Delete a device                  | `ADMIN`             |
 | `POST /api/v1/devices/:deviceId/connect`    | Connect a device                 | `ADMIN`, `OPERATOR` |
 | `POST /api/v1/devices/:deviceId/disconnect` | Disconnect a device              | `ADMIN`, `OPERATOR` |
+
+Devices include a JSON `position` field with `x` and `y` values for UI placement.
 
 Device connection actions are modeled as explicit commands because they cause operational state changes rather than ordinary resource updates.
 

@@ -13,10 +13,11 @@ type CreatePlantRequest struct {
 }
 
 type UpdatePlantRequest struct {
-	Name        string             `json:"name" binding:"omitempty,min=1,max=120"`
-	Location    string             `json:"location" binding:"omitempty,min=1,max=200"`
-	Description string             `json:"description" binding:"omitempty"`
-	Status      models.PlantStatus `json:"status" binding:"omitempty,oneof=ACTIVE INACTIVE MAINTENANCE"`
+	Name         string             `json:"name" binding:"omitempty,min=1,max=120"`
+	Location     string             `json:"location" binding:"omitempty,min=1,max=200"`
+	Description  string             `json:"description" binding:"omitempty"`
+	Status       models.PlantStatus `json:"status" binding:"omitempty,oneof=ACTIVE INACTIVE MAINTENANCE"`
+	AccessibleBy []string           `json:"accessibleBy" binding:"omitempty"`
 }
 
 type DeletePlantRequest struct {
@@ -24,11 +25,12 @@ type DeletePlantRequest struct {
 }
 
 type PlantResponse struct {
-	ID          string             `json:"id"`
-	Name        string             `json:"name"`
-	Location    string             `json:"location"`
-	Description string             `json:"description"`
-	Status      models.PlantStatus `json:"status"`
-	CreatedAt   time.Time          `json:"createdAt"`
-	UpdatedAt   time.Time          `json:"updatedAt"`
+	ID           string             `json:"id"`
+	Name         string             `json:"name"`
+	Location     string             `json:"location"`
+	Description  string             `json:"description"`
+	Status       models.PlantStatus `json:"status"`
+	AccessibleBy []string           `json:"accessibleBy"`
+	CreatedAt    time.Time          `json:"createdAt"`
+	UpdatedAt    time.Time          `json:"updatedAt"`
 }

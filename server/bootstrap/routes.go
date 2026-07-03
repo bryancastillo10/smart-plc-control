@@ -82,11 +82,24 @@ func registerProcessUnits(r *gin.RouterGroup, DB *gorm.DB) {
 		plantProcessUnitGrp.GET("", processUnit.GetProcessUnitsByPlantID)
 	}
 
+	plantProcessUnitConnectionGrp := r.Group("/plants/:plantId/process-unit-connections", middleware.JWTAuthMiddleware())
+	{
+		plantProcessUnitConnectionGrp.POST("", middleware.RequireRoles(models.Admin), processUnit.CreateProcessUnitConnection)
+		plantProcessUnitConnectionGrp.GET("", processUnit.GetProcessUnitConnectionsByPlantID)
+	}
+
 	processUnitGrp := r.Group("/process-units", middleware.JWTAuthMiddleware())
 	{
 		processUnitGrp.GET("/:processUnitId", processUnit.GetProcessUnitByID)
 		processUnitGrp.PUT("/:processUnitId", middleware.RequireRoles(models.Admin), processUnit.UpdateProcessUnit)
 		processUnitGrp.DELETE("/:processUnitId", middleware.RequireRoles(models.Admin), processUnit.DeleteProcessUnit)
+	}
+
+	processUnitConnectionGrp := r.Group("/process-unit-connections", middleware.JWTAuthMiddleware())
+	{
+		processUnitConnectionGrp.GET("/:connectionId", processUnit.GetProcessUnitConnectionByID)
+		processUnitConnectionGrp.PUT("/:connectionId", middleware.RequireRoles(models.Admin), processUnit.UpdateProcessUnitConnection)
+		processUnitConnectionGrp.DELETE("/:connectionId", middleware.RequireRoles(models.Admin), processUnit.DeleteProcessUnitConnection)
 	}
 }
 

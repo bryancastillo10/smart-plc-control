@@ -14,10 +14,13 @@ erDiagram
     USERS ||--o{ AUDIT_LOGS : performs
 
     PLANTS ||--o{ PROCESS_UNITS : contains
+    PLANTS ||--o{ PROCESS_UNIT_CONNECTIONS : maps
     PLANTS ||--o{ DEVICES : contains
     PLANTS ||--o{ SIMULATIONS : runs
 
     PROCESS_UNITS ||--o{ TAGS : groups
+    PROCESS_UNITS ||--o{ PROCESS_UNIT_CONNECTIONS : source
+    PROCESS_UNITS ||--o{ PROCESS_UNIT_CONNECTIONS : target
     DEVICES ||--o{ TAGS : contains
 
     TAGS ||--o{ TAG_READINGS : produces
@@ -33,6 +36,8 @@ erDiagram
 ```text
 Plant
 ├── Process Units
+│   ├── Ports
+│   ├── Process Unit Connections
 │   └── Tags
 │       ├── Tag Readings
 │       └── Alert Rules
@@ -85,15 +90,16 @@ ZH-TW
 
 ## `plants`
 
-Stores monitored plants or facilities.
+Stores monitored plants or facilities. A plant can be accessible to multiple users through `accessible_by`, which stores user IDs as JSON strings.
 
 | Field | Type | Constraints |
 | ----- | ---- | ----------- |
 | `id` | `UUID` | Primary key |
 | `name` | `VARCHAR(120)` | Not null |
-| `location` | `VARCHAR(200)` | Nullable |
+| `location` | `VARCHAR(200)` | Not null |
 | `description` | `TEXT` | Nullable |
 | `status` | `VARCHAR(20)` | Not null, default `ACTIVE` |
+| `accessible_by` | `JSONB` | User ID string array |
 | `created_at` | `TIMESTAMPTZ` | Not null |
 | `updated_at` | `TIMESTAMPTZ` | Not null |
 
@@ -116,14 +122,33 @@ For an anaerobic digestion plant, examples include influent tank, acid reactor, 
 | Field | Type | Constraints |
 | ----- | ---- | ----------- |
 | `id` | `UUID` | Primary key |
-| `plant_id` | `UUID` | Foreign key -> `plants.id` |
+| `plant_id` | `UUID` | Foreign key -> `plants.id`, not null, indexed |
 | `name` | `VARCHAR(120)` | Not null |
 | `type` | `VARCHAR(80)` | Not null |
 | `description` | `TEXT` | Nullable |
 | `status` | `VARCHAR(20)` | Not null, default `ACTIVE` |
+| `position` | `JSONB` | Diagram coordinates, `{ "x": number, "y": number }` |
+| `ports` | `JSONB` | Process-unit port array |
 | `created_at` | `TIMESTAMPTZ` | Not null |
 | `updated_at` | `TIMESTAMPTZ` | Not null |
 
+`position` is used by the client diagram editor for drag-and-drop placement.
+
+Example `ports` value:
+
+```json
+[
+  { "id": "in", "label": "In", "direction": "IN" },
+  { "id": "out", "label": "Out", "direction": "OUT" }
+]
+```
+
+Allowed port directions:
+
+```text
+IN
+OUT
+```
 
 Allowed statuses:
 
@@ -138,6 +163,47 @@ Recommended unique constraint:
 ```text
 UNIQUE(plant_id, name)
 ```
+
+---
+
+## `process_unit_connections`
+
+Stores diagram connections between process-unit ports. Each connection belongs to a plant and links a source unit port to a target unit port.
+
+| Field | Type | Constraints |
+| ----- | ---- | ----------- |
+| `id` | `UUID` | Primary key |
+| `plant_id` | `UUID` | Foreign key -> `plants.id`, not null, indexed |
+| `source_unit_id` | `UUID` | Foreign key -> `process_units.id`, not null, indexed |
+| `source_port_id` | `VARCHAR(80)` | Not null |
+| `target_unit_id` | `UUID` | Foreign key -> `process_units.id`, not null, indexed |
+| `target_port_id` | `VARCHAR(80)` | Not null |
+| `label` | `VARCHAR(120)` | Nullable |
+| `flow_type` | `VARCHAR(80)` | Nullable |
+| `created_at` | `TIMESTAMPTZ` | Not null |
+| `updated_at` | `TIMESTAMPTZ` | Not null |
+
+Allowed flow types:
+
+```text
+WATER
+WASTEWATER
+SLUDGE
+GAS
+CHEMICAL
+RAW_MATERIAL
+OTHERS
+```
+
+Recommended indexes:
+
+```text
+INDEX(plant_id)
+INDEX(source_unit_id)
+INDEX(target_unit_id)
+```
+
+When a process unit is deleted through the application API, connections where it is either the source or target unit are deleted before the process unit is deleted.
 
 ---
 
@@ -158,6 +224,7 @@ Stores PLCs, simulated controllers, communication gateways, sensor groups, and a
 | `connection_status` | `VARCHAR(20)` | Not null, default `DISCONNECTED` |
 | `enabled` | `BOOLEAN` | Not null, default `TRUE` |
 | `last_connected_at` | `TIMESTAMPTZ` | Nullable |
+| `position` | `JSONB` | Diagram coordinates, `{ "x": number, "y": number }` |
 | `created_at` | `TIMESTAMPTZ` | Not null |
 | `updated_at` | `TIMESTAMPTZ` | Not null |
 
@@ -491,6 +558,7 @@ Audit logs should be append-only.
 | `users` | Application accounts and roles |
 | `plants` | Monitored facilities |
 | `process_units` | Process areas inside a plant |
+| `process_unit_connections` | Diagram arrows between process-unit ports |
 | `devices` | PLCs, simulated controllers, communication gateways, and equipment groups |
 | `tags` | PLC variable definitions, sensor variables, actuator states, and simulated values |
 | `tag_readings` | Current and historical tag values |
@@ -511,6 +579,7 @@ Plant deleted
 └── Cascade delete its simulations
 
 Process unit deleted
+├── Delete related process_unit_connections where it is source or target
 └── Set related tag process_unit_id to null, or restrict deletion when tag history must be preserved
 
 Device deleted

@@ -67,3 +67,48 @@ func (r *Repository) UpdateProcessUnit(processUnit *models.ProcessUnits) (*model
 func (r *Repository) DeleteProcessUnit(processUnit *models.ProcessUnits) error {
 	return r.db.Delete(processUnit).Error
 }
+
+func (r *Repository) CreateProcessUnitConnection(connection *models.ProcessUnitConnections) (*models.ProcessUnitConnections, error) {
+	if err := r.db.Create(connection).Error; err != nil {
+		return nil, err
+	}
+
+	return connection, nil
+}
+
+func (r *Repository) FindProcessUnitConnectionsByPlantID(plantID uuid.UUID) ([]models.ProcessUnitConnections, error) {
+	var connections []models.ProcessUnitConnections
+	if err := r.db.Where("plant_id = ?", plantID).Order("created_at DESC").Find(&connections).Error; err != nil {
+		return nil, err
+	}
+
+	return connections, nil
+}
+
+func (r *Repository) FindProcessUnitConnectionByID(connectionID uuid.UUID) (*models.ProcessUnitConnections, error) {
+	var connection models.ProcessUnitConnections
+	if err := r.db.Where("id = ?", connectionID).First(&connection).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &connection, nil
+}
+
+func (r *Repository) UpdateProcessUnitConnection(connection *models.ProcessUnitConnections) (*models.ProcessUnitConnections, error) {
+	if err := r.db.Save(connection).Error; err != nil {
+		return nil, err
+	}
+
+	return connection, nil
+}
+
+func (r *Repository) DeleteProcessUnitConnection(connection *models.ProcessUnitConnections) error {
+	return r.db.Delete(connection).Error
+}
+
+func (r *Repository) DeleteProcessUnitConnectionsByUnitID(processUnitID uuid.UUID) error {
+	return r.db.Where("source_unit_id = ? OR target_unit_id = ?", processUnitID, processUnitID).Delete(&models.ProcessUnitConnections{}).Error
+}

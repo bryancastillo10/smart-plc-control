@@ -1,5 +1,5 @@
 ### Create PLC Device
-@plantId = 86ca5d65-3c1e-4dbd-9c5a-46ea68a897be
+@plantId = 6203ddf0-52a1-4251-bafa-193f694d7601
 POST http://localhost:8080/api/v1/devices
 Content-Type: application/json
 
@@ -31,7 +31,9 @@ Content-Type: application/json
 GET http://localhost:8080/api/v1/devices
 
 ### Get Device Details
-@deviceId = 72305f0b-a0dd-43cb-9183-072d768ec2f9
+@deviceId = 49a165fe-90fe-4673-8dff-3bdbc403f8e3
+
+@deleteDeviceId = 5b9c55b0-aa4b-41e2-8b44-556fc9476e9f
 GET http://localhost:8080/api/v1/devices/{{deviceId}}
 
 ### Update Device
@@ -41,15 +43,19 @@ Content-Type: application/json
 {
 	"name": "Digester PLC",
 	"description": "Updated PLC controller for anaerobic digester feed, heating, gas handling, and safety interlocks.",
-	"protocol": "MODBUS_TCP",
+	"protocol": "SIMULATOR",
 	"host": "192.168.10.26",
 	"port": 1502,
 	"connectionStatus": "DISCONNECTED",
-	"enabled": true
+	"enabled": true,
+	"position": {
+		"x": 95.43,
+		"y":-8.88
+	}
 }
 
 ### Delete Device
-DELETE http://localhost:8080/api/v1/devices/{{deviceId}}
+DELETE http://localhost:8080/api/v1/devices/{{deleteDeviceId}}
 
 ### Connect Device
 POST http://localhost:8080/api/v1/devices/{{deviceId}}/connect

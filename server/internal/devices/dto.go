@@ -15,6 +15,7 @@ type CreateDeviceRequest struct {
 	Port             *int                    `json:"port" binding:"omitempty,min=1,max=65535"`
 	ConnectionStatus models.ConnectionStatus `json:"connectionStatus" binding:"omitempty,oneof=CONNECTED DISCONNECTED CONNECTING ERROR"`
 	Enabled          *bool                   `json:"enabled" binding:"omitempty"`
+	Position         *models.Position        `json:"position" binding:"omitempty"`
 }
 
 type UpdateDeviceRequest struct {
@@ -26,6 +27,7 @@ type UpdateDeviceRequest struct {
 	Port             *int                    `json:"port" binding:"omitempty,min=1,max=65535"`
 	ConnectionStatus models.ConnectionStatus `json:"connectionStatus" binding:"omitempty,oneof=CONNECTED DISCONNECTED CONNECTING ERROR"`
 	Enabled          *bool                   `json:"enabled" binding:"omitempty"`
+	Position         *models.Position        `json:"position" binding:"omitempty"`
 }
 
 type DeviceResponse struct {
@@ -40,6 +42,7 @@ type DeviceResponse struct {
 	ConnectionStatus models.ConnectionStatus `json:"connectionStatus"`
 	Enabled          bool                    `json:"enabled"`
 	LastConnectedAt  *time.Time              `json:"lastConnectedAt"`
+	Position         models.Position         `json:"position"`
 	CreatedAt        time.Time               `json:"createdAt"`
 	UpdatedAt        time.Time               `json:"updatedAt"`
 }
