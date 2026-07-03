@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 import type { UserProfile } from "@/types/user";
 
@@ -20,6 +20,7 @@ export const useUserStore = create(
 		}),
 		{
 			name: "auth",
+			storage: createJSONStorage(() => localStorage),
 		},
 	),
 );
