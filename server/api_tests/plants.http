@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ### Get Plant By ID
-@plantId = 264dbd8e-ce3e-4652-bddf-1a739e5b6c7f
+@plantId = 6203ddf0-52a1-4251-bafa-193f694d7601
 GET http://localhost:8080/api/v1/plants/{{plantId}}
 
 ### Update Plant By ID

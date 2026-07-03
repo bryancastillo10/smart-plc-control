@@ -1,5 +1,5 @@
 ### Create Process Unit for Anaerobic Digestion Plant
-@plantId = 86ca5d65-3c1e-4dbd-9c5a-46ea68a897be
+@plantId = 6203ddf0-52a1-4251-bafa-193f694d7601
 POST http://localhost:8080/api/v1/plants/{{plantId}}/process-units
 Content-Type: application/json
 
@@ -14,7 +14,7 @@ Content-Type: application/json
 GET http://localhost:8080/api/v1/plants/{{plantId}}/process-units
 
 ### Get Process Unit Details
-@processUnitId = 6a22788f-7ce7-4ac1-8b08-58ec18708e7f
+@processUnitId = aaafa5d1-673e-46b6-ada8-93e5929cc55f
 GET http://localhost:8080/api/v1/process-units/{{processUnitId}}
 
 ### Update Process Unit
@@ -25,7 +25,11 @@ Content-Type: application/json
 	"name": "Methane Reactor",
 	"type": "Anaerobic Digestion",
 	"description": "Updated methanogenesis process unit for methane production stabilization and biogas quality monitoring.",
-	"status": "MAINTENANCE"
+	"status": "MAINTENANCE",
+	"position": {
+			"x":120.45,
+			"y":-10.25
+	}
 }
 
 ### Delete Process Unit
