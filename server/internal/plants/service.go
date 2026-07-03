@@ -68,7 +68,7 @@ func (s *Service) CreatePlant(userID string, req CreatePlantRequest) (*PlantResp
 		Location:     req.Location,
 		Description:  req.Description,
 		Status:       req.Status,
-		AccessibleBy: ensureUserAccess(req.AccessibleBy, userID),
+		AccessibleBy: []string{userID},
 	}
 
 	createdPlant, err := s.repo.CreatePlant(plant)
@@ -153,26 +153,4 @@ func toPlantResponse(plant models.Plants) PlantResponse {
 		CreatedAt:    plant.CreatedAt,
 		UpdatedAt:    plant.UpdatedAt,
 	}
-}
-
-func ensureUserAccess(accessibleBy []string, userID string) []string {
-	seen := make(map[string]struct{}, len(accessibleBy)+1)
-	res := make([]string, 0, len(accessibleBy)+1)
-
-	for _, accessibleUserID := range accessibleBy {
-		if accessibleUserID == "" {
-			continue
-		}
-		if _, exists := seen[accessibleUserID]; exists {
-			continue
-		}
-		seen[accessibleUserID] = struct{}{}
-		res = append(res, accessibleUserID)
-	}
-
-	if _, exists := seen[userID]; !exists {
-		res = append(res, userID)
-	}
-
-	return res
 }
