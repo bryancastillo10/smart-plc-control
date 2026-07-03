@@ -123,12 +123,19 @@ func (s *Service) GetCurrentUser(userID string) (*CurrentUserResponse, error) {
 		return nil, appErr.NewNotFound("User not found", nil)
 	}
 
+	hasOwnedPlant, err := s.repo.HasAccessiblePlant(userID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get accessible plant status", err)
+	}
+
 	return &CurrentUserResponse{
-		UserName:  user.UserName,
-		Email:     user.Email,
-		Role:      user.Role,
-		Language:  user.Language,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
+		ID:            user.ID.String(),
+		UserName:      user.UserName,
+		Email:         user.Email,
+		Role:          user.Role,
+		Language:      user.Language,
+		CreatedAt:     user.CreatedAt,
+		UpdatedAt:     user.UpdatedAt,
+		HasOwnedPlant: hasOwnedPlant,
 	}, nil
 }
