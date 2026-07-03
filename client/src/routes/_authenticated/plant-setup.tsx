@@ -8,8 +8,7 @@ import {
 	appSurfaceVariants,
 	appTextVariants,
 } from "@/styles/recipes";
-
-type UserRole = "ADMIN" | "OPERATOR" | "VIEWER";
+import type { UserRole } from "@/types/enum";
 
 const currentUserRole: UserRole = "ADMIN";
 

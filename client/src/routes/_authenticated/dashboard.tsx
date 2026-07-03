@@ -1,4 +1,5 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
+import { useUserStore } from "@/store/user";
 
 const dashboardSections = [
 	"Plant Overview",
@@ -20,6 +21,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function DashboardPage() {
+	const { user } = useUserStore();
+
+	console.log(user);
+
 	return (
 		<div className="space-y-6">
 			<div>
