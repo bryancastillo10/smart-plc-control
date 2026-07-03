@@ -1,4 +1,4 @@
-﻿import type { Language, Role } from "@/types/enum";
+import type { Language, Role } from "@/types/enum";
 
 export interface SignInRequest {
 	email: string;
@@ -24,6 +24,7 @@ export interface LogoutResponse {
 }
 
 export interface CurrentUserResponse {
+	id: string;
 	username: string;
 	email: string;
 	role: Role;
