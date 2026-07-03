@@ -108,3 +108,7 @@ func (r *Repository) UpdateProcessUnitConnection(connection *models.ProcessUnitC
 func (r *Repository) DeleteProcessUnitConnection(connection *models.ProcessUnitConnections) error {
 	return r.db.Delete(connection).Error
 }
+
+func (r *Repository) DeleteProcessUnitConnectionsByUnitID(processUnitID uuid.UUID) error {
+	return r.db.Where("source_unit_id = ? OR target_unit_id = ?", processUnitID, processUnitID).Delete(&models.ProcessUnitConnections{}).Error
+}
