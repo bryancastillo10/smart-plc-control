@@ -51,6 +51,7 @@ func (s *Service) CreateProcessUnit(plantID string, req CreateProcessUnitRequest
 		Type:        req.Type,
 		Description: req.Description,
 		Status:      req.Status,
+		Position:    getPosition(req.Position),
 	}
 
 	createdProcessUnit, err := s.repo.CreateProcessUnit(processUnit)
@@ -120,7 +121,7 @@ func (s *Service) UpdateProcessUnit(processUnitID string, req UpdateProcessUnitR
 		return nil, appErr.NewBadRequest("Missing process unit ID", nil)
 	}
 
-	if req.Name == "" && req.Type == "" && req.Description == "" && req.Status == "" {
+	if req.Name == "" && req.Type == "" && req.Description == "" && req.Status == "" && req.Position == nil {
 		return nil, appErr.NewBadRequest("Missing process unit fields to update", nil)
 	}
 
@@ -145,7 +146,9 @@ func (s *Service) UpdateProcessUnit(processUnitID string, req UpdateProcessUnitR
 	utils.PatchIfNotZero(&processUnit.Type, req.Type)
 	utils.PatchIfNotZero(&processUnit.Description, req.Description)
 	utils.PatchIfNotZero(&processUnit.Status, req.Status)
-
+	if req.Position != nil {
+		processUnit.Position = *req.Position
+	}
 	updatedProcessUnit, err := s.repo.UpdateProcessUnit(processUnit)
 	if err != nil {
 		return nil, appErr.NewInternal("Failed to update process unit", err)
@@ -192,7 +195,16 @@ func toProcessUnitResponse(processUnit models.ProcessUnits) ProcessUnitResponse 
 		Type:        processUnit.Type,
 		Description: processUnit.Description,
 		Status:      processUnit.Status,
+		Position:    processUnit.Position,
 		CreatedAt:   processUnit.CreatedAt,
 		UpdatedAt:   processUnit.UpdatedAt,
 	}
+}
+
+func getPosition(position *models.Position) models.Position {
+	if position == nil {
+		return models.Position{}
+	}
+
+	return *position
 }
