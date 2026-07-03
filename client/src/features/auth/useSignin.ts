@@ -1,12 +1,14 @@
 ﻿import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-import { signIn } from "@/features/auth/queries";
+import { currentUser, signIn } from "@/features/auth/queries";
 import type { SignInRequest } from "@/features/auth/type";
+import { toUserProfile } from "@/features/auth/userProfile";
 import { useToast } from "@/integrations/sonner";
 import { useLanguageStore } from "@/store/language";
+import { useUserStore } from "@/store/user";
 import { getErrorMessage } from "@/utils/error";
 
 const initialSignIn: SignInRequest = {
@@ -18,18 +20,31 @@ const useSignin = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const toast = useToast();
+
 	const language = useLanguageStore((state) => state.language);
 	const setLanguage = useLanguageStore((state) => state.setLanguage);
+
+	const setUser = useUserStore((state) => state.setUser);
+	const clearUser = useUserStore((state) => state.clearUser);
+
 	const [signInData, setSignInData] = useState<SignInRequest>(initialSignIn);
 	const [showPassword, setShowPassword] = useState(false);
 
 	const signInMutation = useMutation({
 		mutationFn: signIn,
 		onSuccess: async () => {
-			toast.success(t("success"));
-			setSignInData(initialSignIn);
-			setShowPassword(false);
-			await navigate({ to: "/dashboard" });
+			try {
+				const user = await currentUser();
+
+				setUser(toUserProfile(user));
+				toast.success(t("success"));
+				setSignInData(initialSignIn);
+				setShowPassword(false);
+				await navigate({ to: "/dashboard" });
+			} catch (error) {
+				clearUser();
+				toast.error(getErrorMessage(error, t("failed")));
+			}
 		},
 		onError: (error) => {
 			toast.error(getErrorMessage(error, t("failed")));
@@ -47,7 +62,7 @@ const useSignin = () => {
 		setShowPassword((current) => !current);
 	};
 
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
 		if (!signInData.email.trim() || !signInData.password) {
