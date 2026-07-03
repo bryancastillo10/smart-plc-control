@@ -1,5 +1,7 @@
-### Create Process Unit for Anaerobic Digestion Plant
 @plantId = 6203ddf0-52a1-4251-bafa-193f694d7601
+
+### Create Process Unit - Defaults Ports
+# Response includes: processUnit.ports, processUnit.position, connections
 POST http://localhost:8080/api/v1/plants/{{plantId}}/process-units
 Content-Type: application/json
 
@@ -7,18 +9,55 @@ Content-Type: application/json
 	"name": "Methane Tank",
 	"type": "Anaerobic Digestion",
 	"description": "For methanogenesis process",
-	"status": "ACTIVE"
+	"status": "ACTIVE",
+	"position": {
+		"x": 320,
+		"y": 120
+	}
 }
 
-### Get Process Units for Anaerobic Digestion Plant
+### Create Process Unit - Custom Ports
+# Use the returned processUnit.id as @targetProcessUnitId when creating connections
+POST http://localhost:8080/api/v1/plants/{{plantId}}/process-units
+Content-Type: application/json
+
+{
+	"name": "Acid Tank",
+	"type": "Acidogenesis",
+	"description": "Acidification process unit before methane production",
+	"status": "ACTIVE",
+	"position": {
+		"x": 180,
+		"y": 120
+	},
+	"ports": [
+		{
+			"id": "feed-in",
+			"label": "Feed In",
+			"direction": "IN"
+		},
+		{
+			"id": "acid-out",
+			"label": "Acid Out",
+			"direction": "OUT"
+		},
+		{
+			"id": "drain-out",
+			"label": "Drain Out",
+			"direction": "OUT"
+		}
+	]
+}
+
+### Get Process Units for Plant
 GET http://localhost:8080/api/v1/plants/{{plantId}}/process-units
 
 ### Get Process Unit Details
-@processUnitId = aaafa5d1-673e-46b6-ada8-93e5929cc55f
-GET http://localhost:8080/api/v1/process-units/{{processUnitId}}
+GET http://localhost:8080/api/v1/process-units/{{sourceProcessUnitId}}
 
 ### Update Process Unit
-PUT http://localhost:8080/api/v1/process-units/{{processUnitId}}
+# Response includes the updated processUnit plus all current plant process-unit connections
+PUT http://localhost:8080/api/v1/process-units/{{sourceProcessUnitId}}
 Content-Type: application/json
 
 {
@@ -27,13 +66,80 @@ Content-Type: application/json
 	"description": "Updated methanogenesis process unit for methane production stabilization and biogas quality monitoring.",
 	"status": "MAINTENANCE",
 	"position": {
-			"x":120.45,
-			"y":-10.25
-	}
+		"x": 420.45,
+		"y": 140.25
+	},
+	"ports": [
+		{
+			"id": "influent-in",
+			"label": "Influent In",
+			"direction": "IN"
+		},
+		{
+			"id": "biogas-out",
+			"label": "Biogas Out",
+			"direction": "OUT"
+		},
+		{
+			"id": "sludge-out",
+			"label": "Sludge Out",
+			"direction": "OUT"
+		}
+	]
+}
+
+### Create Process Unit Connection
+
+@sourceProcessUnitId = ace1f696-ab30-4f07-9444-f98c98bbc494
+@targetProcessUnitId = 3c40fa37-a5bd-4b6b-953b-2ba45ed46728
+
+POST http://localhost:8080/api/v1/plants/{{plantId}}/process-unit-connections
+Content-Type: application/json
+
+{
+	"sourceUnitId": "{{sourceProcessUnitId}}",
+	"sourcePortId": "biogas-out",
+	"targetUnitId": "{{targetProcessUnitId}}",
+	"targetPortId": "feed-in",
+	"label": "Methane Reactor to Acid Tank",
+	"flowType": "GAS"
+}
+
+### Get Process Unit Connections for Plant
+GET http://localhost:8080/api/v1/plants/{{plantId}}/process-unit-connections
+
+### Get Process Unit Connection Details
+@connectionId = 78228f63-0944-4bf7-9903-047563725572
+
+GET http://localhost:8080/api/v1/process-unit-connections/{{connectionId}}
+
+### Update Process Unit Connection
+PUT http://localhost:8080/api/v1/process-unit-connections/{{connectionId}}
+Content-Type: application/json
+
+{
+	"sourcePortId": "sludge-out",
+	"targetPortId": "feed-in",
+	"label": "Methane Reactor sludge recycle to Acid Tank",
+	"flowType": "SLUDGE"
+}
+
+### Delete Process Unit Connection
+@deleteConnectionId = 87bc27e5-549f-445d-8764-35f68ff40864
+
+DELETE http://localhost:8080/api/v1/process-unit-connections/{{deleteConnectionId}}
+Content-Type: application/json
+
+{
+	"action": "delete"
 }
 
 ### Delete Process Unit
-DELETE http://localhost:8080/api/v1/process-units/{{processUnitId}}
+# Response includes deletedProcessUnitId and remaining connections after related connections are removed
+
+@deleteProcessUnitId = a113447e-64c2-44e9-bd4f-9e38de4d25a5
+
+DELETE http://localhost:8080/api/v1/process-units/{{deleteProcessUnitId}}
 Content-Type: application/json
 
 {
