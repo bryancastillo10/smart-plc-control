@@ -16,7 +16,7 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) CreateProcessUnit(plantID string, req CreateProcessUnitRequest) (*ProcessUnitResponse, error) {
+func (s *Service) CreateProcessUnit(plantID string, req CreateProcessUnitRequest) (*ProcessUnitMutationResponse, error) {
 	if plantID == "" {
 		return nil, appErr.NewBadRequest("Missing plant ID", nil)
 	}
@@ -62,8 +62,7 @@ func (s *Service) CreateProcessUnit(plantID string, req CreateProcessUnitRequest
 		return nil, appErr.NewInternal("Failed to create process unit", err)
 	}
 
-	res := toProcessUnitResponse(*createdProcessUnit)
-	return &res, nil
+	return s.toProcessUnitMutationResponse(parsedPlantID, createdProcessUnit, "")
 }
 
 func (s *Service) GetProcessUnitsByPlantID(plantID string) ([]ProcessUnitResponse, error) {
@@ -95,7 +94,7 @@ func (s *Service) GetProcessUnitByID(processUnitID string) (*ProcessUnitResponse
 	return &res, nil
 }
 
-func (s *Service) UpdateProcessUnit(processUnitID string, req UpdateProcessUnitRequest) (*ProcessUnitResponse, error) {
+func (s *Service) UpdateProcessUnit(processUnitID string, req UpdateProcessUnitRequest) (*ProcessUnitMutationResponse, error) {
 	if processUnitID == "" {
 		return nil, appErr.NewBadRequest("Missing process unit ID", nil)
 	}
@@ -129,25 +128,31 @@ func (s *Service) UpdateProcessUnit(processUnitID string, req UpdateProcessUnitR
 		return nil, appErr.NewInternal("Failed to update process unit", err)
 	}
 
-	res := toProcessUnitResponse(*updatedProcessUnit)
-	return &res, nil
+	return s.toProcessUnitMutationResponse(updatedProcessUnit.PlantID, updatedProcessUnit, "")
 }
 
-func (s *Service) DeleteProcessUnit(processUnitID string, req DeleteProcessUnitRequest) error {
+func (s *Service) DeleteProcessUnit(processUnitID string, req DeleteProcessUnitRequest) (*ProcessUnitMutationResponse, error) {
 	if req.Action != "delete" {
-		return appErr.NewBadRequest("Delete confirmation must be exactly 'delete'", nil)
+		return nil, appErr.NewBadRequest("Delete confirmation must be exactly 'delete'", nil)
 	}
 
 	processUnit, err := s.findProcessUnit(processUnitID)
 	if err != nil {
-		return err
+		return nil, err
+	}
+
+	plantID := processUnit.PlantID
+	deletedProcessUnitID := processUnit.ID.String()
+
+	if err := s.repo.DeleteProcessUnitConnectionsByUnitID(processUnit.ID); err != nil {
+		return nil, appErr.NewInternal("Failed to delete process unit connections", err)
 	}
 
 	if err := s.repo.DeleteProcessUnit(processUnit); err != nil {
-		return appErr.NewInternal("Failed to delete process unit", err)
+		return nil, appErr.NewInternal("Failed to delete process unit", err)
 	}
 
-	return nil
+	return s.toProcessUnitMutationResponse(plantID, nil, deletedProcessUnitID)
 }
 
 func (s *Service) CreateProcessUnitConnection(plantID string, req CreateProcessUnitConnectionRequest) (*ProcessUnitConnectionResponse, error) {
@@ -387,6 +392,26 @@ func (s *Service) validateConnectionUnitIDs(plantID uuid.UUID, sourceUnitID uuid
 	return sourceUnit, targetUnit, nil
 }
 
+func (s *Service) toProcessUnitMutationResponse(plantID uuid.UUID, processUnit *models.ProcessUnits, deletedProcessUnitID string) (*ProcessUnitMutationResponse, error) {
+	connections, err := s.repo.FindProcessUnitConnectionsByPlantID(plantID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get process unit connections", err)
+	}
+
+	res := ProcessUnitMutationResponse{
+		DeletedProcessUnitID: deletedProcessUnitID,
+		Connections:          make([]ProcessUnitConnectionResponse, 0, len(connections)),
+	}
+	if processUnit != nil {
+		processUnitResponse := toProcessUnitResponse(*processUnit)
+		res.ProcessUnit = &processUnitResponse
+	}
+	for _, connection := range connections {
+		res.Connections = append(res.Connections, toProcessUnitConnectionResponse(connection))
+	}
+
+	return &res, nil
+}
 func toProcessUnitResponse(processUnit models.ProcessUnits) ProcessUnitResponse {
 	return ProcessUnitResponse{
 		ID:          processUnit.ID.String(),
