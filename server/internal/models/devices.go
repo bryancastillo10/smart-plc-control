@@ -19,6 +19,7 @@ type Devices struct {
 	ConnectionStatus ConnectionStatus `gorm:"type:varchar(20);not null;default:DISCONNECTED" json:"connectionStatus"`
 	Enabled          bool             `gorm:"not null;default:true" json:"enabled"`
 	LastConnectedAt  *time.Time       `gorm:"type:timestamptz" json:"lastConnectedAt"`
+	Position         Position         `gorm:"serializer:json;type:jsonb" json:"position"`
 
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updatedAt"`

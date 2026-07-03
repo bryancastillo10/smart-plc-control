@@ -14,6 +14,7 @@ type ProcessUnits struct {
 	Type        string      `gorm:"type:varchar(80);not null" json:"type"`
 	Description string      `gorm:"type:text" json:"description"`
 	Status      PlantStatus `gorm:"type:varchar(20);not null;default:ACTIVE" json:"status"`
+	Position    Position    `gorm:"serializer:json;type:jsonb" json:"position"`
 
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
