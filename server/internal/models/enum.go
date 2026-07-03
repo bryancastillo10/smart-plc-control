@@ -125,3 +125,10 @@ const (
 	RawMaterialFlow FlowType = "RAW_MATERIAL"
 	OthersFlow      FlowType = "OTHERS"
 )
+
+type ProcessDirection string
+
+const (
+	In  ProcessDirection = "IN"
+	Out ProcessDirection = "OUT"
+)
