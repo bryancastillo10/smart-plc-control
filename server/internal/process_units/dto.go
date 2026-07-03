@@ -10,6 +10,7 @@ type CreateProcessUnitRequest struct {
 	Type        string             `json:"type" binding:"required,min=1,max=80"`
 	Description string             `json:"description" binding:"omitempty"`
 	Status      models.PlantStatus `json:"status" binding:"omitempty,oneof=ACTIVE INACTIVE MAINTENANCE"`
+	Position    *models.Position   `json:"position" binding:"omitempty"`
 }
 
 type UpdateProcessUnitRequest struct {
@@ -17,6 +18,7 @@ type UpdateProcessUnitRequest struct {
 	Type        string             `json:"type" binding:"omitempty,min=1,max=80"`
 	Description string             `json:"description" binding:"omitempty"`
 	Status      models.PlantStatus `json:"status" binding:"omitempty,oneof=ACTIVE INACTIVE MAINTENANCE"`
+	Position    *models.Position   `json:"position" binding:"omitempty"`
 }
 
 type DeleteProcessUnitRequest struct {
@@ -30,6 +32,7 @@ type ProcessUnitResponse struct {
 	Type        string             `json:"type"`
 	Description string             `json:"description"`
 	Status      models.PlantStatus `json:"status"`
+	Position    models.Position    `json:"position"`
 	CreatedAt   time.Time          `json:"createdAt"`
 	UpdatedAt   time.Time          `json:"updatedAt"`
 }
