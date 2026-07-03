@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"encoding/json"
 	"smart-plc-control-server/internal/models"
 
 	"gorm.io/gorm"
@@ -42,4 +43,21 @@ func (r *Repository) FindUserByID(userID string) (*models.Users, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *Repository) HasAccessiblePlant(userID string) (bool, error) {
+	accessibleBy, err := json.Marshal([]string{userID})
+	if err != nil {
+		return false, err
+	}
+
+	var count int64
+	err = r.db.Model(&models.Plants{}).
+		Where("accessible_by @> ?::jsonb", string(accessibleBy)).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
 }
