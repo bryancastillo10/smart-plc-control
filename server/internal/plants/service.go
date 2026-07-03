@@ -45,7 +45,11 @@ func (s *Service) GetPlantByID(plantID string) (*PlantResponse, error) {
 	return &res, nil
 }
 
-func (s *Service) CreatePlant(req CreatePlantRequest) (*PlantResponse, error) {
+func (s *Service) CreatePlant(userID string, req CreatePlantRequest) (*PlantResponse, error) {
+	if userID == "" {
+		return nil, appErr.NewUnauthorized("Missing authenticated user", nil)
+	}
+
 	if req.Name == "" || req.Location == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
 	}
@@ -59,11 +63,12 @@ func (s *Service) CreatePlant(req CreatePlantRequest) (*PlantResponse, error) {
 	}
 
 	plant := &models.Plants{
-		ID:          utils.GenerateUUID(),
-		Name:        req.Name,
-		Location:    req.Location,
-		Description: req.Description,
-		Status:      req.Status,
+		ID:           utils.GenerateUUID(),
+		Name:         req.Name,
+		Location:     req.Location,
+		Description:  req.Description,
+		Status:       req.Status,
+		AccessibleBy: ensureUserAccess(req.AccessibleBy, userID),
 	}
 
 	createdPlant, err := s.repo.CreatePlant(plant)
@@ -80,7 +85,7 @@ func (s *Service) UpdatePlant(plantID string, req UpdatePlantRequest) (*PlantRes
 		return nil, appErr.NewBadRequest("Missing plant ID", nil)
 	}
 
-	if req.Name == "" && req.Location == "" && req.Description == "" && req.Status == "" {
+	if req.Name == "" && req.Location == "" && req.Description == "" && req.Status == "" && len(req.AccessibleBy) == 0 {
 		return nil, appErr.NewBadRequest("Missing plant details to update", nil)
 	}
 
@@ -100,6 +105,9 @@ func (s *Service) UpdatePlant(plantID string, req UpdatePlantRequest) (*PlantRes
 	utils.PatchIfNotZero(&plant.Location, req.Location)
 	utils.PatchIfNotZero(&plant.Description, req.Description)
 	utils.PatchIfNotZero(&plant.Status, req.Status)
+	if len(req.AccessibleBy) > 0 {
+		plant.AccessibleBy = req.AccessibleBy
+	}
 
 	updatedPlant, err := s.repo.UpdatePlant(plant)
 	if err != nil {
@@ -136,12 +144,35 @@ func (s *Service) DeletePlant(plantID string, req DeletePlantRequest) error {
 
 func toPlantResponse(plant models.Plants) PlantResponse {
 	return PlantResponse{
-		ID:          plant.ID.String(),
-		Name:        plant.Name,
-		Location:    plant.Location,
-		Description: plant.Description,
-		Status:      plant.Status,
-		CreatedAt:   plant.CreatedAt,
-		UpdatedAt:   plant.UpdatedAt,
+		ID:           plant.ID.String(),
+		Name:         plant.Name,
+		Location:     plant.Location,
+		Description:  plant.Description,
+		Status:       plant.Status,
+		AccessibleBy: plant.AccessibleBy,
+		CreatedAt:    plant.CreatedAt,
+		UpdatedAt:    plant.UpdatedAt,
 	}
+}
+
+func ensureUserAccess(accessibleBy []string, userID string) []string {
+	seen := make(map[string]struct{}, len(accessibleBy)+1)
+	res := make([]string, 0, len(accessibleBy)+1)
+
+	for _, accessibleUserID := range accessibleBy {
+		if accessibleUserID == "" {
+			continue
+		}
+		if _, exists := seen[accessibleUserID]; exists {
+			continue
+		}
+		seen[accessibleUserID] = struct{}{}
+		res = append(res, accessibleUserID)
+	}
+
+	if _, exists := seen[userID]; !exists {
+		res = append(res, userID)
+	}
+
+	return res
 }
