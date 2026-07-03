@@ -40,6 +40,11 @@ type ProcessUnitResponse struct {
 	UpdatedAt   time.Time                `json:"updatedAt"`
 }
 
+type ProcessUnitMutationResponse struct {
+	ProcessUnit          *ProcessUnitResponse            `json:"processUnit,omitempty"`
+	DeletedProcessUnitID string                          `json:"deletedProcessUnitId,omitempty"`
+	Connections          []ProcessUnitConnectionResponse `json:"connections"`
+}
 type CreateProcessUnitConnectionRequest struct {
 	SourceUnitID string          `json:"sourceUnitId" binding:"required"`
 	SourcePortID string          `json:"sourcePortId" binding:"required"`
