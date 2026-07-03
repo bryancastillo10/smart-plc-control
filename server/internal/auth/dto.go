@@ -29,10 +29,12 @@ type ErrorResponse struct {
 }
 
 type CurrentUserResponse struct {
-	UserName  string          `json:"username"`
-	Email     string          `json:"email"`
-	Role      models.Role     `json:"role"`
-	Language  models.Language `json:"language"`
-	CreatedAt time.Time       `json:"created_at"`
-	UpdatedAt time.Time       `json:"updated_at"`
+	ID            string          `json:"id"`
+	UserName      string          `json:"username"`
+	Email         string          `json:"email"`
+	Role          models.Role     `json:"role"`
+	Language      models.Language `json:"language"`
+	CreatedAt     time.Time       `json:"created_at"`
+	UpdatedAt     time.Time       `json:"updated_at"`
+	HasOwnedPlant bool            `json:"hasOwnedPlant"`
 }
