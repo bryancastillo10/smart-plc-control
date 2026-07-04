@@ -58,3 +58,12 @@ func (r *Repository) CreateTag(tag *models.Tags) (*models.Tags, error) {
 
 	return tag, nil
 }
+
+func (r *Repository) FindTagsByDeviceID(deviceID uuid.UUID) ([]models.Tags, error) {
+	var tags []models.Tags
+	if err := r.db.Where("device_id = ?", deviceID).Order("created_at DESC").Find(&tags).Error; err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
