@@ -67,3 +67,12 @@ func (r *Repository) FindTagsByDeviceID(deviceID uuid.UUID) ([]models.Tags, erro
 
 	return tags, nil
 }
+
+func (r *Repository) FindTagsByProcessUnitID(processUnitID uuid.UUID) ([]models.Tags, error) {
+	var tags []models.Tags
+	if err := r.db.Where("process_unit_id = ?", processUnitID).Order("created_at DESC").Find(&tags).Error; err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
