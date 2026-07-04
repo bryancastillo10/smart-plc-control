@@ -128,9 +128,9 @@ func registerTags(r *gin.RouterGroup, DB *gorm.DB) {
 		deviceTagGrp.GET("", tag.GetTagsByDeviceID)
 	}
 
-	processUnitTagGrp := r.Group("/process-units/:processUnitId/tags")
+	processUnitTagGrp := r.Group("/process-units/:processUnitId/tags", middleware.JWTAuthMiddleware())
 	{
-		processUnitTagGrp.GET("")
+		processUnitTagGrp.GET("", tag.GetTagsByProcessUnitID)
 	}
 
 	tagGrp := r.Group("/tags")
