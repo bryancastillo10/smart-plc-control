@@ -10,6 +10,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	"smart-plc-control-server/internal/plants"
 	"smart-plc-control-server/internal/process_units"
+	"smart-plc-control-server/internal/tags"
 	"smart-plc-control-server/internal/users"
 )
 
@@ -119,11 +120,11 @@ func registerDevices(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerTags(r *gin.RouterGroup, DB *gorm.DB) {
-	// tag := tags.NewHandler(DB)
+	tag := tags.NewHandler(DB)
 
-	deviceTagGrp := r.Group("/devices/:deviceId/tags")
+	deviceTagGrp := r.Group("/devices/:deviceId/tags", middleware.JWTAuthMiddleware())
 	{
-		deviceTagGrp.POST("")
+		deviceTagGrp.POST("", middleware.RequireRoles(models.Admin), tag.CreateTag)
 		deviceTagGrp.GET("")
 	}
 
