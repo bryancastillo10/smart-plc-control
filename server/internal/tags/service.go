@@ -16,6 +16,37 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
+func (s *Service) GetTagsByDeviceID(deviceID string) ([]TagResponse, error) {
+	if deviceID == "" {
+		return nil, appErr.NewBadRequest("Missing device ID", nil)
+	}
+
+	parsedDeviceID, err := utils.ParseId(deviceID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid device ID", err)
+	}
+
+	device, err := s.repo.FindDeviceByID(parsedDeviceID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find device", err)
+	}
+	if device == nil {
+		return nil, appErr.NewNotFound("Device not found", nil)
+	}
+
+	tags, err := s.repo.FindTagsByDeviceID(parsedDeviceID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get tags", err)
+	}
+
+	res := make([]TagResponse, 0, len(tags))
+	for _, tag := range tags {
+		res = append(res, toTagResponse(tag))
+	}
+
+	return res, nil
+}
+
 func (s *Service) CreateTag(deviceID string, req CreateTagRequest) (*TagResponse, error) {
 	if deviceID == "" {
 		return nil, appErr.NewBadRequest("Missing device ID", nil)
