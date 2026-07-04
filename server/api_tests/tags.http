@@ -1,6 +1,12 @@
 @deviceId = 175f865a-afcd-438c-baf8-dc39ee8585fe
 @processUnitId = 3c40fa37-a5bd-4b6b-953b-2ba45ed46728
 
+### Get Tags By Device
+GET http://localhost:8080/api/v1/devices/{{deviceId}}/tags
+
+### Get Tags By Process Unit
+GET http://localhost:8080/api/v1/process-units/{{processUnitId}}/tags
+
 ### Create Float Tag
 # Requires an authenticated ADMIN user.
 POST http://localhost:8080/api/v1/devices/{{deviceId}}/tags
