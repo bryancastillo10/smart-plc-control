@@ -125,7 +125,7 @@ func registerTags(r *gin.RouterGroup, DB *gorm.DB) {
 	deviceTagGrp := r.Group("/devices/:deviceId/tags", middleware.JWTAuthMiddleware())
 	{
 		deviceTagGrp.POST("", middleware.RequireRoles(models.Admin), tag.CreateTag)
-		deviceTagGrp.GET("")
+		deviceTagGrp.GET("", tag.GetTagsByDeviceID)
 	}
 
 	processUnitTagGrp := r.Group("/process-units/:processUnitId/tags")
