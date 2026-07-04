@@ -29,6 +29,18 @@ func (h *Handler) GetTagsByDeviceID(c *gin.Context) {
 	c.JSON(200, tags)
 }
 
+func (h *Handler) GetTagsByProcessUnitID(c *gin.Context) {
+	processUnitID := c.Param("processUnitId")
+
+	tags, err := h.service.GetTagsByProcessUnitID(processUnitID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, tags)
+}
+
 func (h *Handler) CreateTag(c *gin.Context) {
 	deviceID := c.Param("deviceId")
 
