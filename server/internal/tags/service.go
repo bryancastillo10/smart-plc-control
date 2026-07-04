@@ -47,6 +47,37 @@ func (s *Service) GetTagsByDeviceID(deviceID string) ([]TagResponse, error) {
 	return res, nil
 }
 
+func (s *Service) GetTagsByProcessUnitID(processUnitID string) ([]TagResponse, error) {
+	if processUnitID == "" {
+		return nil, appErr.NewBadRequest("Missing process unit ID", nil)
+	}
+
+	parsedProcessUnitID, err := utils.ParseId(processUnitID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid process unit ID", err)
+	}
+
+	processUnit, err := s.repo.FindProcessUnitByID(parsedProcessUnitID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find process unit", err)
+	}
+	if processUnit == nil {
+		return nil, appErr.NewNotFound("Process unit not found", nil)
+	}
+
+	tags, err := s.repo.FindTagsByProcessUnitID(parsedProcessUnitID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get tags", err)
+	}
+
+	res := make([]TagResponse, 0, len(tags))
+	for _, tag := range tags {
+		res = append(res, toTagResponse(tag))
+	}
+
+	return res, nil
+}
+
 func (s *Service) CreateTag(deviceID string, req CreateTagRequest) (*TagResponse, error) {
 	if deviceID == "" {
 		return nil, appErr.NewBadRequest("Missing device ID", nil)
