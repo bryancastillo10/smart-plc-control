@@ -1,0 +1,87 @@
+@deviceId = 175f865a-afcd-438c-baf8-dc39ee8585fe
+@processUnitId = 3c40fa37-a5bd-4b6b-953b-2ba45ed46728
+
+### Create Float Tag
+# Requires an authenticated ADMIN user.
+POST http://localhost:8080/api/v1/devices/{{deviceId}}/tags
+Content-Type: application/json
+
+{
+	"name": "Methane_Tank_Temperature",
+	"address": "40001",
+	"dataType": "FLOAT",
+	"unit": "degC",
+	"description": "Methane reactor temperature signal from PLC holding register.",
+	"readOnly": true,
+	"scanIntervalMs": 1000,
+	"minValue": 0,
+	"maxValue": 100,
+	"enabled": true
+}
+
+### Create Tag With Process Unit Mapping
+# Use a process unit from the same plant as the device.
+POST http://localhost:8080/api/v1/devices/{{deviceId}}/tags
+Content-Type: application/json
+
+{
+	"processUnitId": "{{processUnitId}}",
+	"name": "Methane_Tank_pH",
+	"address": "40002",
+	"dataType": "FLOAT",
+	"unit": "pH",
+	"description": "Methane reactor pH signal mapped to its process unit.",
+	"readOnly": true,
+	"scanIntervalMs": 1000,
+	"minValue": 0,
+	"maxValue": 14,
+	"enabled": true
+}
+
+### Create Writable Bool Tag
+POST http://localhost:8080/api/v1/devices/{{deviceId}}/tags
+Content-Type: application/json
+
+{
+	"name": "Feed_Pump_Command",
+	"address": "00001",
+	"dataType": "BOOL",
+	"unit": "status",
+	"description": "Writable simulated feed pump command.",
+	"readOnly": false,
+	"scanIntervalMs": 500,
+	"enabled": true
+}
+
+### Create Tag With Defaults
+# Defaults: readOnly=true, enabled=true, scanIntervalMs=1000.
+POST http://localhost:8080/api/v1/devices/{{deviceId}}/tags
+Content-Type: application/json
+
+{
+	"name": "Biogas_Flow",
+	"address": "40003",
+	"dataType": "FLOAT",
+	"unit": "m3/day",
+	"description": "Biogas flow signal using server-side defaults."
+}
+
+### Validation: Invalid Data Type
+POST http://localhost:8080/api/v1/devices/{{deviceId}}/tags
+Content-Type: application/json
+
+{
+	"name": "Invalid_Data_Type_Test",
+	"dataType": "DOUBLE"
+}
+
+### Validation: Min Greater Than Max
+POST http://localhost:8080/api/v1/devices/{{deviceId}}/tags
+Content-Type: application/json
+
+{
+	"name": "Invalid_Range_Test",
+	"dataType": "FLOAT",
+	"minValue": 100,
+	"maxValue": 10
+}
