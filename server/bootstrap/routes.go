@@ -10,6 +10,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	"smart-plc-control-server/internal/plants"
 	"smart-plc-control-server/internal/process_units"
+	"smart-plc-control-server/internal/tags"
 	"smart-plc-control-server/internal/users"
 )
 
@@ -119,23 +120,23 @@ func registerDevices(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerTags(r *gin.RouterGroup, DB *gorm.DB) {
-	// tag := tags.NewHandler(DB)
+	tag := tags.NewHandler(DB)
 
-	deviceTagGrp := r.Group("/devices/:deviceId/tags")
+	deviceTagGrp := r.Group("/devices/:deviceId/tags", middleware.JWTAuthMiddleware())
 	{
-		deviceTagGrp.POST("")
-		deviceTagGrp.GET("")
+		deviceTagGrp.POST("", middleware.RequireRoles(models.Admin), tag.CreateTag)
+		deviceTagGrp.GET("", tag.GetTagsByDeviceID)
 	}
 
-	processUnitTagGrp := r.Group("/process-units/:processUnitId/tags")
+	processUnitTagGrp := r.Group("/process-units/:processUnitId/tags", middleware.JWTAuthMiddleware())
 	{
-		processUnitTagGrp.GET("")
+		processUnitTagGrp.GET("", tag.GetTagsByProcessUnitID)
 	}
 
 	tagGrp := r.Group("/tags")
 	{
-		tagGrp.GET("")
-		tagGrp.GET("/:tagId")
+		tagGrp.GET("", middleware.JWTAuthMiddleware(), tag.GetTags)
+		tagGrp.GET("/:tagId", middleware.JWTAuthMiddleware(), tag.GetTagByID)
 		tagGrp.PUT("/:tagId")
 		tagGrp.DELETE("/:tagId")
 		tagGrp.POST("/:tagId/write")
