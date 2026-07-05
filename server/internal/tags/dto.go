@@ -43,3 +43,19 @@ type TagResponse struct {
 	CreatedAt      time.Time          `json:"createdAt"`
 	UpdatedAt      time.Time          `json:"updatedAt"`
 }
+
+type TagDetailResponse struct {
+	TagResponse
+	LatestReading *LatestTagReadingResponse `json:"latestReading"`
+}
+
+type LatestTagReadingResponse struct {
+	ID           uint64                `json:"id"`
+	TagID        string                `json:"tagId"`
+	ValueNumeric *float64              `json:"valueNumeric"`
+	ValueText    string                `json:"valueText"`
+	ValueBool    *bool                 `json:"valueBool"`
+	Quality      models.ReadingQuality `json:"quality"`
+	Source       models.ReadingSource  `json:"source"`
+	RecordedAt   time.Time             `json:"recordedAt"`
+}
