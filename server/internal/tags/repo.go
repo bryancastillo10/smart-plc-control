@@ -70,6 +70,30 @@ func (r *Repository) FindTagByDeviceIDAndName(deviceID uuid.UUID, name string) (
 	return &tag, nil
 }
 
+func (r *Repository) FindTagByID(tagID uuid.UUID) (*models.Tags, error) {
+	var tag models.Tags
+	if err := r.db.Where("id = ?", tagID).First(&tag).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &tag, nil
+}
+
+func (r *Repository) FindLatestReadingByTagID(tagID uuid.UUID) (*models.TagReadings, error) {
+	var reading models.TagReadings
+	if err := r.db.Where("tag_id = ?", tagID).Order("recorded_at DESC").First(&reading).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &reading, nil
+}
+
 func (r *Repository) CreateTag(tag *models.Tags) (*models.Tags, error) {
 	if err := r.db.Create(tag).Error; err != nil {
 		return nil, err
