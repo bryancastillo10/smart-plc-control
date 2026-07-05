@@ -1,5 +1,15 @@
+@plantId = 6203ddf0-52a1-4251-bafa-193f694d7601
 @deviceId = 175f865a-afcd-438c-baf8-dc39ee8585fe
 @processUnitId = 3c40fa37-a5bd-4b6b-953b-2ba45ed46728
+
+### Get All Tags
+GET http://localhost:8080/api/v1/tags
+
+### Get Tags Filtered By Plant
+GET http://localhost:8080/api/v1/tags?plantId={{plantId}}
+
+### Get Tags Filtered By Device, Process Unit, And Enabled
+GET http://localhost:8080/api/v1/tags?deviceId={{deviceId}}&processUnitId={{processUnitId}}&enabled=true
 
 ### Get Tags By Device
 GET http://localhost:8080/api/v1/devices/{{deviceId}}/tags
