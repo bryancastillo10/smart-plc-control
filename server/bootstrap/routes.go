@@ -135,7 +135,7 @@ func registerTags(r *gin.RouterGroup, DB *gorm.DB) {
 
 	tagGrp := r.Group("/tags")
 	{
-		tagGrp.GET("")
+		tagGrp.GET("", middleware.JWTAuthMiddleware(), tag.GetTags)
 		tagGrp.GET("/:tagId")
 		tagGrp.PUT("/:tagId")
 		tagGrp.DELETE("/:tagId")
