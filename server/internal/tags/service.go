@@ -16,6 +16,33 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
+func (s *Service) GetTagByID(tagID string) (*TagDetailResponse, error) {
+	if tagID == "" {
+		return nil, appErr.NewBadRequest("Missing tag ID", nil)
+	}
+
+	parsedTagID, err := utils.ParseId(tagID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid tag ID", err)
+	}
+
+	tag, err := s.repo.FindTagByID(parsedTagID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find tag", err)
+	}
+	if tag == nil {
+		return nil, appErr.NewNotFound("Tag not found", nil)
+	}
+
+	latestReading, err := s.repo.FindLatestReadingByTagID(parsedTagID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find latest tag reading", err)
+	}
+
+	res := toTagDetailResponse(*tag, latestReading)
+	return &res, nil
+}
+
 func (s *Service) GetTags(query ListTagsQuery) ([]TagResponse, error) {
 	filters := TagFilters{
 		Enabled: query.Enabled,
@@ -265,6 +292,13 @@ func toTagResponse(tag models.Tags) TagResponse {
 	}
 }
 
+func toTagDetailResponse(tag models.Tags, latestReading *models.TagReadings) TagDetailResponse {
+	return TagDetailResponse{
+		TagResponse:   toTagResponse(tag),
+		LatestReading: toLatestTagReadingResponse(latestReading),
+	}
+}
+
 func toTagResponses(tags []models.Tags) []TagResponse {
 	res := make([]TagResponse, 0, len(tags))
 	for _, tag := range tags {
@@ -272,6 +306,23 @@ func toTagResponses(tags []models.Tags) []TagResponse {
 	}
 
 	return res
+}
+
+func toLatestTagReadingResponse(reading *models.TagReadings) *LatestTagReadingResponse {
+	if reading == nil {
+		return nil
+	}
+
+	return &LatestTagReadingResponse{
+		ID:           reading.ID,
+		TagID:        reading.TagID.String(),
+		ValueNumeric: reading.ValueNumeric,
+		ValueText:    reading.ValueText,
+		ValueBool:    reading.ValueBool,
+		Quality:      reading.Quality,
+		Source:       reading.Source,
+		RecordedAt:   reading.RecordedAt,
+	}
 }
 
 func isValidTagDataType(dataType models.TagDataType) bool {
