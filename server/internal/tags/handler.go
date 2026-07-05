@@ -17,6 +17,18 @@ func NewHandler(db *gorm.DB) *Handler {
 	return &Handler{service: service}
 }
 
+func (h *Handler) GetTagByID(c *gin.Context) {
+	tagID := c.Param("tagId")
+
+	tag, err := h.service.GetTagByID(tagID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, tag)
+}
+
 func (h *Handler) GetTags(c *gin.Context) {
 	query, err := http.BindQuery[ListTagsQuery](c)
 	if err != nil {
