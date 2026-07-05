@@ -16,6 +16,76 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
+func (s *Service) GetTags(query ListTagsQuery) ([]TagResponse, error) {
+	filters := TagFilters{
+		Enabled: query.Enabled,
+	}
+
+	if query.PlantID != "" {
+		parsedPlantID, err := utils.ParseId(query.PlantID)
+		if err != nil {
+			return nil, appErr.NewBadRequest("Invalid plant ID", err)
+		}
+
+		plant, err := s.repo.FindPlantByID(parsedPlantID)
+		if err != nil {
+			return nil, appErr.NewInternal("Failed to find plant", err)
+		}
+		if plant == nil {
+			return nil, appErr.NewNotFound("Plant not found", nil)
+		}
+
+		filters.PlantID = &parsedPlantID
+	}
+
+	if query.DeviceID != "" {
+		parsedDeviceID, err := utils.ParseId(query.DeviceID)
+		if err != nil {
+			return nil, appErr.NewBadRequest("Invalid device ID", err)
+		}
+
+		device, err := s.repo.FindDeviceByID(parsedDeviceID)
+		if err != nil {
+			return nil, appErr.NewInternal("Failed to find device", err)
+		}
+		if device == nil {
+			return nil, appErr.NewNotFound("Device not found", nil)
+		}
+		if filters.PlantID != nil && device.PlantID != *filters.PlantID {
+			return nil, appErr.NewBadRequest("Device must belong to the filtered plant", nil)
+		}
+
+		filters.DeviceID = &parsedDeviceID
+	}
+
+	if query.ProcessUnitID != "" {
+		parsedProcessUnitID, err := utils.ParseId(query.ProcessUnitID)
+		if err != nil {
+			return nil, appErr.NewBadRequest("Invalid process unit ID", err)
+		}
+
+		processUnit, err := s.repo.FindProcessUnitByID(parsedProcessUnitID)
+		if err != nil {
+			return nil, appErr.NewInternal("Failed to find process unit", err)
+		}
+		if processUnit == nil {
+			return nil, appErr.NewNotFound("Process unit not found", nil)
+		}
+		if filters.PlantID != nil && processUnit.PlantID != *filters.PlantID {
+			return nil, appErr.NewBadRequest("Process unit must belong to the filtered plant", nil)
+		}
+
+		filters.ProcessUnitID = &parsedProcessUnitID
+	}
+
+	tags, err := s.repo.FindTags(filters)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get tags", err)
+	}
+
+	return toTagResponses(tags), nil
+}
+
 func (s *Service) GetTagsByDeviceID(deviceID string) ([]TagResponse, error) {
 	if deviceID == "" {
 		return nil, appErr.NewBadRequest("Missing device ID", nil)
@@ -39,12 +109,7 @@ func (s *Service) GetTagsByDeviceID(deviceID string) ([]TagResponse, error) {
 		return nil, appErr.NewInternal("Failed to get tags", err)
 	}
 
-	res := make([]TagResponse, 0, len(tags))
-	for _, tag := range tags {
-		res = append(res, toTagResponse(tag))
-	}
-
-	return res, nil
+	return toTagResponses(tags), nil
 }
 
 func (s *Service) GetTagsByProcessUnitID(processUnitID string) ([]TagResponse, error) {
@@ -70,12 +135,7 @@ func (s *Service) GetTagsByProcessUnitID(processUnitID string) ([]TagResponse, e
 		return nil, appErr.NewInternal("Failed to get tags", err)
 	}
 
-	res := make([]TagResponse, 0, len(tags))
-	for _, tag := range tags {
-		res = append(res, toTagResponse(tag))
-	}
-
-	return res, nil
+	return toTagResponses(tags), nil
 }
 
 func (s *Service) CreateTag(deviceID string, req CreateTagRequest) (*TagResponse, error) {
@@ -203,6 +263,15 @@ func toTagResponse(tag models.Tags) TagResponse {
 		CreatedAt:      tag.CreatedAt,
 		UpdatedAt:      tag.UpdatedAt,
 	}
+}
+
+func toTagResponses(tags []models.Tags) []TagResponse {
+	res := make([]TagResponse, 0, len(tags))
+	for _, tag := range tags {
+		res = append(res, toTagResponse(tag))
+	}
+
+	return res
 }
 
 func isValidTagDataType(dataType models.TagDataType) bool {
