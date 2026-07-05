@@ -11,8 +11,27 @@ type Repository struct {
 	db *gorm.DB
 }
 
+type TagFilters struct {
+	PlantID       *uuid.UUID
+	DeviceID      *uuid.UUID
+	ProcessUnitID *uuid.UUID
+	Enabled       *bool
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
+}
+
+func (r *Repository) FindPlantByID(plantID uuid.UUID) (*models.Plants, error) {
+	var plant models.Plants
+	if err := r.db.Where("id = ?", plantID).First(&plant).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &plant, nil
 }
 
 func (r *Repository) FindDeviceByID(deviceID uuid.UUID) (*models.Devices, error) {
@@ -62,6 +81,31 @@ func (r *Repository) CreateTag(tag *models.Tags) (*models.Tags, error) {
 func (r *Repository) FindTagsByDeviceID(deviceID uuid.UUID) ([]models.Tags, error) {
 	var tags []models.Tags
 	if err := r.db.Where("device_id = ?", deviceID).Order("created_at DESC").Find(&tags).Error; err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
+
+func (r *Repository) FindTags(filters TagFilters) ([]models.Tags, error) {
+	var tags []models.Tags
+	query := r.db.Model(&models.Tags{})
+
+	if filters.PlantID != nil {
+		query = query.Joins("JOIN devices ON devices.id = tags.device_id").
+			Where("devices.plant_id = ?", *filters.PlantID)
+	}
+	if filters.DeviceID != nil {
+		query = query.Where("tags.device_id = ?", *filters.DeviceID)
+	}
+	if filters.ProcessUnitID != nil {
+		query = query.Where("tags.process_unit_id = ?", *filters.ProcessUnitID)
+	}
+	if filters.Enabled != nil {
+		query = query.Where("tags.enabled = ?", *filters.Enabled)
+	}
+
+	if err := query.Order("tags.created_at DESC").Find(&tags).Error; err != nil {
 		return nil, err
 	}
 
