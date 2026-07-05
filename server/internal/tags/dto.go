@@ -19,6 +19,13 @@ type CreateTagRequest struct {
 	Enabled        *bool              `json:"enabled" binding:"omitempty"`
 }
 
+type ListTagsQuery struct {
+	PlantID       string `form:"plantId" binding:"omitempty"`
+	DeviceID      string `form:"deviceId" binding:"omitempty"`
+	ProcessUnitID string `form:"processUnitId" binding:"omitempty"`
+	Enabled       *bool  `form:"enabled" binding:"omitempty"`
+}
+
 type TagResponse struct {
 	ID             string             `json:"id"`
 	DeviceID       string             `json:"deviceId"`
