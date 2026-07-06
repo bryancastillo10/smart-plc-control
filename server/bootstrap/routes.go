@@ -10,6 +10,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	"smart-plc-control-server/internal/plants"
 	"smart-plc-control-server/internal/process_units"
+	"smart-plc-control-server/internal/tag_readings"
 	"smart-plc-control-server/internal/tags"
 	"smart-plc-control-server/internal/users"
 )
@@ -143,11 +144,11 @@ func registerTags(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerReadings(r *gin.RouterGroup, DB *gorm.DB) {
-	// reading := tag_readings.NewHandler(DB)
+	reading := tag_readings.NewHandler(DB)
 
-	readingGrp := r.Group("/readings")
+	readingGrp := r.Group("/readings", middleware.JWTAuthMiddleware())
 	{
-		readingGrp.GET("/latest")
+		readingGrp.GET("/latest", reading.GetLatestReadings)
 		readingGrp.GET("/history")
 	}
 }
