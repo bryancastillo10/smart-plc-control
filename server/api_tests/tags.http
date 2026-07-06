@@ -104,3 +104,22 @@ Content-Type: application/json
 	"minValue": 100,
 	"maxValue": 10
 }
+
+### Update Tag Configuration
+# Requires an authenticated ADMIN user.
+PUT http://localhost:8080/api/v1/tags/{{tagId}}
+Content-Type: application/json
+
+{
+	"processUnitId": "{{processUnitId}}",
+	"name": "Methane_Tank_Temperature_Updated",
+	"address": "40011",
+	"dataType": "FLOAT",
+	"unit": "degC",
+	"description": "Updated PLC tag configuration.",
+	"readOnly": true,
+	"scanIntervalMs": 2000,
+	"minValue": 0,
+	"maxValue": 120,
+	"enabled": true
+}
