@@ -104,3 +104,14 @@ func (h *Handler) UpdateTag(c *gin.Context) {
 
 	c.JSON(200, tag)
 }
+
+func (h *Handler) DeleteTag(c *gin.Context) {
+	tagID := c.Param("tagId")
+
+	if err := h.service.DeleteTag(tagID); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Tag deleted successfully"})
+}
