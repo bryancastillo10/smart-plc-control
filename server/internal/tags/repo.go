@@ -102,6 +102,18 @@ func (r *Repository) CreateTag(tag *models.Tags) (*models.Tags, error) {
 	return tag, nil
 }
 
+func (r *Repository) UpdateTag(tag *models.Tags) (*models.Tags, error) {
+	if err := r.db.Save(tag).Error; err != nil {
+		return nil, err
+	}
+
+	return tag, nil
+}
+
+func (r *Repository) DeleteTag(tag *models.Tags) error {
+	return r.db.Delete(tag).Error
+}
+
 func (r *Repository) FindTagsByDeviceID(deviceID uuid.UUID) ([]models.Tags, error) {
 	var tags []models.Tags
 	if err := r.db.Where("device_id = ?", deviceID).Order("created_at DESC").Find(&tags).Error; err != nil {
