@@ -3,15 +3,17 @@ import { navigationItems, type SidebarNavItem } from "@/constants/navigation";
 import { useLogout } from "@/features/auth/useLogout";
 import { useUserStore } from "@/store/user";
 import { appIconVariants, appSidebar } from "@/styles/recipes";
-import { plantSetUpPath } from "@/utils/authRoutes";
+import { canAccessAuthenticatedPath } from "@/utils/authRoutes";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Activity, LogOut, UserRound } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function Sidebar() {
+	const { t } = useTranslation();
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
-	const hasOwnedPlant = useUserStore((state) => state.user?.hasOwnedPlant ?? false);
+	const user = useUserStore((state) => state.user);
 	const { logout, logoutLoading } = useLogout();
 
 	return (
@@ -28,12 +30,14 @@ export function Sidebar() {
 
 			<nav className={appSidebar.nav} aria-label="Main navigation">
 				{navigationItems.map((item) => {
-					const isDisabled = !hasOwnedPlant && item.href !== plantSetUpPath;
+					const isDisabled = user ? !canAccessAuthenticatedPath(user, item.href) : true;
 
 					return (
 						<SidebarNavLink
 							key={item.href}
 							item={item}
+							label={t(item.labelKey)}
+							description={t(item.descriptionKey)}
 							isActive={pathname === item.href}
 							isDisabled={isDisabled}
 						/>
@@ -47,8 +51,8 @@ export function Sidebar() {
 						<UserRound className={appIconVariants({ tone: "brand" })} />
 					</div>
 					<div className="min-w-0">
-						<p className={appSidebar.userName}>Administrator</p>
-						<p className={appSidebar.userMeta}>Authenticated session</p>
+						<p className={appSidebar.userName}>{user?.userName ?? "User"}</p>
+						<p className={appSidebar.userMeta}>{user?.role ?? "Authenticated session"}</p>
 					</div>
 				</div>
 				<Button
@@ -68,10 +72,14 @@ export function Sidebar() {
 
 function SidebarNavLink({
 	item,
+	label,
+	description,
 	isActive,
 	isDisabled,
 }: {
 	item: SidebarNavItem;
+	label: string;
+	description: string;
 	isActive: boolean;
 	isDisabled: boolean;
 }) {
@@ -82,8 +90,8 @@ function SidebarNavLink({
 				className={appIconVariants({ tone: isActive ? "brand" : "muted" })}
 			/>
 			<span className="min-w-0">
-				<span className={appSidebar.navLabel}>{item.label}</span>
-				<span className={appSidebar.navDescription}>{item.description}</span>
+				<span className={appSidebar.navLabel}>{label}</span>
+				<span className={appSidebar.navDescription}>{description}</span>
 			</span>
 		</>
 	);
