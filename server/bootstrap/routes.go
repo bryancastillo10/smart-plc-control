@@ -149,7 +149,7 @@ func registerReadings(r *gin.RouterGroup, DB *gorm.DB) {
 	readingGrp := r.Group("/readings", middleware.JWTAuthMiddleware())
 	{
 		readingGrp.GET("/latest", reading.GetLatestReadings)
-		readingGrp.GET("/history")
+		readingGrp.GET("/history", reading.GetHistoryReadings)
 	}
 }
 
