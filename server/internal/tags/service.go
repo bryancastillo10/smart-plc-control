@@ -266,6 +266,108 @@ func (s *Service) CreateTag(deviceID string, req CreateTagRequest) (*TagResponse
 	return &res, nil
 }
 
+func (s *Service) UpdateTag(tagID string, req UpdateTagRequest) (*TagResponse, error) {
+	if tagID == "" {
+		return nil, appErr.NewBadRequest("Missing tag ID", nil)
+	}
+
+	if req.ProcessUnitID == "" && req.Name == "" && req.Address == "" && req.DataType == "" && req.Unit == "" && req.Description == "" && req.ReadOnly == nil && req.ScanIntervalMS == 0 && req.MinValue == nil && req.MaxValue == nil && req.Enabled == nil {
+		return nil, appErr.NewBadRequest("Missing tag fields to update", nil)
+	}
+
+	if req.DataType != "" && !isValidTagDataType(req.DataType) {
+		return nil, appErr.NewBadRequest("Invalid tag data type", nil)
+	}
+	if req.ScanIntervalMS < 0 {
+		return nil, appErr.NewBadRequest("Invalid scan interval", nil)
+	}
+
+	parsedTagID, err := utils.ParseId(tagID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid tag ID", err)
+	}
+
+	tag, err := s.repo.FindTagByID(parsedTagID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find tag", err)
+	}
+	if tag == nil {
+		return nil, appErr.NewNotFound("Tag not found", nil)
+	}
+
+	if req.Name != "" && req.Name != tag.Name {
+		existingTag, err := s.repo.FindTagByDeviceIDAndName(tag.DeviceID, req.Name)
+		if err != nil {
+			return nil, appErr.NewInternal("Failed to verify tag name", err)
+		}
+		if existingTag != nil && existingTag.ID != tag.ID {
+			return nil, appErr.NewBadRequest("Tag with that name already exists for the device", nil)
+		}
+	}
+
+	if req.ProcessUnitID != "" {
+		parsedProcessUnitID, err := utils.ParseId(req.ProcessUnitID)
+		if err != nil {
+			return nil, appErr.NewBadRequest("Invalid process unit ID", err)
+		}
+
+		device, err := s.repo.FindDeviceByID(tag.DeviceID)
+		if err != nil {
+			return nil, appErr.NewInternal("Failed to find device", err)
+		}
+		if device == nil {
+			return nil, appErr.NewNotFound("Device not found", nil)
+		}
+
+		processUnit, err := s.repo.FindProcessUnitByID(parsedProcessUnitID)
+		if err != nil {
+			return nil, appErr.NewInternal("Failed to find process unit", err)
+		}
+		if processUnit == nil {
+			return nil, appErr.NewNotFound("Process unit not found", nil)
+		}
+		if processUnit.PlantID != device.PlantID {
+			return nil, appErr.NewBadRequest("Process unit must belong to the same plant as the device", nil)
+		}
+
+		tag.ProcessUnitID = &parsedProcessUnitID
+	}
+
+	utils.PatchIfNotZero(&tag.Name, req.Name)
+	utils.PatchIfNotZero(&tag.Address, req.Address)
+	utils.PatchIfNotZero(&tag.DataType, req.DataType)
+	utils.PatchIfNotZero(&tag.Unit, req.Unit)
+	utils.PatchIfNotZero(&tag.Description, req.Description)
+	utils.PatchIfNotZero(&tag.ScanIntervalMS, req.ScanIntervalMS)
+	if req.ReadOnly != nil {
+		tag.ReadOnly = *req.ReadOnly
+	}
+	if req.MinValue != nil {
+		tag.MinValue = req.MinValue
+	}
+	if req.MaxValue != nil {
+		tag.MaxValue = req.MaxValue
+	}
+	if req.Enabled != nil {
+		tag.Enabled = *req.Enabled
+	}
+
+	if tag.ScanIntervalMS < 1 {
+		return nil, appErr.NewBadRequest("Invalid scan interval", nil)
+	}
+	if tag.MinValue != nil && tag.MaxValue != nil && *tag.MinValue > *tag.MaxValue {
+		return nil, appErr.NewBadRequest("Minimum value cannot be greater than maximum value", nil)
+	}
+
+	updatedTag, err := s.repo.UpdateTag(tag)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to update tag", err)
+	}
+
+	res := toTagResponse(*updatedTag)
+	return &res, nil
+}
+
 func toTagResponse(tag models.Tags) TagResponse {
 	var processUnitID *string
 	if tag.ProcessUnitID != nil {
