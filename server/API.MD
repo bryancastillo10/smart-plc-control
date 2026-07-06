@@ -334,31 +334,18 @@ DELETE /api/v1/simulations/:simulationId
 POST   /api/v1/simulations/:simulationId/start
 POST   /api/v1/simulations/:simulationId/pause
 POST   /api/v1/simulations/:simulationId/stop
-
-GET    /api/v1/simulation-scenarios
-POST   /api/v1/simulations/:simulationId/scenarios
-GET    /api/v1/simulation-scenarios/:scenarioId
-PUT    /api/v1/simulation-scenarios/:scenarioId
-DELETE /api/v1/simulation-scenarios/:scenarioId
-POST   /api/v1/simulations/:simulationId/scenarios/:scenarioId/trigger
 ```
 
-| Endpoint                                                               | Description                         | Access              |
-| ---------------------------------------------------------------------- | ----------------------------------- | ------------------- |
-| `POST /api/v1/simulations`                                             | Create a simulation instance        | `ADMIN`             |
-| `GET /api/v1/simulations`                                              | List simulations and their statuses | Authenticated       |
-| `GET /api/v1/simulations/:simulationId`                                | Get simulation details              | Authenticated       |
-| `PUT /api/v1/simulations/:simulationId`                                | Update simulation configuration     | `ADMIN`             |
-| `DELETE /api/v1/simulations/:simulationId`                             | Delete a simulation                 | `ADMIN`             |
-| `POST /api/v1/simulations/:simulationId/start`                         | Start a simulation                  | `ADMIN`, `OPERATOR` |
-| `POST /api/v1/simulations/:simulationId/pause`                         | Pause a simulation                  | `ADMIN`, `OPERATOR` |
-| `POST /api/v1/simulations/:simulationId/stop`                          | Stop a simulation                   | `ADMIN`, `OPERATOR` |
-| `GET /api/v1/simulation-scenarios`                                     | List available fault scenarios      | Authenticated       |
-| `POST /api/v1/simulations/:simulationId/scenarios`                     | Create a scenario for a simulation  | `ADMIN`             |
-| `GET /api/v1/simulation-scenarios/:scenarioId`                         | Get scenario details                | Authenticated       |
-| `PUT /api/v1/simulation-scenarios/:scenarioId`                         | Update a scenario                   | `ADMIN`             |
-| `DELETE /api/v1/simulation-scenarios/:scenarioId`                      | Delete a scenario                   | `ADMIN`             |
-| `POST /api/v1/simulations/:simulationId/scenarios/:scenarioId/trigger` | Trigger a scenario                  | `ADMIN`, `OPERATOR` |
+| Endpoint                                       | Description                         | Access              |
+| ---------------------------------------------- | ----------------------------------- | ------------------- |
+| `POST /api/v1/simulations`                     | Create a simulation instance        | `ADMIN`             |
+| `GET /api/v1/simulations`                      | List simulations and their statuses | Authenticated       |
+| `GET /api/v1/simulations/:simulationId`        | Get simulation details              | Authenticated       |
+| `PUT /api/v1/simulations/:simulationId`        | Update simulation configuration     | `ADMIN`             |
+| `DELETE /api/v1/simulations/:simulationId`     | Delete a simulation                 | `ADMIN`             |
+| `POST /api/v1/simulations/:simulationId/start` | Start a simulation                  | `ADMIN`, `OPERATOR` |
+| `POST /api/v1/simulations/:simulationId/pause` | Pause a simulation                  | `ADMIN`, `OPERATOR` |
+| `POST /api/v1/simulations/:simulationId/stop`  | Stop a simulation                   | `ADMIN`, `OPERATOR` |
 
 Using `simulationId` allows the application to support multiple plants or simulation instances later.
 
@@ -371,6 +358,26 @@ POST   /api/v1/simulations/stop
 GET    /api/v1/simulations
 POST   /api/v1/simulations/scenarios/:scenarioId/trigger
 ```
+
+### Simulation Scenarios
+
+```text
+GET    /api/v1/simulation-scenarios
+POST   /api/v1/simulations/:simulationId/scenarios
+GET    /api/v1/simulation-scenarios/:scenarioId
+PUT    /api/v1/simulation-scenarios/:scenarioId
+DELETE /api/v1/simulation-scenarios/:scenarioId
+POST   /api/v1/simulations/:simulationId/scenarios/:scenarioId/trigger
+```
+
+| Endpoint                                                               | Description                        | Access              |
+| ---------------------------------------------------------------------- | ---------------------------------- | ------------------- |
+| `GET /api/v1/simulation-scenarios`                                     | List available fault scenarios     | Authenticated       |
+| `POST /api/v1/simulations/:simulationId/scenarios`                     | Create a scenario for a simulation | `ADMIN`             |
+| `GET /api/v1/simulation-scenarios/:scenarioId`                         | Get scenario details               | Authenticated       |
+| `PUT /api/v1/simulation-scenarios/:scenarioId`                         | Update a scenario                  | `ADMIN`             |
+| `DELETE /api/v1/simulation-scenarios/:scenarioId`                      | Delete a scenario                  | `ADMIN`             |
+| `POST /api/v1/simulations/:simulationId/scenarios/:scenarioId/trigger` | Trigger a scenario                 | `ADMIN`, `OPERATOR` |
 
 ### Audit Logs
 
