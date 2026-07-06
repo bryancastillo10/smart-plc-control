@@ -1,61 +1,68 @@
-﻿import type { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import {
 	BellRing,
 	Building2,
 	ChartNoAxesCombined,
 	Gauge,
 	Settings,
+	ShieldAlert,
 	SlidersHorizontal,
 	Tags,
 } from "lucide-react";
 
 export type SidebarNavItem = {
-	label: string;
-	description: string;
+	labelKey: string;
+	descriptionKey: string;
 	icon: LucideIcon;
 	href: string;
 };
 
 export const navigationItems = [
 	{
-		label: "Plant Setup",
-		description: "First-run access",
+		labelKey: "navigation.plantSetup.label",
+		descriptionKey: "navigation.plantSetup.description",
 		icon: Building2,
 		href: "/plant-setup",
 	},
 	{
-		label: "Dashboard",
-		description: "System overview",
+		labelKey: "navigation.noPlantAccess.label",
+		descriptionKey: "navigation.noPlantAccess.description",
+		icon: ShieldAlert,
+		href: "/no-plant-access",
+	},
+	{
+		labelKey: "navigation.dashboard.label",
+		descriptionKey: "navigation.dashboard.description",
 		icon: ChartNoAxesCombined,
 		href: "/dashboard",
 	},
 	{
-		label: "PLC Control",
-		description: "Live operations",
+		labelKey: "navigation.plc.label",
+		descriptionKey: "navigation.plc.description",
 		icon: SlidersHorizontal,
 		href: "/plc",
 	},
 	{
-		label: "Equipment",
-		description: "Devices and stations",
+		labelKey: "navigation.equipment.label",
+		descriptionKey: "navigation.equipment.description",
 		icon: Gauge,
 		href: "/equipment",
 	},
 	{
-		label: "Tags",
-		description: "Signals and readings",
+		labelKey: "navigation.tags.label",
+		descriptionKey: "navigation.tags.description",
 		icon: Tags,
 		href: "/tags",
 	},
 	{
-		label: "Alarms",
-		description: "Active events",
+		labelKey: "navigation.alarms.label",
+		descriptionKey: "navigation.alarms.description",
 		icon: BellRing,
 		href: "/alarms",
 	},
 	{
-		label: "Settings",
-		description: "System preferences",
+		labelKey: "navigation.settings.label",
+		descriptionKey: "navigation.settings.description",
 		icon: Settings,
 		href: "/settings",
 	},
