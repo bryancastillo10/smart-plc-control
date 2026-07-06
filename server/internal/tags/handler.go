@@ -86,3 +86,21 @@ func (h *Handler) CreateTag(c *gin.Context) {
 
 	c.JSON(201, tag)
 }
+
+func (h *Handler) UpdateTag(c *gin.Context) {
+	tagID := c.Param("tagId")
+
+	req, err := http.BindJSON[UpdateTagRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	tag, err := h.service.UpdateTag(tagID, *req)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, tag)
+}
