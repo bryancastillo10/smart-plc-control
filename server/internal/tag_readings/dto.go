@@ -11,7 +11,14 @@ type LatestReadingsQuery struct {
 	TagIDs        string `form:"tagIds" binding:"omitempty"`
 }
 
-type LatestReadingResponse struct {
+type HistoryReadingsQuery struct {
+	TagIDs   string `form:"tagIds" binding:"required"`
+	From     string `form:"from" binding:"required"`
+	To       string `form:"to" binding:"required"`
+	Interval string `form:"interval" binding:"omitempty"`
+}
+
+type ReadingResponse struct {
 	ID           uint64                `json:"id"`
 	TagID        string                `json:"tagId"`
 	ValueNumeric *float64              `json:"valueNumeric"`
