@@ -7,6 +7,8 @@ This project is a PLC monitoring and simulation monorepository composed of two s
 
 - `server/`  backend GoLang Gin API for real-time communication, PLC simulation, alarm processing, and data persistence
 
+Refer to `server/API.md` for API endpoints guidelines while the `server/SCHEMA.md` for the data schema and their relationships
+
 ### Main Features
 - Real-time Dashboard
 - Device Monitoring
