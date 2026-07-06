@@ -29,6 +29,7 @@ export interface CurrentUserResponse {
 	email: string;
 	role: Role;
 	language: Language;
+	hasOwnedPlant: boolean;
 	created_at: string;
 	updated_at: string;
 }
