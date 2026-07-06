@@ -3,10 +3,14 @@ import { currentUser } from "@/features/auth/queries";
 import { toUserProfile } from "@/features/auth/userProfile";
 import { useAuthenticatedRouteGuard } from "@/hooks/useAuthenticatedRouteGuard";
 import { useUserStore } from "@/store/user";
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import {
+	canAccessAuthenticatedPath,
+	getAuthenticatedRedirectPath,
+} from "@/utils/authRoutes";
+import { createFileRoute, isRedirect, Outlet, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated")({
-	beforeLoad: async () => {
+	beforeLoad: async ({ location }) => {
 		if (typeof window === "undefined") {
 			return;
 		}
@@ -16,7 +20,18 @@ export const Route = createFileRoute("/_authenticated")({
 		try {
 			const user = await currentUser();
 			store.setUser(toUserProfile(user));
-		} catch {
+
+			if (!canAccessAuthenticatedPath(user, location.pathname)) {
+				throw redirect({
+					to: getAuthenticatedRedirectPath(user),
+					replace: true,
+				});
+			}
+		} catch (error) {
+			if (isRedirect(error)) {
+				throw error;
+			}
+
 			store.clearUser();
 			throw redirect({ to: "/", replace: true });
 		}

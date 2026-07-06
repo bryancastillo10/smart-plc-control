@@ -3,6 +3,7 @@ import { currentUser } from "@/features/auth/queries";
 import type { CurrentUserResponse } from "@/features/auth/type";
 import { toUserProfile } from "@/features/auth/userProfile";
 import { useUserStore } from "@/store/user";
+import { getAuthenticatedRedirectPath, loginPath } from "@/utils/authRoutes";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -23,8 +24,15 @@ export const Route = createFileRoute("/")({
 			return;
 		}
 
+		const redirectPath = getAuthenticatedRedirectPath(authenticatedUser);
+
+		if (redirectPath === loginPath) {
+			store.clearUser();
+			return;
+		}
+
 		store.setUser(toUserProfile(authenticatedUser));
-		throw redirect({ to: "/dashboard", replace: true });
+		throw redirect({ to: redirectPath, replace: true });
 	},
 	component: HomePage,
 });
@@ -40,13 +48,20 @@ function HomePage() {
 		async function redirectAuthenticatedUser() {
 			try {
 				const authenticatedUser = await currentUser();
+				const redirectPath = getAuthenticatedRedirectPath(authenticatedUser);
 
 				if (!isMounted) {
 					return;
 				}
 
+				if (redirectPath === loginPath) {
+					store.clearUser();
+					setIsCheckingAuth(false);
+					return;
+				}
+
 				store.setUser(toUserProfile(authenticatedUser));
-				void navigate({ to: "/dashboard", replace: true });
+				void navigate({ to: redirectPath, replace: true });
 			} catch {
 				store.clearUser();
 
