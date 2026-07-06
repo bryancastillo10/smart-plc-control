@@ -3,7 +3,9 @@ import { currentUser } from "@/features/auth/queries";
 import type { CurrentUserResponse } from "@/features/auth/type";
 import { toUserProfile } from "@/features/auth/userProfile";
 import { useUserStore } from "@/store/user";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { getAuthenticatedRedirectPath } from "@/utils/authRoutes";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/")({
 	beforeLoad: async () => {
@@ -13,26 +15,61 @@ export const Route = createFileRoute("/")({
 
 		const store = useUserStore.getState();
 
-		if (store.validateAuth()) {
-			throw redirect({ to: "/dashboard" });
-		}
-
-		let authenticatedUser: CurrentUserResponse | null = null;
+		let authenticatedUser: CurrentUserResponse;
 
 		try {
 			authenticatedUser = await currentUser();
 		} catch {
 			store.clearUser();
+			return;
 		}
 
-		if (authenticatedUser) {
-			store.setUser(toUserProfile(authenticatedUser));
-			throw redirect({ to: "/dashboard" });
-		}
+		const redirectPath = getAuthenticatedRedirectPath(authenticatedUser);
+
+		store.setUser(toUserProfile(authenticatedUser));
+		throw redirect({ to: redirectPath, replace: true });
 	},
 	component: HomePage,
 });
 
 function HomePage() {
+	const navigate = useNavigate();
+	const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+	useEffect(() => {
+		let isMounted = true;
+		const store = useUserStore.getState();
+
+		async function redirectAuthenticatedUser() {
+			try {
+				const authenticatedUser = await currentUser();
+				const redirectPath = getAuthenticatedRedirectPath(authenticatedUser);
+
+				if (!isMounted) {
+					return;
+				}
+
+				store.setUser(toUserProfile(authenticatedUser));
+				void navigate({ to: redirectPath, replace: true });
+			} catch {
+				store.clearUser();
+
+				if (isMounted) {
+					setIsCheckingAuth(false);
+				}
+			}
+		}
+
+		void redirectAuthenticatedUser();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [navigate]);
+
+	if (isCheckingAuth) {
+		return null;
+	}
+
 	return <LoginPage />;
 }

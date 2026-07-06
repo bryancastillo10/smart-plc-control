@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { useLanguageStore } from "@/store/language";
 import type { UserProfile } from "@/types/user";
 
 export interface AuthState {
@@ -14,7 +15,10 @@ export const useUserStore = create(
 	persist<AuthState>(
 		(set, get) => ({
 			user: null,
-			setUser: (user) => set({ user }),
+			setUser: (user) => {
+				set({ user });
+				useLanguageStore.getState().setLanguage(user.language);
+			},
 			clearUser: () => set({ user: null }),
 			validateAuth: () => get().user !== null,
 		}),

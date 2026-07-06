@@ -15,6 +15,7 @@ import { Route as AuthenticatedTagsRouteImport } from './routes/_authenticated/t
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedPlcRouteImport } from './routes/_authenticated/plc'
 import { Route as AuthenticatedPlantSetupRouteImport } from './routes/_authenticated/plant-setup'
+import { Route as AuthenticatedNoPlantAccessRouteImport } from './routes/_authenticated/no-plant-access'
 import { Route as AuthenticatedEquipmentRouteImport } from './routes/_authenticated/equipment'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAlarmsRouteImport } from './routes/_authenticated/alarms'
@@ -48,6 +49,12 @@ const AuthenticatedPlantSetupRoute = AuthenticatedPlantSetupRouteImport.update({
   path: '/plant-setup',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedNoPlantAccessRoute =
+  AuthenticatedNoPlantAccessRouteImport.update({
+    id: '/no-plant-access',
+    path: '/no-plant-access',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedEquipmentRoute = AuthenticatedEquipmentRouteImport.update({
   id: '/equipment',
   path: '/equipment',
@@ -69,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/alarms': typeof AuthenticatedAlarmsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/equipment': typeof AuthenticatedEquipmentRoute
+  '/no-plant-access': typeof AuthenticatedNoPlantAccessRoute
   '/plant-setup': typeof AuthenticatedPlantSetupRoute
   '/plc': typeof AuthenticatedPlcRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -79,6 +87,7 @@ export interface FileRoutesByTo {
   '/alarms': typeof AuthenticatedAlarmsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/equipment': typeof AuthenticatedEquipmentRoute
+  '/no-plant-access': typeof AuthenticatedNoPlantAccessRoute
   '/plant-setup': typeof AuthenticatedPlantSetupRoute
   '/plc': typeof AuthenticatedPlcRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -91,6 +100,7 @@ export interface FileRoutesById {
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/equipment': typeof AuthenticatedEquipmentRoute
+  '/_authenticated/no-plant-access': typeof AuthenticatedNoPlantAccessRoute
   '/_authenticated/plant-setup': typeof AuthenticatedPlantSetupRoute
   '/_authenticated/plc': typeof AuthenticatedPlcRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/alarms'
     | '/dashboard'
     | '/equipment'
+    | '/no-plant-access'
     | '/plant-setup'
     | '/plc'
     | '/settings'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/alarms'
     | '/dashboard'
     | '/equipment'
+    | '/no-plant-access'
     | '/plant-setup'
     | '/plc'
     | '/settings'
@@ -124,6 +136,7 @@ export interface FileRouteTypes {
     | '/_authenticated/alarms'
     | '/_authenticated/dashboard'
     | '/_authenticated/equipment'
+    | '/_authenticated/no-plant-access'
     | '/_authenticated/plant-setup'
     | '/_authenticated/plc'
     | '/_authenticated/settings'
@@ -179,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlantSetupRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/no-plant-access': {
+      id: '/_authenticated/no-plant-access'
+      path: '/no-plant-access'
+      fullPath: '/no-plant-access'
+      preLoaderRoute: typeof AuthenticatedNoPlantAccessRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/equipment': {
       id: '/_authenticated/equipment'
       path: '/equipment'
@@ -207,6 +227,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAlarmsRoute: typeof AuthenticatedAlarmsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEquipmentRoute: typeof AuthenticatedEquipmentRoute
+  AuthenticatedNoPlantAccessRoute: typeof AuthenticatedNoPlantAccessRoute
   AuthenticatedPlantSetupRoute: typeof AuthenticatedPlantSetupRoute
   AuthenticatedPlcRoute: typeof AuthenticatedPlcRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -217,6 +238,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAlarmsRoute: AuthenticatedAlarmsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEquipmentRoute: AuthenticatedEquipmentRoute,
+  AuthenticatedNoPlantAccessRoute: AuthenticatedNoPlantAccessRoute,
   AuthenticatedPlantSetupRoute: AuthenticatedPlantSetupRoute,
   AuthenticatedPlcRoute: AuthenticatedPlcRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,

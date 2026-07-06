@@ -8,6 +8,7 @@ export function toUserProfile(user: CurrentUserResponse): UserProfile {
 		email: user.email,
 		role: user.role,
 		language: user.language,
+		hasOwnedPlant: user.hasOwnedPlant,
 		createdAt: user.created_at,
 		updatedAt: user.updated_at,
 	};

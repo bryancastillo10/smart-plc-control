@@ -1,4 +1,4 @@
-﻿import {
+import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
@@ -6,6 +6,7 @@
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
+import '@/integrations/i18n'
 import { AppToaster } from '@/integrations/sonner'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
