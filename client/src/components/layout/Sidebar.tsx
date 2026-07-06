@@ -3,7 +3,10 @@ import { navigationItems, type SidebarNavItem } from "@/constants/navigation";
 import { useLogout } from "@/features/auth/useLogout";
 import { useUserStore } from "@/store/user";
 import { appIconVariants, appSidebar } from "@/styles/recipes";
-import { canAccessAuthenticatedPath } from "@/utils/authRoutes";
+import {
+	canAccessAuthenticatedPath,
+	shouldShowAuthenticatedPath,
+} from "@/utils/authRoutes";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Activity, LogOut, UserRound } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -15,6 +18,9 @@ export function Sidebar() {
 	});
 	const user = useUserStore((state) => state.user);
 	const { logout, logoutLoading } = useLogout();
+	const visibleNavigationItems = user
+		? navigationItems.filter((item) => shouldShowAuthenticatedPath(user, item.href))
+		: [];
 
 	return (
 		<aside className={appSidebar.root}>
@@ -29,7 +35,7 @@ export function Sidebar() {
 			</div>
 
 			<nav className={appSidebar.nav} aria-label="Main navigation">
-				{navigationItems.map((item) => {
+				{visibleNavigationItems.map((item) => {
 					const isDisabled = user ? !canAccessAuthenticatedPath(user, item.href) : true;
 
 					return (
