@@ -3,6 +3,7 @@ package tag_readings
 import (
 	"smart-plc-control-server/internal/models"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -16,6 +17,13 @@ type LatestReadingFilters struct {
 	DeviceID      *uuid.UUID
 	ProcessUnitID *uuid.UUID
 	TagIDs        []uuid.UUID
+}
+
+type HistoryReadingFilters struct {
+	TagIDs []uuid.UUID
+	From   time.Time
+	To     time.Time
+	Limit  int
 }
 
 func NewRepository(db *gorm.DB) *Repository {
@@ -82,6 +90,20 @@ func (r *Repository) FindLatestReadings(filters LatestReadingFilters) ([]models.
 			"tag_readings.recorded_at DESC",
 			"tag_readings.id DESC",
 		}, ", ")).
+		Find(&readings).Error; err != nil {
+		return nil, err
+	}
+
+	return readings, nil
+}
+
+func (r *Repository) FindHistoryReadings(filters HistoryReadingFilters) ([]models.TagReadings, error) {
+	var readings []models.TagReadings
+
+	if err := r.db.Where("tag_id IN ?", filters.TagIDs).
+		Where("recorded_at >= ? AND recorded_at <= ?", filters.From, filters.To).
+		Order("recorded_at ASC, id ASC").
+		Limit(filters.Limit).
 		Find(&readings).Error; err != nil {
 		return nil, err
 	}
