@@ -19,6 +19,20 @@ type CreateTagRequest struct {
 	Enabled        *bool              `json:"enabled" binding:"omitempty"`
 }
 
+type UpdateTagRequest struct {
+	ProcessUnitID  string             `json:"processUnitId" binding:"omitempty"`
+	Name           string             `json:"name" binding:"omitempty,min=1,max=120"`
+	Address        string             `json:"address" binding:"omitempty,max=120"`
+	DataType       models.TagDataType `json:"dataType" binding:"omitempty,oneof=BOOL INT FLOAT STRING"`
+	Unit           string             `json:"unit" binding:"omitempty,max=30"`
+	Description    string             `json:"description" binding:"omitempty"`
+	ReadOnly       *bool              `json:"readOnly" binding:"omitempty"`
+	ScanIntervalMS int                `json:"scanIntervalMs" binding:"omitempty,min=1"`
+	MinValue       *float64           `json:"minValue" binding:"omitempty"`
+	MaxValue       *float64           `json:"maxValue" binding:"omitempty"`
+	Enabled        *bool              `json:"enabled" binding:"omitempty"`
+}
+
 type ListTagsQuery struct {
 	PlantID       string `form:"plantId" binding:"omitempty"`
 	DeviceID      string `form:"deviceId" binding:"omitempty"`
