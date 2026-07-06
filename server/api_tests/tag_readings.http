@@ -1,2 +1,26 @@
-### Get Tags By Device
+### Get Latest Readings
 GET http://localhost:8080/api/v1/readings/latest
+
+### Get Latest Readings By Device
+@deviceId = 175f865a-afcd-438c-baf8-dc39ee8585fe
+GET http://localhost:8080/api/v1/readings/latest?deviceId={{deviceId}}
+
+### Get Latest Readings By Process Unit
+@processUnitId = 3c40fa37-a5bd-4b6b-953b-2ba45ed46728
+GET http://localhost:8080/api/v1/readings/latest?processUnitId={{processUnitId}}
+
+### Get Latest Readings By Tag IDs
+@tagId = b2395794-3ac0-43fc-8ecb-6f1c190fc805
+@tagIds = {{tagId}}
+GET http://localhost:8080/api/v1/readings/latest?tagIds={{tagIds}}
+
+### Get Historical Readings
+GET http://localhost:8080/api/v1/readings/history?tagIds={{tagIds}}&from={{from}}&to={{to}}
+
+### Validation: Missing Time Range
+GET http://localhost:8080/api/v1/readings/history?tagIds={{tagIds}}
+
+### Validation: Unsupported Aggregation Interval
+@from = 2026-06-01T00:00:00Z
+@to = 2026-06-15T00:00:00Z
+GET http://localhost:8080/api/v1/readings/history?tagIds={{tagIds}}&from={{from}}&to={{to}}&interval=1m
