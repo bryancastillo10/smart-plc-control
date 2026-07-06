@@ -1,10 +1,14 @@
 import type { CurrentUserResponse } from "@/features/auth/type";
+import type { UserProfile } from "@/types/user";
+
+type AuthRouteUser = Pick<CurrentUserResponse | UserProfile, "role" | "hasOwnedPlant">;
 
 export const plantSetUpPath = "/plant-setup";
+export const noPlantAccessPath = "/no-plant-access";
 export const dashboardPath = "/dashboard";
 export const loginPath = "/";
 
-export function getAuthenticatedRedirectPath(user: CurrentUserResponse) {
+export function getAuthenticatedRedirectPath(user: AuthRouteUser) {
 	if (user.hasOwnedPlant) {
 		return dashboardPath;
 	}
@@ -13,13 +17,17 @@ export function getAuthenticatedRedirectPath(user: CurrentUserResponse) {
 		return plantSetUpPath;
 	}
 
-	return loginPath;
+	return noPlantAccessPath;
 }
 
-export function canAccessAuthenticatedPath(user: CurrentUserResponse, pathname: string) {
+export function canAccessAuthenticatedPath(user: AuthRouteUser, pathname: string) {
 	if (user.hasOwnedPlant) {
-		return true;
+		return pathname !== plantSetUpPath && pathname !== noPlantAccessPath;
 	}
 
-	return user.role === "ADMIN" && pathname === plantSetUpPath;
+	if (user.role === "ADMIN") {
+		return pathname === plantSetUpPath;
+	}
+
+	return pathname === noPlantAccessPath;
 }
