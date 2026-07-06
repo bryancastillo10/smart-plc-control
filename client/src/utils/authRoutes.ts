@@ -31,3 +31,15 @@ export function canAccessAuthenticatedPath(user: AuthRouteUser, pathname: string
 
 	return pathname === noPlantAccessPath;
 }
+
+export function shouldShowAuthenticatedPath(user: AuthRouteUser, pathname: string) {
+	if (user.hasOwnedPlant) {
+		return pathname !== plantSetUpPath && pathname !== noPlantAccessPath;
+	}
+
+	if (user.role === "ADMIN") {
+		return pathname !== noPlantAccessPath;
+	}
+
+	return pathname !== plantSetUpPath;
+}
