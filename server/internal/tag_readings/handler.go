@@ -32,3 +32,19 @@ func (h *Handler) GetLatestReadings(c *gin.Context) {
 
 	c.JSON(200, readings)
 }
+
+func (h *Handler) GetHistoryReadings(c *gin.Context) {
+	query, err := http.BindQuery[HistoryReadingsQuery](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	readings, err := h.service.GetHistoryReadings(*query)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, readings)
+}
