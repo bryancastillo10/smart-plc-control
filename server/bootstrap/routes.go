@@ -133,13 +133,12 @@ func registerTags(r *gin.RouterGroup, DB *gorm.DB) {
 		processUnitTagGrp.GET("", tag.GetTagsByProcessUnitID)
 	}
 
-	tagGrp := r.Group("/tags")
+	tagGrp := r.Group("/tags", middleware.JWTAuthMiddleware())
 	{
-		tagGrp.GET("", middleware.JWTAuthMiddleware(), tag.GetTags)
-		tagGrp.GET("/:tagId", middleware.JWTAuthMiddleware(), tag.GetTagByID)
-		tagGrp.PUT("/:tagId", middleware.JWTAuthMiddleware(), middleware.RequireRoles(models.Admin), tag.UpdateTag)
-		tagGrp.DELETE("/:tagId")
-		tagGrp.POST("/:tagId/write")
+		tagGrp.GET("", tag.GetTags)
+		tagGrp.GET("/:tagId", tag.GetTagByID)
+		tagGrp.PUT("/:tagId", middleware.RequireRoles(models.Admin), tag.UpdateTag)
+		tagGrp.DELETE("/:tagId", middleware.RequireRoles(models.Admin), tag.DeleteTag)
 	}
 }
 
