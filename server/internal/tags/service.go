@@ -368,6 +368,31 @@ func (s *Service) UpdateTag(tagID string, req UpdateTagRequest) (*TagResponse, e
 	return &res, nil
 }
 
+func (s *Service) DeleteTag(tagID string) error {
+	if tagID == "" {
+		return appErr.NewBadRequest("Missing tag ID", nil)
+	}
+
+	parsedTagID, err := utils.ParseId(tagID)
+	if err != nil {
+		return appErr.NewBadRequest("Invalid tag ID", err)
+	}
+
+	tag, err := s.repo.FindTagByID(parsedTagID)
+	if err != nil {
+		return appErr.NewInternal("Failed to find tag", err)
+	}
+	if tag == nil {
+		return appErr.NewNotFound("Tag not found", nil)
+	}
+
+	if err := s.repo.DeleteTag(tag); err != nil {
+		return appErr.NewInternal("Failed to delete tag", err)
+	}
+
+	return nil
+}
+
 func toTagResponse(tag models.Tags) TagResponse {
 	var processUnitID *string
 	if tag.ProcessUnitID != nil {
