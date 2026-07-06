@@ -137,7 +137,7 @@ func registerTags(r *gin.RouterGroup, DB *gorm.DB) {
 	{
 		tagGrp.GET("", middleware.JWTAuthMiddleware(), tag.GetTags)
 		tagGrp.GET("/:tagId", middleware.JWTAuthMiddleware(), tag.GetTagByID)
-		tagGrp.PUT("/:tagId")
+		tagGrp.PUT("/:tagId", middleware.JWTAuthMiddleware(), middleware.RequireRoles(models.Admin), tag.UpdateTag)
 		tagGrp.DELETE("/:tagId")
 		tagGrp.POST("/:tagId/write")
 	}
