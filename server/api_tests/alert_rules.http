@@ -1,0 +1,98 @@
+﻿@tagId = 05a47c70-8537-4b3d-b302-9b76152cf515
+@boolTagId = d569923e-f453-43a6-92bb-3e18cf75877e
+
+### Create Numeric Alert Rule
+# Requires an authenticated ADMIN user.
+# Use a FLOAT or INT tag ID.
+POST http://localhost:8080/api/v1/alert-rules
+Content-Type: application/json
+
+{
+	"tagId": "{{tagId}}",
+	"name": "Methane Tank Temperature High",
+	"operator": "GT",
+	"thresholdNumeric": 55,
+	"severity": "HIGH",
+	"delaySeconds": 30,
+	"message": "Methane tank temperature is above the safe operating range.",
+	"enabled": true
+}
+
+### Create Numeric Alert Rule With Defaults
+# Defaults: delaySeconds=0, enabled=true.
+POST http://localhost:8080/api/v1/alert-rules
+Content-Type: application/json
+
+{
+	"tagId": "{{tagId}}",
+	"name": "Methane Tank Temperature Critical",
+	"operator": "GTE",
+	"thresholdNumeric": 65,
+	"severity": "CRITICAL",
+	"message": "Methane tank temperature reached a critical threshold."
+}
+
+### Create Bool Alert Rule
+# Use a BOOL tag ID. BOOL rules only support EQ or NEQ.
+POST http://localhost:8080/api/v1/alert-rules
+Content-Type: application/json
+
+{
+	"tagId": "{{boolTagId}}",
+	"name": "Feed Pump Command Off",
+	"operator": "EQ",
+	"thresholdBool": false,
+	"severity": "MEDIUM",
+	"delaySeconds": 10,
+	"message": "Feed pump command is off while the process is expected to run.",
+	"enabled": true
+}
+
+
+### Validation: Missing Threshold
+POST http://localhost:8080/api/v1/alert-rules
+Content-Type: application/json
+
+{
+	"tagId": "{{tagId}}",
+	"name": "Invalid Missing Threshold",
+	"operator": "GT",
+	"severity": "LOW"
+}
+
+### Validation: Multiple Thresholds
+POST http://localhost:8080/api/v1/alert-rules
+Content-Type: application/json
+
+{
+	"tagId": "{{tagId}}",
+	"name": "Invalid Multiple Thresholds",
+	"operator": "GT",
+	"thresholdNumeric": 55,
+	"thresholdText": "55",
+	"severity": "LOW"
+}
+
+### Validation: Invalid Operator For Bool Tag
+POST http://localhost:8080/api/v1/alert-rules
+Content-Type: application/json
+
+{
+	"tagId": "{{boolTagId}}",
+	"name": "Invalid Bool Operator",
+	"operator": "GT",
+	"thresholdBool": true,
+	"severity": "LOW"
+}
+
+### Validation: Invalid Severity
+POST http://localhost:8080/api/v1/alert-rules
+Content-Type: application/json
+
+{
+	"tagId": "{{tagId}}",
+	"name": "Invalid Severity",
+	"operator": "GT",
+	"thresholdNumeric": 55,
+	"severity": "URGENT"
+}
