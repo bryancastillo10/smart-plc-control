@@ -72,3 +72,14 @@ func (h *Handler) UpdateAlertRule(c *gin.Context) {
 
 	c.JSON(200, alertRule)
 }
+
+func (h *Handler) DeleteAlertRule(c *gin.Context) {
+	ruleID := c.Param("ruleId")
+
+	if err := h.service.DeleteAlertRule(ruleID); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Alert rule deleted successfully"})
+}
