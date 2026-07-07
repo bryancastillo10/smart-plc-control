@@ -1,6 +1,8 @@
 package alerts
 
 import (
+	"fmt"
+
 	"smart-plc-control-server/pkg/http"
 
 	"github.com/gin-gonic/gin"
@@ -37,6 +39,31 @@ func (h *Handler) GetAlertByID(c *gin.Context) {
 	alertID := c.Param("alertId")
 
 	alert, err := h.service.GetAlertByID(alertID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, alert)
+}
+
+func (h *Handler) AcknowledgeAlert(c *gin.Context) {
+	alertID := c.Param("alertId")
+	userID, _ := c.Get("userID")
+
+	alert, err := h.service.AcknowledgeAlert(alertID, fmt.Sprint(userID))
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, alert)
+}
+
+func (h *Handler) ResolveAlert(c *gin.Context) {
+	alertID := c.Param("alertId")
+
+	alert, err := h.service.ResolveAlert(alertID)
 	if err != nil {
 		c.Error(err)
 		return
