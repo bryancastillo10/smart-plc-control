@@ -1,0 +1,34 @@
+@plantId =  6203ddf0-52a1-4251-bafa-193f694d7601
+@alertRuleId = 1ccc2868-4fd3-464f-bb86-8dd7d0f93519
+@from = 2026-06-01T00:00:00Z
+@to = 2026-07-01T00:00:00Z
+
+### Get All Alerts
+GET http://localhost:8080/api/v1/alerts
+
+### Get Active Alerts
+GET http://localhost:8080/api/v1/alerts?status=ACTIVE
+
+### Get Resolved Alerts
+GET http://localhost:8080/api/v1/alerts?status=RESOLVED
+
+### Get Critical Alerts
+GET http://localhost:8080/api/v1/alerts?severity=CRITICAL
+
+### Get Alerts By Alert Rule
+GET http://localhost:8080/api/v1/alerts?alertRuleId={{alertRuleId}}
+
+### Get Alerts By Plant
+GET http://localhost:8080/api/v1/alerts?plantId={{plantId}}
+
+### Get Alerts By Time Range
+GET http://localhost:8080/api/v1/alerts?from={{from}}&to={{to}}
+
+### Get Active Critical Alerts By Plant
+GET http://localhost:8080/api/v1/alerts?status=ACTIVE&severity=CRITICAL&plantId={{plantId}}
+
+### Validation: Invalid Status
+GET http://localhost:8080/api/v1/alerts?status=OPEN
+
+### Validation: Invalid Time Range
+GET http://localhost:8080/api/v1/alerts?from={{to}}&to={{from}}
