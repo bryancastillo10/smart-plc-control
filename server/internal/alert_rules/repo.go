@@ -27,6 +27,15 @@ func (r *Repository) FindTagByID(tagID uuid.UUID) (*models.Tags, error) {
 	return &tag, nil
 }
 
+func (r *Repository) FindAlertRules() ([]models.AlertRules, error) {
+	var alertRules []models.AlertRules
+	if err := r.db.Order("created_at DESC").Find(&alertRules).Error; err != nil {
+		return nil, err
+	}
+
+	return alertRules, nil
+}
+
 func (r *Repository) CreateAlertRule(alertRule *models.AlertRules) (*models.AlertRules, error) {
 	if err := r.db.Create(alertRule).Error; err != nil {
 		return nil, err
