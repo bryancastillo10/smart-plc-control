@@ -20,6 +20,7 @@ i18n.use(initReactI18next).init({
 	lng: "en",
 	fallbackLng: "en",
 	defaultNS: "login",
+	ns: ["login", "toast"],
 	supportedLngs: ["en", "zh-TW"],
 	interpolation: {
 		escapeValue: false,
