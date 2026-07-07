@@ -1,6 +1,11 @@
 package alert_rules
 
-import "gorm.io/gorm"
+import (
+	"smart-plc-control-server/internal/models"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Repository struct {
 	db *gorm.DB
@@ -8,4 +13,24 @@ type Repository struct {
 
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
+}
+
+func (r *Repository) FindTagByID(tagID uuid.UUID) (*models.Tags, error) {
+	var tag models.Tags
+	if err := r.db.Where("id = ?", tagID).First(&tag).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &tag, nil
+}
+
+func (r *Repository) CreateAlertRule(alertRule *models.AlertRules) (*models.AlertRules, error) {
+	if err := r.db.Create(alertRule).Error; err != nil {
+		return nil, err
+	}
+
+	return alertRule, nil
 }
