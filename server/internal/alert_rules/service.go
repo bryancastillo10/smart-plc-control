@@ -45,6 +45,110 @@ func (s *Service) GetAlertRuleByID(ruleID string) (*AlertRuleResponse, error) {
 	return &res, nil
 }
 
+func (s *Service) UpdateAlertRule(ruleID string, req UpdateAlertRuleRequest) (*AlertRuleResponse, error) {
+	if ruleID == "" {
+		return nil, appErr.NewBadRequest("Missing alert rule ID", nil)
+	}
+
+	if req.TagID == "" && req.Name == "" && req.Operator == "" && req.ThresholdNumeric == nil && req.ThresholdText == "" && req.ThresholdBool == nil && req.Severity == "" && req.DelaySeconds == nil && req.Message == "" && req.Enabled == nil {
+		return nil, appErr.NewBadRequest("Missing alert rule fields to update", nil)
+	}
+
+	if req.Operator != "" && !isValidAlertOperator(req.Operator) {
+		return nil, appErr.NewBadRequest("Invalid alert operator", nil)
+	}
+	if req.Severity != "" && !isValidAlertSeverity(req.Severity) {
+		return nil, appErr.NewBadRequest("Invalid alert severity", nil)
+	}
+	if req.DelaySeconds != nil && *req.DelaySeconds < 0 {
+		return nil, appErr.NewBadRequest("Invalid alert delay", nil)
+	}
+
+	parsedRuleID, err := utils.ParseId(ruleID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid alert rule ID", err)
+	}
+
+	alertRule, err := s.repo.FindAlertRuleByID(parsedRuleID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find alert rule", err)
+	}
+	if alertRule == nil {
+		return nil, appErr.NewNotFound("Alert rule not found", nil)
+	}
+
+	tagID := alertRule.TagID
+	if req.TagID != "" {
+		parsedTagID, err := utils.ParseId(req.TagID)
+		if err != nil {
+			return nil, appErr.NewBadRequest("Invalid tag ID", err)
+		}
+		tagID = parsedTagID
+		alertRule.TagID = parsedTagID
+	}
+
+	tag, err := s.repo.FindTagByID(tagID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find tag", err)
+	}
+	if tag == nil {
+		return nil, appErr.NewNotFound("Tag not found", nil)
+	}
+
+	thresholdUpdates := 0
+	if req.ThresholdNumeric != nil {
+		thresholdUpdates++
+	}
+	if req.ThresholdText != "" {
+		thresholdUpdates++
+	}
+	if req.ThresholdBool != nil {
+		thresholdUpdates++
+	}
+	if thresholdUpdates > 1 {
+		return nil, appErr.NewBadRequest("Only one alert threshold can be set", nil)
+	}
+
+	utils.PatchIfNotZero(&alertRule.Name, req.Name)
+	utils.PatchIfNotZero(&alertRule.Operator, req.Operator)
+	utils.PatchIfNotZero(&alertRule.Severity, req.Severity)
+	utils.PatchIfNotZero(&alertRule.Message, req.Message)
+	if req.DelaySeconds != nil {
+		alertRule.DelaySeconds = *req.DelaySeconds
+	}
+	if req.Enabled != nil {
+		alertRule.Enabled = *req.Enabled
+	}
+
+	if req.ThresholdNumeric != nil {
+		alertRule.ThresholdNumeric = req.ThresholdNumeric
+		alertRule.ThresholdText = ""
+		alertRule.ThresholdBool = nil
+	}
+	if req.ThresholdText != "" {
+		alertRule.ThresholdNumeric = nil
+		alertRule.ThresholdText = req.ThresholdText
+		alertRule.ThresholdBool = nil
+	}
+	if req.ThresholdBool != nil {
+		alertRule.ThresholdNumeric = nil
+		alertRule.ThresholdText = ""
+		alertRule.ThresholdBool = req.ThresholdBool
+	}
+
+	if err := validateAlertRuleForTag(*tag, *alertRule); err != nil {
+		return nil, err
+	}
+
+	updatedAlertRule, err := s.repo.UpdateAlertRule(alertRule)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to update alert rule", err)
+	}
+
+	res := toAlertRuleResponse(*updatedAlertRule)
+	return &res, nil
+}
+
 func (s *Service) CreateAlertRule(req CreateAlertRuleRequest) (*AlertRuleResponse, error) {
 	if req.TagID == "" || req.Name == "" || req.Operator == "" || req.Severity == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
@@ -141,6 +245,51 @@ func validateThresholdForTag(tag models.Tags, req CreateAlertRuleRequest) error 
 		}
 	case models.IntDataType, models.FloatDataType:
 		if req.ThresholdNumeric == nil {
+			return appErr.NewBadRequest("Numeric tags require thresholdNumeric", nil)
+		}
+	default:
+		return appErr.NewBadRequest("Unsupported tag data type", nil)
+	}
+
+	return nil
+}
+
+func validateAlertRuleForTag(tag models.Tags, alertRule models.AlertRules) error {
+	thresholdCount := 0
+	if alertRule.ThresholdNumeric != nil {
+		thresholdCount++
+	}
+	if alertRule.ThresholdText != "" {
+		thresholdCount++
+	}
+	if alertRule.ThresholdBool != nil {
+		thresholdCount++
+	}
+
+	if thresholdCount == 0 {
+		return appErr.NewBadRequest("Missing alert threshold", nil)
+	}
+	if thresholdCount > 1 {
+		return appErr.NewBadRequest("Only one alert threshold can be set", nil)
+	}
+
+	switch tag.DataType {
+	case models.BoolDataType:
+		if alertRule.ThresholdBool == nil {
+			return appErr.NewBadRequest("BOOL tags require thresholdBool", nil)
+		}
+		if alertRule.Operator != models.EqualTo && alertRule.Operator != models.NotEqualTo {
+			return appErr.NewBadRequest("BOOL alert rules only support EQ or NEQ operators", nil)
+		}
+	case models.StringDataType:
+		if alertRule.ThresholdText == "" {
+			return appErr.NewBadRequest("STRING tags require thresholdText", nil)
+		}
+		if alertRule.Operator != models.EqualTo && alertRule.Operator != models.NotEqualTo {
+			return appErr.NewBadRequest("STRING alert rules only support EQ or NEQ operators", nil)
+		}
+	case models.IntDataType, models.FloatDataType:
+		if alertRule.ThresholdNumeric == nil {
 			return appErr.NewBadRequest("Numeric tags require thresholdNumeric", nil)
 		}
 	default:
