@@ -174,7 +174,7 @@ func registerAlerts(r *gin.RouterGroup, DB *gorm.DB) {
 	alertGrp := r.Group("/alerts", middleware.JWTAuthMiddleware())
 	{
 		alertGrp.GET("", alert.GetAlerts)
-		alertGrp.GET("/:alertId")
+		alertGrp.GET("/:alertId", alert.GetAlertByID)
 		alertGrp.POST("/:alertId/acknowledge")
 		alertGrp.POST("/:alertId/resolve")
 	}
