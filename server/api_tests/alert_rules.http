@@ -1,8 +1,12 @@
 @tagId = 05a47c70-8537-4b3d-b302-9b76152cf515
 @boolTagId = d569923e-f453-43a6-92bb-3e18cf75877e
+@ruleId = 1ccc2868-4fd3-464f-bb86-8dd7d0f93519
 
 ### Get All Alert Rules
 GET http://localhost:8080/api/v1/alert-rules
+
+### Get Alert Rule By ID
+GET http://localhost:8080/api/v1/alert-rules/{{ruleId}}
 
 ### Create Numeric Alert Rule
 # Requires an authenticated ADMIN user.
