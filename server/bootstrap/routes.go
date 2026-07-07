@@ -175,8 +175,8 @@ func registerAlerts(r *gin.RouterGroup, DB *gorm.DB) {
 	{
 		alertGrp.GET("", alert.GetAlerts)
 		alertGrp.GET("/:alertId", alert.GetAlertByID)
-		alertGrp.POST("/:alertId/acknowledge")
-		alertGrp.POST("/:alertId/resolve")
+		alertGrp.POST("/:alertId/acknowledge", middleware.RequireRoles(models.Admin, models.Operator), alert.AcknowledgeAlert)
+		alertGrp.POST("/:alertId/resolve", middleware.RequireRoles(models.Admin, models.Operator), alert.ResolveAlert)
 	}
 }
 
