@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 
 	"smart-plc-control-server/internal/alert_rules"
+	"smart-plc-control-server/internal/alerts"
 	"smart-plc-control-server/internal/auth"
 	"smart-plc-control-server/internal/devices"
 	"smart-plc-control-server/internal/middleware"
@@ -168,11 +169,11 @@ func registerAlertRules(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerAlerts(r *gin.RouterGroup, DB *gorm.DB) {
-	// alert := alerts.NewHandler(DB)
+	alert := alerts.NewHandler(DB)
 
-	alertGrp := r.Group("/alerts")
+	alertGrp := r.Group("/alerts", middleware.JWTAuthMiddleware())
 	{
-		alertGrp.GET("")
+		alertGrp.GET("", alert.GetAlerts)
 		alertGrp.GET("/:alertId")
 		alertGrp.POST("/:alertId/acknowledge")
 		alertGrp.POST("/:alertId/resolve")
