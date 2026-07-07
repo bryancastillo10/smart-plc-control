@@ -160,7 +160,7 @@ func registerAlertRules(r *gin.RouterGroup, DB *gorm.DB) {
 	alertRuleGrp := r.Group("/alert-rules", middleware.JWTAuthMiddleware())
 	{
 		alertRuleGrp.POST("", middleware.RequireRoles(models.Admin), alertRule.CreateAlertRule)
-		alertRuleGrp.GET("")
+		alertRuleGrp.GET("", alertRule.GetAlertRules)
 		alertRuleGrp.GET("/:ruleId")
 		alertRuleGrp.PUT("/:ruleId")
 		alertRuleGrp.DELETE("/:ruleId")
