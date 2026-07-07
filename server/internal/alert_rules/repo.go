@@ -63,3 +63,7 @@ func (r *Repository) UpdateAlertRule(alertRule *models.AlertRules) (*models.Aler
 
 	return alertRule, nil
 }
+
+func (r *Repository) DeleteAlertRule(alertRule *models.AlertRules) error {
+	return r.db.Delete(alertRule).Error
+}
