@@ -1,5 +1,8 @@
-﻿@tagId = 05a47c70-8537-4b3d-b302-9b76152cf515
+@tagId = 05a47c70-8537-4b3d-b302-9b76152cf515
 @boolTagId = d569923e-f453-43a6-92bb-3e18cf75877e
+
+### Get All Alert Rules
+GET http://localhost:8080/api/v1/alert-rules
 
 ### Create Numeric Alert Rule
 # Requires an authenticated ADMIN user.
@@ -96,3 +99,4 @@ Content-Type: application/json
 	"thresholdNumeric": 55,
 	"severity": "URGENT"
 }
+
