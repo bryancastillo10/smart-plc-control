@@ -17,6 +17,16 @@ func NewHandler(db *gorm.DB) *Handler {
 	return &Handler{service: service}
 }
 
+func (h *Handler) GetAlertRules(c *gin.Context) {
+	alertRules, err := h.service.GetAlertRules()
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, alertRules)
+}
+
 func (h *Handler) CreateAlertRule(c *gin.Context) {
 	req, err := http.BindJSON[CreateAlertRuleRequest](c)
 	if err != nil {
