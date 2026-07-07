@@ -49,6 +49,18 @@ func (r *Repository) FindAlertRuleByID(ruleID uuid.UUID) (*models.AlertRules, er
 	return &alertRule, nil
 }
 
+func (r *Repository) FindAlertByID(alertID uuid.UUID) (*models.Alerts, error) {
+	var alert models.Alerts
+	if err := r.db.Preload("AlertRule").Where("id = ?", alertID).First(&alert).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &alert, nil
+}
+
 func (r *Repository) FindAlerts(filters AlertFilters) ([]models.Alerts, error) {
 	var alerts []models.Alerts
 	query := r.db.Model(&models.Alerts{}).Preload("AlertRule")
