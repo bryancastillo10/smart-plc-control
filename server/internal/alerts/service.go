@@ -92,6 +92,71 @@ func (s *Service) GetAlerts(query ListAlertsQuery) ([]AlertResponse, error) {
 }
 
 func (s *Service) GetAlertByID(alertID string) (*AlertResponse, error) {
+	alert, err := s.findAlert(alertID)
+	if err != nil {
+		return nil, err
+	}
+
+	res := toAlertResponse(*alert)
+	return &res, nil
+}
+
+func (s *Service) AcknowledgeAlert(alertID string, userID string) (*AlertResponse, error) {
+	alert, err := s.findAlert(alertID)
+	if err != nil {
+		return nil, err
+	}
+
+	if alert.Status == models.AlertResolved {
+		return nil, appErr.NewBadRequest("Resolved alerts cannot be acknowledged", nil)
+	}
+	if alert.Status == models.AlertAcknowledged {
+		return nil, appErr.NewBadRequest("Alert is already acknowledged", nil)
+	}
+
+	parsedUserID, err := utils.ParseId(userID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid user ID", err)
+	}
+
+	now := time.Now()
+	alert.Status = models.AlertAcknowledged
+	alert.AcknowledgedAt = &now
+	alert.AcknowledgedBy = &parsedUserID
+
+	updatedAlert, err := s.repo.UpdateAlert(alert)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to acknowledge alert", err)
+	}
+
+	res := toAlertResponse(*updatedAlert)
+	return &res, nil
+}
+
+func (s *Service) ResolveAlert(alertID string) (*AlertResponse, error) {
+	alert, err := s.findAlert(alertID)
+	if err != nil {
+		return nil, err
+	}
+
+	if alert.Status == models.AlertResolved {
+		return nil, appErr.NewBadRequest("Alert is already resolved", nil)
+	}
+
+	now := time.Now()
+	alert.Status = models.AlertResolved
+	alert.ResolvedAt = &now
+
+	updatedAlert, err := s.repo.UpdateAlert(alert)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to resolve alert", err)
+	}
+
+	res := toAlertResponse(*updatedAlert)
+	return &res, nil
+}
+
+func (s *Service) findAlert(alertID string) (*models.Alerts, error) {
 	if alertID == "" {
 		return nil, appErr.NewBadRequest("Missing alert ID", nil)
 	}
@@ -109,8 +174,7 @@ func (s *Service) GetAlertByID(alertID string) (*AlertResponse, error) {
 		return nil, appErr.NewNotFound("Alert not found", nil)
 	}
 
-	res := toAlertResponse(*alert)
-	return &res, nil
+	return alert, nil
 }
 
 func parseTimestamp(value string, field string) (time.Time, error) {
