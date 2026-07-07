@@ -32,3 +32,15 @@ func (h *Handler) GetAlerts(c *gin.Context) {
 
 	c.JSON(200, alerts)
 }
+
+func (h *Handler) GetAlertByID(c *gin.Context) {
+	alertID := c.Param("alertId")
+
+	alert, err := h.service.GetAlertByID(alertID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, alert)
+}
