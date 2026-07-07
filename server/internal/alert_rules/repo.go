@@ -55,3 +55,11 @@ func (r *Repository) CreateAlertRule(alertRule *models.AlertRules) (*models.Aler
 
 	return alertRule, nil
 }
+
+func (r *Repository) UpdateAlertRule(alertRule *models.AlertRules) (*models.AlertRules, error) {
+	if err := r.db.Save(alertRule).Error; err != nil {
+		return nil, err
+	}
+
+	return alertRule, nil
+}
