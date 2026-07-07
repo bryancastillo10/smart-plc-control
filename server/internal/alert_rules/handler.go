@@ -54,3 +54,21 @@ func (h *Handler) CreateAlertRule(c *gin.Context) {
 
 	c.JSON(201, alertRule)
 }
+
+func (h *Handler) UpdateAlertRule(c *gin.Context) {
+	ruleID := c.Param("ruleId")
+
+	req, err := http.BindJSON[UpdateAlertRuleRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	alertRule, err := h.service.UpdateAlertRule(ruleID, *req)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, alertRule)
+}
