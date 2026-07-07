@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	"smart-plc-control-server/internal/alert_rules"
 	"smart-plc-control-server/internal/auth"
 	"smart-plc-control-server/internal/devices"
 	"smart-plc-control-server/internal/middleware"
@@ -154,15 +155,15 @@ func registerReadings(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerAlertRules(r *gin.RouterGroup, DB *gorm.DB) {
-	// alertRule := alert_rules.NewHandler(DB)
+	alertRule := alert_rules.NewHandler(DB)
 
-	alertRuleGrp := r.Group("/alert-rules")
+	alertRuleGrp := r.Group("/alert-rules", middleware.JWTAuthMiddleware())
 	{
-		alertRuleGrp.POST("")
-		alertRuleGrp.GET("")
-		alertRuleGrp.GET("/:ruleId")
-		alertRuleGrp.PUT("/:ruleId")
-		alertRuleGrp.DELETE("/:ruleId")
+		alertRuleGrp.POST("", middleware.RequireRoles(models.Admin), alertRule.CreateAlertRule)
+		alertRuleGrp.GET("", alertRule.GetAlertRules)
+		alertRuleGrp.GET("/:ruleId", alertRule.GetAlertRuleByID)
+		alertRuleGrp.PUT("/:ruleId", middleware.RequireRoles(models.Admin), alertRule.UpdateAlertRule)
+		alertRuleGrp.DELETE("/:ruleId", middleware.RequireRoles(models.Admin, models.Operator), alertRule.DeleteAlertRule)
 	}
 }
 
