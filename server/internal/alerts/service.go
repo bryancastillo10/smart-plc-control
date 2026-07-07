@@ -91,6 +91,28 @@ func (s *Service) GetAlerts(query ListAlertsQuery) ([]AlertResponse, error) {
 	return toAlertResponses(alerts), nil
 }
 
+func (s *Service) GetAlertByID(alertID string) (*AlertResponse, error) {
+	if alertID == "" {
+		return nil, appErr.NewBadRequest("Missing alert ID", nil)
+	}
+
+	parsedAlertID, err := utils.ParseId(alertID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid alert ID", err)
+	}
+
+	alert, err := s.repo.FindAlertByID(parsedAlertID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find alert", err)
+	}
+	if alert == nil {
+		return nil, appErr.NewNotFound("Alert not found", nil)
+	}
+
+	res := toAlertResponse(*alert)
+	return &res, nil
+}
+
 func parseTimestamp(value string, field string) (time.Time, error) {
 	parsed, err := time.Parse(time.RFC3339, value)
 	if err != nil {
