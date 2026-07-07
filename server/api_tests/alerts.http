@@ -1,10 +1,14 @@
-@plantId =  6203ddf0-52a1-4251-bafa-193f694d7601
+@plantId = 6203ddf0-52a1-4251-bafa-193f694d7601
 @alertRuleId = 1ccc2868-4fd3-464f-bb86-8dd7d0f93519
+@alertId = replace-with-alert-id
 @from = 2026-06-01T00:00:00Z
 @to = 2026-07-01T00:00:00Z
 
 ### Get All Alerts
 GET http://localhost:8080/api/v1/alerts
+
+### Get Alert By ID
+GET http://localhost:8080/api/v1/alerts/{{alertId}}
 
 ### Get Active Alerts
 GET http://localhost:8080/api/v1/alerts?status=ACTIVE
