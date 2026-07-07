@@ -14,6 +14,15 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
+func (s *Service) GetAlertRules() ([]AlertRuleResponse, error) {
+	alertRules, err := s.repo.FindAlertRules()
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get alert rules", err)
+	}
+
+	return toAlertRuleResponses(alertRules), nil
+}
+
 func (s *Service) CreateAlertRule(req CreateAlertRuleRequest) (*AlertRuleResponse, error) {
 	if req.TagID == "" || req.Name == "" || req.Operator == "" || req.Severity == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
@@ -135,6 +144,15 @@ func toAlertRuleResponse(alertRule models.AlertRules) AlertRuleResponse {
 		CreatedAt:        alertRule.CreatedAt,
 		UpdatedAt:        alertRule.UpdatedAt,
 	}
+}
+
+func toAlertRuleResponses(alertRules []models.AlertRules) []AlertRuleResponse {
+	res := make([]AlertRuleResponse, 0, len(alertRules))
+	for _, alertRule := range alertRules {
+		res = append(res, toAlertRuleResponse(alertRule))
+	}
+
+	return res
 }
 
 func isValidAlertOperator(operator models.AlertOperator) bool {
