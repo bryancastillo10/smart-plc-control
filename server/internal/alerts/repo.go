@@ -95,3 +95,15 @@ func (r *Repository) FindAlerts(filters AlertFilters) ([]models.Alerts, error) {
 
 	return alerts, nil
 }
+
+func (r *Repository) UpdateAlert(alert *models.Alerts) (*models.Alerts, error) {
+	if err := r.db.Save(alert).Error; err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Preload("AlertRule").Where("id = ?", alert.ID).First(alert).Error; err != nil {
+		return nil, err
+	}
+
+	return alert, nil
+}
