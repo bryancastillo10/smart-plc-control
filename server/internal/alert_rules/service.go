@@ -23,6 +23,28 @@ func (s *Service) GetAlertRules() ([]AlertRuleResponse, error) {
 	return toAlertRuleResponses(alertRules), nil
 }
 
+func (s *Service) GetAlertRuleByID(ruleID string) (*AlertRuleResponse, error) {
+	if ruleID == "" {
+		return nil, appErr.NewBadRequest("Missing alert rule ID", nil)
+	}
+
+	parsedRuleID, err := utils.ParseId(ruleID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid alert rule ID", err)
+	}
+
+	alertRule, err := s.repo.FindAlertRuleByID(parsedRuleID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find alert rule", err)
+	}
+	if alertRule == nil {
+		return nil, appErr.NewNotFound("Alert rule not found", nil)
+	}
+
+	res := toAlertRuleResponse(*alertRule)
+	return &res, nil
+}
+
 func (s *Service) CreateAlertRule(req CreateAlertRuleRequest) (*AlertRuleResponse, error) {
 	if req.TagID == "" || req.Name == "" || req.Operator == "" || req.Severity == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
