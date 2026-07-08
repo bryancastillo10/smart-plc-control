@@ -12,7 +12,7 @@ export interface AlertRule {
 	enabled: boolean;
 }
 
-export interface CreateAlertRuleLocalRequest {
+export interface CreateAlertRuleRequest {
 	plantId?: string;
 	tagId: string;
 	name: string;
@@ -22,5 +22,3 @@ export interface CreateAlertRuleLocalRequest {
 	message?: string;
 	enabled: boolean;
 }
-
-export type CreateAlertRuleLocalVariables = CreateAlertRuleLocalRequest;
