@@ -1,3 +1,17 @@
+import {
+	BellRing,
+	Cpu,
+	Factory,
+	Gauge,
+	GitBranch,
+	LayoutDashboard,
+	Map,
+	Network,
+	Tags,
+	Users,
+	type LucideIcon,
+} from "lucide-react";
+
 import type {
 	PlantSetupStep,
 	PlantSetupStepId,
@@ -99,6 +113,20 @@ export const plantSetupStepDescriptions = {
 	dashboard: () =>
 		"Finish the static workflow with a dashboard placeholder. Navigation to /dashboard can be connected after the setup flow has real data.",
 } satisfies Record<PlantSetupStepId, PlantSetupStepDescriptionResolver>;
+
+
+export const stepIcons = {
+	plant: Factory,
+	processUnits: Network,
+	diagram: GitBranch,
+	devices: Cpu,
+	tags: Tags,
+	alertRules: BellRing,
+	simulation: Gauge,
+	users: Users,
+	review: Map,
+	dashboard: LayoutDashboard,
+} as const satisfies Record<PlantSetupStepId, LucideIcon>;
 
 export function getPlantSetupStepDescription(
 	stepId: PlantSetupStepId,
