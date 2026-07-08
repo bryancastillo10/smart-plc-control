@@ -1,14 +1,12 @@
-import type {
-	AlertOperator,
-	AlertSeverity,
-	DeviceType,
-	Language,
-	PlantStatus,
-	Protocol,
-	SimulationStatus,
-	TagDataType,
-	UserRole,
-} from "@/types/enum";
+import type { AlertRule } from "@/types/alert-rule";
+import type { Device } from "@/types/device";
+import type { Language, UserRole } from "@/types/enum";
+import type { Plant } from "@/types/plant";
+import type { ProcessUnit } from "@/types/process-unit";
+import type { ProcessUnitConnection } from "@/types/process-unit-connection";
+import type { Simulation } from "@/types/simulation";
+import type { SimulationScenario } from "@/types/simulation-scenario";
+import type { Tag } from "@/types/tag";
 
 export type PlantSetupStepId =
 	| "plant"
@@ -22,83 +20,10 @@ export type PlantSetupStepId =
 	| "review"
 	| "dashboard";
 
-
 export interface PlantSetupStep {
 	id: PlantSetupStepId;
 	title: string;
 	description: string;
-}
-
-export interface PlantSetupPlant {
-	id: string;
-	name: string;
-	location: string;
-	description?: string;
-	status: PlantStatus;
-}
-
-export interface PlantSetupProcessUnit {
-	id: string;
-	name: string;
-	type: string;
-	description?: string;
-	status: PlantStatus;
-	position: { x: number; y: number };
-	icon: string;
-}
-
-export interface PlantSetupProcessUnitConnection {
-	id: string;
-	sourceProcessUnitId: string;
-	targetProcessUnitId: string;
-	label?: string;
-	flowType?: string;
-}
-
-export interface PlantSetupDevice {
-	id: string;
-	name: string;
-	type: DeviceType;
-	protocol: Protocol;
-	description?: string;
-	host?: string;
-	port?: number;
-	enabled: boolean;
-	icon: string;
-}
-
-export interface PlantSetupTag {
-	id: string;
-	name: string;
-	deviceId: string;
-	processUnitId?: string;
-	dataType: TagDataType;
-	unit?: string;
-	enabled: boolean;
-}
-
-export interface PlantSetupAlertRule {
-	id: string;
-	name: string;
-	tagId: string;
-	operator: AlertOperator;
-	threshold: string;
-	severity: AlertSeverity;
-	enabled: boolean;
-}
-
-export interface PlantSetupSimulation {
-	id: string;
-	name: string;
-	deviceId: string;
-	status: SimulationStatus;
-}
-
-export interface PlantSetupSimulationScenario {
-	id: string;
-	simulationId: string;
-	name: string;
-	description?: string;
 }
 
 export interface PlantSetupUser {
@@ -110,13 +35,29 @@ export interface PlantSetupUser {
 }
 
 export interface PlantSetupWorkflowState {
-	plant: PlantSetupPlant | null;
-	processUnits: PlantSetupProcessUnit[];
-	processUnitConnections: PlantSetupProcessUnitConnection[];
-	devices: PlantSetupDevice[];
-	tags: PlantSetupTag[];
-	alertRules: PlantSetupAlertRule[];
-	simulations: PlantSetupSimulation[];
-	simulationScenarios: PlantSetupSimulationScenario[];
+	plant: Plant | null;
+	processUnits: ProcessUnit[];
+	processUnitConnections: ProcessUnitConnection[];
+	devices: Device[];
+	tags: Tag[];
+	alertRules: AlertRule[];
+	simulations: Simulation[];
+	simulationScenarios: SimulationScenario[];
 	users: PlantSetupUser[];
 }
+
+export type PlantSetupEntityInput<T extends { id: string }> = Omit<T, "id"> & {
+	id?: string;
+};
+
+export type PlantSetupPlantInput = PlantSetupEntityInput<Plant>;
+export type PlantSetupProcessUnitInput = PlantSetupEntityInput<ProcessUnit>;
+export type PlantSetupProcessUnitConnectionInput =
+	PlantSetupEntityInput<ProcessUnitConnection>;
+export type PlantSetupDeviceInput = PlantSetupEntityInput<Device>;
+export type PlantSetupTagInput = PlantSetupEntityInput<Tag>;
+export type PlantSetupAlertRuleInput = PlantSetupEntityInput<AlertRule>;
+export type PlantSetupSimulationInput = PlantSetupEntityInput<Simulation>;
+export type PlantSetupSimulationScenarioInput =
+	PlantSetupEntityInput<SimulationScenario>;
+export type PlantSetupUserInput = PlantSetupEntityInput<PlantSetupUser>;
