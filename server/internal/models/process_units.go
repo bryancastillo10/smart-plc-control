@@ -12,6 +12,7 @@ type ProcessUnits struct {
 	Plant       *Plants           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	Name        string            `gorm:"type:varchar(120);not null;uniqueIndex:idx_process_units_plant_name" json:"name"`
 	Type        string            `gorm:"type:varchar(80);not null" json:"type"`
+	Icon        string            `gorm:"type:varchar(50)" json:"icon"`
 	Description string            `gorm:"type:text" json:"description"`
 	Status      PlantStatus       `gorm:"type:varchar(20);not null;default:ACTIVE" json:"status"`
 	Position    Position          `gorm:"serializer:json;type:jsonb" json:"position"`

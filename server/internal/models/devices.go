@@ -11,6 +11,7 @@ type Devices struct {
 	PlantID          uuid.UUID        `gorm:"type:uuid;not null;index;uniqueIndex:idx_devices_plant_name" json:"plantId"`
 	Plant            *Plants          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	Name             string           `gorm:"type:varchar(120);not null;uniqueIndex:idx_devices_plant_name" json:"name"`
+	Icon             string           `gorm:"type:varchar(50)" json:"icon"`
 	Type             DeviceType       `gorm:"type:varchar(30);not null" json:"type"`
 	Description      string           `gorm:"type:text" json:"description"`
 	Protocol         Protocol         `gorm:"type:varchar(20);not null" json:"protocol"`
