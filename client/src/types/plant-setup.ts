@@ -22,6 +22,7 @@ export type PlantSetupStepId =
 	| "review"
 	| "dashboard";
 
+
 export interface PlantSetupStep {
 	id: PlantSetupStepId;
 	title: string;
