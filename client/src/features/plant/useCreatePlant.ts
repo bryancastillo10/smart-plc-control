@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import { currentUser } from "@/features/auth/queries";
 import { toUserProfile } from "@/features/auth/userProfile";
@@ -9,7 +10,6 @@ import type { CreatePlantRequest, CreatePlantVariables } from "@/features/plant/
 import { useToast } from "@/integrations/sonner";
 import { useUserStore } from "@/store/user";
 import type { PlantStatus } from "@/types/enum";
-import { getErrorMessage } from "@/utils/error";
 
 const initialPlantData: CreatePlantRequest = {
 	name: "",
@@ -18,11 +18,8 @@ const initialPlantData: CreatePlantRequest = {
 	status: "ACTIVE",
 };
 
-const createPlantSuccessMessage = "A plant has been created.";
-const createPlantErrorMessage = "Failed to create a plant.";
-const createPlantRequiredMessage = "Enter both plant name and location.";
-
 export function useCreatePlant() {
+	const { t } = useTranslation("toast");
 	const navigate = useNavigate();
 	const toast = useToast();
 	const setUser = useUserStore((state) => state.setUser);
@@ -31,20 +28,24 @@ export function useCreatePlant() {
 
 	const createPlantMutation = useMutation({
 		mutationFn: (variables: CreatePlantVariables) => createPlant(variables),
+		onMutate: () => toast.loading(t("plant.create.loading")),
 		onSuccess: async () => {
 			try {
 				const user = await currentUser();
 
 				setUser(toUserProfile(user));
 				setPlantData(initialPlantData);
-				toast.success(createPlantSuccessMessage);
+				toast.success(t("plant.create.success"));
 				await navigate({ to: "/dashboard", replace: true });
 			} catch (error) {
-				toast.error(getErrorMessage(error, createPlantErrorMessage));
+				toast.error(error, t("plant.create.failed"));
 			}
 		},
 		onError: (error) => {
-			toast.error(getErrorMessage(error, createPlantErrorMessage));
+			toast.error(error, t("plant.create.failed"));
+		},
+		onSettled: (_data, _error, _variables, toastId) => {
+			toast.dismiss(toastId);
 		},
 	});
 
@@ -63,7 +64,7 @@ export function useCreatePlant() {
 		event.preventDefault();
 
 		if (!plantData.name.trim() || !plantData.location.trim()) {
-			toast.error(null, createPlantRequiredMessage);
+			toast.error(null, t("plant.create.required"));
 			return;
 		}
 
