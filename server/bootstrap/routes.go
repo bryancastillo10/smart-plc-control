@@ -217,6 +217,7 @@ func registerAuditLogs(r *gin.RouterGroup, DB *gorm.DB) {
 	auditLogGrp := r.Group("/audit-logs", middleware.JWTAuthMiddleware(), middleware.RequireRoles(models.Admin))
 	{
 		auditLogGrp.GET("", auditLog.GetAuditLogs)
+		auditLogGrp.GET("/:auditLogId", auditLog.GetAuditLogByID)
 	}
 }
 
