@@ -6,6 +6,7 @@ import (
 
 	"smart-plc-control-server/internal/alert_rules"
 	"smart-plc-control-server/internal/alerts"
+	"smart-plc-control-server/internal/audit_logs"
 	"smart-plc-control-server/internal/auth"
 	"smart-plc-control-server/internal/devices"
 	"smart-plc-control-server/internal/middleware"
@@ -211,12 +212,12 @@ func registerSimulationScenarios(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerAuditLogs(r *gin.RouterGroup, DB *gorm.DB) {
-	// auditLog := audit_logs.NewHandler(DB)
+	auditLog := audit_logs.NewHandler(DB)
 
-	auditLogGrp := r.Group("/audit-logs")
+	auditLogGrp := r.Group("/audit-logs", middleware.JWTAuthMiddleware(), middleware.RequireRoles(models.Admin))
 	{
-		auditLogGrp.GET("")
-		auditLogGrp.GET("/:auditLogId")
+		auditLogGrp.GET("", auditLog.GetAuditLogs)
+		auditLogGrp.GET("/:auditLogId", auditLog.GetAuditLogByID)
 	}
 }
 
