@@ -4,6 +4,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	appErr "smart-plc-control-server/pkg/errors"
 	"smart-plc-control-server/pkg/utils"
+	"strconv"
 	"time"
 )
 
@@ -77,6 +78,28 @@ func (s *Service) GetAuditLogs(query ListAuditLogsQuery) ([]AuditLogResponse, er
 	}
 
 	return toAuditLogResponses(auditLogs), nil
+}
+
+func (s *Service) GetAuditLogByID(auditLogID string) (*AuditLogResponse, error) {
+	if auditLogID == "" {
+		return nil, appErr.NewBadRequest("Missing audit log ID", nil)
+	}
+
+	parsedAuditLogID, err := strconv.ParseUint(auditLogID, 10, 64)
+	if err != nil || parsedAuditLogID == 0 {
+		return nil, appErr.NewBadRequest("Invalid audit log ID", err)
+	}
+
+	auditLog, err := s.repo.FindAuditLogByID(parsedAuditLogID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find audit log", err)
+	}
+	if auditLog == nil {
+		return nil, appErr.NewNotFound("Audit log not found", nil)
+	}
+
+	res := toAuditLogResponse(*auditLog)
+	return &res, nil
 }
 
 func parseTimestamp(value string, field string) (time.Time, error) {
