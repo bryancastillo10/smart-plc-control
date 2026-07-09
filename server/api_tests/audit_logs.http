@@ -1,0 +1,55 @@
+﻿@userId = to be tested soon
+@entityId = to be tested soon
+@auditLogId = 1
+@from = 2026-06-01T00:00:00Z
+@to = 2026-07-01T00:00:00Z
+
+### Get Audit Logs
+# Requires an authenticated ADMIN user.
+GET http://localhost:8080/api/v1/audit-logs
+
+### Get Audit Log By ID
+# Requires an authenticated ADMIN user.
+GET http://localhost:8080/api/v1/audit-logs/{{auditLogId}}
+
+### Get Audit Logs With Limit
+# Requires an authenticated ADMIN user.
+GET http://localhost:8080/api/v1/audit-logs?limit=25
+
+### Get Audit Logs By User
+# Requires an authenticated ADMIN user.
+GET http://localhost:8080/api/v1/audit-logs?userId={{userId}}
+
+### Get Audit Logs By Action
+# Requires an authenticated ADMIN user.
+GET http://localhost:8080/api/v1/audit-logs?action=CREATE
+
+### Get Audit Logs By Entity Type
+# Requires an authenticated ADMIN user.
+GET http://localhost:8080/api/v1/audit-logs?entityType=DEVICE
+
+### Get Audit Logs By Entity
+# Requires an authenticated ADMIN user.
+GET http://localhost:8080/api/v1/audit-logs?entityType=DEVICE&entityId={{entityId}}
+
+### Get Audit Logs By Time Range
+# Requires an authenticated ADMIN user.
+GET http://localhost:8080/api/v1/audit-logs?from={{from}}&to={{to}}
+
+### Get Filtered Audit Logs
+# Requires an authenticated ADMIN user.
+GET http://localhost:8080/api/v1/audit-logs?action=UPDATE&entityType=TAG&from={{from}}&to={{to}}&limit=50
+
+### Validation: Invalid User ID
+GET http://localhost:8080/api/v1/audit-logs?userId=not-a-uuid
+
+### Validation: Invalid Time Range
+GET http://localhost:8080/api/v1/audit-logs?from={{to}}&to={{from}}
+
+### Validation: Limit Too High
+GET http://localhost:8080/api/v1/audit-logs?limit=501
+
+### Validation: Invalid Audit Log ID
+GET http://localhost:8080/api/v1/audit-logs/not-a-number
+
+
