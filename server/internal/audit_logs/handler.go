@@ -32,3 +32,15 @@ func (h *Handler) GetAuditLogs(c *gin.Context) {
 
 	c.JSON(200, auditLogs)
 }
+
+func (h *Handler) GetAuditLogByID(c *gin.Context) {
+	auditLogID := c.Param("auditLogId")
+
+	auditLog, err := h.service.GetAuditLogByID(auditLogID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, auditLog)
+}
