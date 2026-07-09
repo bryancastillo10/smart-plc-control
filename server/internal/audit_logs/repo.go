@@ -70,3 +70,15 @@ func (r *Repository) FindAuditLogs(filters AuditLogFilters) ([]models.AuditLogs,
 
 	return auditLogs, nil
 }
+
+func (r *Repository) FindAuditLogByID(auditLogID uint64) (*models.AuditLogs, error) {
+	var auditLog models.AuditLogs
+	if err := r.db.Preload("User").Where("id = ?", auditLogID).First(&auditLog).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &auditLog, nil
+}
