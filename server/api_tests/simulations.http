@@ -7,6 +7,9 @@ GET http://localhost:8080/api/v1/simulations
 ### Get Simulations By Plant
 GET http://localhost:8080/api/v1/simulations?plantId={{plantId}}
 
+### Get Simulation By ID
+GET http://localhost:8080/api/v1/simulations/{{simulationId}}
+
 ### Get Simulations By Status
 GET http://localhost:8080/api/v1/simulations?status=PAUSED
 
