@@ -13,6 +13,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	"smart-plc-control-server/internal/plants"
 	"smart-plc-control-server/internal/process_units"
+	"smart-plc-control-server/internal/simulations"
 	"smart-plc-control-server/internal/tag_readings"
 	"smart-plc-control-server/internal/tags"
 	"smart-plc-control-server/internal/users"
@@ -182,13 +183,13 @@ func registerAlerts(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerSimulations(r *gin.RouterGroup, DB *gorm.DB) {
-	// simulation := simulations.NewHandler(DB)
+	simulation := simulations.NewHandler(DB)
 
-	simulationGrp := r.Group("/simulations")
+	simulationGrp := r.Group("/simulations", middleware.JWTAuthMiddleware())
 	{
-		simulationGrp.POST("")
-		simulationGrp.GET("")
-		simulationGrp.GET("/:simulationId")
+		simulationGrp.POST("", middleware.RequireRoles(models.Admin), simulation.CreateSimulation)
+		simulationGrp.GET("", simulation.GetSimulations)
+		simulationGrp.GET("/:simulationId", simulation.GetSimulationByID)
 		simulationGrp.PUT("/:simulationId")
 		simulationGrp.DELETE("/:simulationId")
 		simulationGrp.POST("/:simulationId/start")

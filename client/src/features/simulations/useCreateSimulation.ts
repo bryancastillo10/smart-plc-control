@@ -2,31 +2,35 @@ import { useMutation } from "@tanstack/react-query";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 
+import { createSimulation } from "@/features/simulations/queries";
 import { useToast } from "@/integrations/sonner";
-import type { CreateSimulationLocalRequest } from "@/types/simulation";
+import type {
+	CreateSimulationLocalRequest,
+	CreateSimulationLocalVariables,
+} from "@/types/simulation";
 
 const initialSimulationData: CreateSimulationLocalRequest = {
-	deviceId: "",
+	plantId: "",
 	name: "",
-	description: "",
 	status: "IDLE",
+	updateIntervalMs: 1000,
+	noiseFactor: 0,
 };
 
 export function useCreateSimulation() {
 	const { t } = useTranslation("toast");
 	const [simulationData, setSimulationData] = useState(initialSimulationData);
-	const [createSimulationLoading, setCreateSimulationLoading] =
-		useState<boolean>(false);
 	const toast = useToast();
 
 	const createSimulationMutation = useMutation({
-		// mutationFn: () => {},
+		mutationFn: (variables: CreateSimulationLocalVariables) =>
+			createSimulation(variables),
 		onMutate: () => toast.loading(t("simulation.create.loading")),
 		onSuccess: async () => {
-			setCreateSimulationLoading(false);
+			setSimulationData(initialSimulationData);
+			toast.success(t("simulation.create.success"));
 		},
 		onError: (error) => {
-			setCreateSimulationLoading(false);
 			toast.error(error, t("simulation.create.failed"));
 		},
 		onSettled: (_data, _error, _variables, toastId) => {
@@ -34,29 +38,46 @@ export function useCreateSimulation() {
 		},
 	});
 
-
-	const onChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { id , value } = event.target;
+	const onChange = (
+		event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+	) => {
+		const { id, value } = event.target;
 
 		setSimulationData((currentData) => ({
 			...currentData,
-			[id]: value,
+			[id]: numericSimulationFields.has(id) ? Number(value) : value,
 		}));
 	};
+
 	const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		// API call would be here
+		if (!simulationData.plantId.trim() || !simulationData.name.trim()) {
+			toast.error(null, t("simulation.create.failed"));
+			return;
+		}
+
+		createSimulationMutation.mutate({
+			...simulationData,
+			plantId: simulationData.plantId.trim(),
+			name: simulationData.name.trim(),
+		});
 	};
 
 	return {
 		simulationData,
-		createSimulationLoading,
+		createSimulationLoading: createSimulationMutation.isPending,
 		createSimulationMutation,
 		setSimulationData,
 		onChange,
 		handleSubmit,
+		createSimulation: createSimulationMutation.mutate,
+		createSimulationAsync: createSimulationMutation.mutateAsync,
+		createSimulationResponse: createSimulationMutation.data,
+		createSimulationError: createSimulationMutation.error,
 	};
 }
+
+const numericSimulationFields = new Set(["updateIntervalMs", "noiseFactor"]);
 
 export default useCreateSimulation;
