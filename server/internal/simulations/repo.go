@@ -32,6 +32,17 @@ func (r *Repository) FindPlantByID(plantID uuid.UUID) (*models.Plants, error) {
 	return &plant, nil
 }
 
+func (r *Repository) FindSimulationByID(simulationID uuid.UUID) (*models.Simulations, error) {
+	var simulation models.Simulations
+	if err := r.db.Where("id = ?", simulationID).First(&simulation).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &simulation, nil
+}
 func (r *Repository) FindSimulations(filters SimulationFilters) ([]models.Simulations, error) {
 	var simulations []models.Simulations
 	query := r.db.Model(&models.Simulations{})
