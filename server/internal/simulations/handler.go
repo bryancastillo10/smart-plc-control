@@ -33,6 +33,17 @@ func (h *Handler) GetSimulations(c *gin.Context) {
 	c.JSON(200, simulations)
 }
 
+func (h *Handler) GetSimulationByID(c *gin.Context) {
+	simulationID := c.Param("simulationId")
+
+	simulation, err := h.service.GetSimulationByID(simulationID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, simulation)
+}
 func (h *Handler) CreateSimulation(c *gin.Context) {
 	req, err := http.BindJSON[CreateSimulationRequest](c)
 	if err != nil {
