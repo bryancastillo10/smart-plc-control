@@ -11,6 +11,11 @@ type Repository struct {
 	db *gorm.DB
 }
 
+type SimulationFilters struct {
+	PlantID *uuid.UUID
+	Status  *models.SimulationStatus
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
 }
@@ -25,6 +30,24 @@ func (r *Repository) FindPlantByID(plantID uuid.UUID) (*models.Plants, error) {
 	}
 
 	return &plant, nil
+}
+
+func (r *Repository) FindSimulations(filters SimulationFilters) ([]models.Simulations, error) {
+	var simulations []models.Simulations
+	query := r.db.Model(&models.Simulations{})
+
+	if filters.PlantID != nil {
+		query = query.Where("plant_id = ?", *filters.PlantID)
+	}
+	if filters.Status != nil {
+		query = query.Where("status = ?", *filters.Status)
+	}
+
+	if err := query.Order("created_at DESC, id DESC").Find(&simulations).Error; err != nil {
+		return nil, err
+	}
+
+	return simulations, nil
 }
 
 func (r *Repository) CreateSimulation(simulation *models.Simulations) (*models.Simulations, error) {
