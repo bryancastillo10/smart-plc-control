@@ -51,6 +51,27 @@ func (s *Service) GetSimulations(query ListSimulationsQuery) ([]SimulationRespon
 	return toSimulationResponses(simulations), nil
 }
 
+func (s *Service) GetSimulationByID(simulationID string) (*SimulationResponse, error) {
+	if simulationID == "" {
+		return nil, appErr.NewBadRequest("Missing simulation ID", nil)
+	}
+
+	parsedSimulationID, err := utils.ParseId(simulationID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid simulation ID", err)
+	}
+
+	simulation, err := s.repo.FindSimulationByID(parsedSimulationID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find simulation", err)
+	}
+	if simulation == nil {
+		return nil, appErr.NewNotFound("Simulation not found", nil)
+	}
+
+	res := toSimulationResponse(*simulation)
+	return &res, nil
+}
 func (s *Service) CreateSimulation(req CreateSimulationRequest) (*SimulationResponse, error) {
 	if req.PlantID == "" || req.Name == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
