@@ -17,6 +17,22 @@ func NewHandler(db *gorm.DB) *Handler {
 	return &Handler{service: service}
 }
 
+func (h *Handler) GetSimulations(c *gin.Context) {
+	query, err := http.BindQuery[ListSimulationsQuery](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	simulations, err := h.service.GetSimulations(*query)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, simulations)
+}
+
 func (h *Handler) CreateSimulation(c *gin.Context) {
 	req, err := http.BindJSON[CreateSimulationRequest](c)
 	if err != nil {
