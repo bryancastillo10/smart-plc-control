@@ -188,7 +188,7 @@ func registerSimulations(r *gin.RouterGroup, DB *gorm.DB) {
 	simulationGrp := r.Group("/simulations", middleware.JWTAuthMiddleware())
 	{
 		simulationGrp.POST("", middleware.RequireRoles(models.Admin), simulation.CreateSimulation)
-		simulationGrp.GET("")
+		simulationGrp.GET("", simulation.GetSimulations)
 		simulationGrp.GET("/:simulationId")
 		simulationGrp.PUT("/:simulationId")
 		simulationGrp.DELETE("/:simulationId")
