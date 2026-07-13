@@ -16,6 +16,41 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
+func (s *Service) GetSimulations(query ListSimulationsQuery) ([]SimulationResponse, error) {
+	filters := SimulationFilters{}
+
+	if query.PlantID != "" {
+		parsedPlantID, err := utils.ParseId(query.PlantID)
+		if err != nil {
+			return nil, appErr.NewBadRequest("Invalid plant ID", err)
+		}
+
+		plant, err := s.repo.FindPlantByID(parsedPlantID)
+		if err != nil {
+			return nil, appErr.NewInternal("Failed to find plant", err)
+		}
+		if plant == nil {
+			return nil, appErr.NewNotFound("Plant not found", nil)
+		}
+
+		filters.PlantID = &parsedPlantID
+	}
+
+	if query.Status != "" {
+		if !isValidSimulationStatus(query.Status) {
+			return nil, appErr.NewBadRequest("Invalid simulation status", nil)
+		}
+		filters.Status = &query.Status
+	}
+
+	simulations, err := s.repo.FindSimulations(filters)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get simulations", err)
+	}
+
+	return toSimulationResponses(simulations), nil
+}
+
 func (s *Service) CreateSimulation(req CreateSimulationRequest) (*SimulationResponse, error) {
 	if req.PlantID == "" || req.Name == "" {
 		return nil, appErr.NewBadRequest("Missing required fields", nil)
@@ -72,6 +107,15 @@ func (s *Service) CreateSimulation(req CreateSimulationRequest) (*SimulationResp
 
 	res := toSimulationResponse(*createdSimulation)
 	return &res, nil
+}
+
+func toSimulationResponses(simulations []models.Simulations) []SimulationResponse {
+	res := make([]SimulationResponse, 0, len(simulations))
+	for _, simulation := range simulations {
+		res = append(res, toSimulationResponse(simulation))
+	}
+
+	return res
 }
 
 func toSimulationResponse(simulation models.Simulations) SimulationResponse {
