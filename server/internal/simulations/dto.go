@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+type ListSimulationsQuery struct {
+	PlantID string                  `form:"plantId" binding:"omitempty"`
+	Status  models.SimulationStatus `form:"status" binding:"omitempty,oneof=IDLE RUNNING PAUSED STOPPED"`
+}
+
 type CreateSimulationRequest struct {
 	PlantID          string                  `json:"plantId" binding:"required"`
 	Name             string                  `json:"name" binding:"required,min=1,max=120"`
