@@ -1,68 +1,42 @@
 import { CheckCircle2 } from "lucide-react";
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { appButtonVariants, appFeedbackVariants } from "@/styles/recipes";
-import type { PlantStatus } from "@/types/enum";
 import type { Plant, PlantSetupPlantInput } from "@/features/plant/type";
-
-type PlantInformationDraft = {
-	name: string;
-	location: string;
-	description: string;
-	status: PlantStatus;
-};
+import { useCreatePlant } from "@/features/plant/useCreatePlant";
+import { appButtonVariants, appFeedbackVariants } from "@/styles/recipes";
 
 interface PlantInformationStepProps {
 	plant: Plant | null;
 	onSavePlant: (plant: PlantSetupPlantInput) => void;
 }
 
-const initialPlantDraft: PlantInformationDraft = {
-	name: "",
-	location: "",
-	description: "",
-	status: "ACTIVE",
-};
-
 export function PlantInformationStep({
 	plant,
 	onSavePlant,
 }: PlantInformationStepProps) {
-	const [draft, setDraft] = useState<PlantInformationDraft>(initialPlantDraft);
+	const { plantData, setPlantData, onChange } = useCreatePlant();
 	const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (plant) {
-			setDraft({
+			setPlantData({
 				name: plant.name,
 				location: plant.location,
 				description: plant.description ?? "",
 				status: plant.status,
 			});
 		}
-	}, [plant]);
+	}, [plant, setPlantData]);
 
-	const onChange = (
-		event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-	) => {
-		const { id, value } = event.target;
-
-		setDraft((currentDraft) => ({
-			...currentDraft,
-			[id]: id === "status" ? (value as PlantStatus) : value,
-		}));
-		setValidationMessage(null);
-	};
-
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		const name = draft.name.trim();
-		const location = draft.location.trim();
+		const name = plantData.name.trim();
+		const location = plantData.location.trim();
 
 		if (!name || !location) {
 			setValidationMessage("Plant name and location are required.");
@@ -73,10 +47,15 @@ export function PlantInformationStep({
 			id: plant?.id,
 			name,
 			location,
-			description: draft.description.trim(),
-			status: draft.status,
+			description: plantData.description?.trim(),
+			status: plantData.status ?? "ACTIVE",
 			accessibleBy: plant?.accessibleBy ?? [],
 		});
+		setValidationMessage(null);
+	};
+
+	const handleChange: typeof onChange = (event) => {
+		onChange(event);
 		setValidationMessage(null);
 	};
 
@@ -87,9 +66,9 @@ export function PlantInformationStep({
 					<Label htmlFor="name">Plant Name</Label>
 					<Input
 						id="name"
-						onChange={onChange}
+						onChange={handleChange}
 						placeholder="Main Production Plant"
-						value={draft.name}
+						value={plantData.name}
 					/>
 				</div>
 
@@ -97,9 +76,9 @@ export function PlantInformationStep({
 					<Label htmlFor="location">Location</Label>
 					<Input
 						id="location"
-						onChange={onChange}
+						onChange={handleChange}
 						placeholder="Hsinchu, Taiwan"
-						value={draft.location}
+						value={plantData.location}
 					/>
 				</div>
 
@@ -108,8 +87,8 @@ export function PlantInformationStep({
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="status"
-						onChange={onChange}
-						value={draft.status}
+						onChange={handleChange}
+						value={plantData.status ?? "ACTIVE"}
 					>
 						<option value="ACTIVE">Active</option>
 						<option value="INACTIVE">Inactive</option>
@@ -121,9 +100,9 @@ export function PlantInformationStep({
 					<Label htmlFor="description">Description</Label>
 					<Textarea
 						id="description"
-						onChange={onChange}
+						onChange={handleChange}
 						placeholder="Describe the plant scope, equipment area, or operating context."
-						value={draft.description}
+						value={plantData.description ?? ""}
 					/>
 				</div>
 
@@ -156,7 +135,10 @@ function SavedPlantPreview({ plant }: { plant: Plant }) {
 				<PreviewItem label="Name" value={plant.name} />
 				<PreviewItem label="Location" value={plant.location} />
 				<PreviewItem label="Status" value={plant.status} />
-				<PreviewItem label="Description" value={plant.description || "Not provided"} />
+				<PreviewItem
+					label="Description"
+					value={plant.description || "Not provided"}
+				/>
 			</div>
 		</div>
 	);
