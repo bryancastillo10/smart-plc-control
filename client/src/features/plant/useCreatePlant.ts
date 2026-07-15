@@ -50,7 +50,9 @@ export function useCreatePlant() {
 	});
 
 	const onChange = (
-		event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+		event: ChangeEvent<
+			HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+		>,
 	) => {
 		const { id, value } = event.target;
 
@@ -78,6 +80,7 @@ export function useCreatePlant() {
 
 	return {
 		plantData,
+		setPlantData,
 		onChange,
 		handleSubmit,
 		createPlant: createPlantMutation.mutate,

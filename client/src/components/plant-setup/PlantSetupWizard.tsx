@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { PlantSetupStepPanel } from "@/components/plant-setup/PlantSetupStepPanel";
 import { PlantSetupStepper } from "@/components/plant-setup/PlantSetupStepper";
 import { Button } from "@/components/ui/button";
-import { usePlantSetupWorkflow } from "@/features/plant-setup/usePlantSetupWorkflow";
+import { usePlantSetupWorkflow } from "@/features/plant/usePlantSetupWorkflow";
 import {
 	appButtonVariants,
 	appSurfaceVariants,
@@ -42,6 +42,7 @@ export function PlantSetupWizard() {
 				<PlantSetupStepPanel
 					activeStep={workflow.activeStep}
 					hasSimulatorDevice={workflow.hasSimulatorDevice}
+					onSavePlant={workflow.setPlant}
 					workflowState={workflow.workflowState}
 				/>
 

@@ -5,9 +5,10 @@ import {
 	plantSetupSteps,
 } from "@/constants/plant_setup_steps";
 import type {
+	PlantSetupPlantInput,
 	PlantSetupStepId,
 	PlantSetupWorkflowState,
-} from "@/types/plant-setup";
+} from "@/features/plant/type";
 
 const initialWorkflowState: PlantSetupWorkflowState = {
 	plant: null,
@@ -23,7 +24,8 @@ const initialWorkflowState: PlantSetupWorkflowState = {
 
 export function usePlantSetupWorkflow() {
 	const [activeStepId, setActiveStepId] = useState<PlantSetupStepId>("plant");
-	const [workflowState] = useState<PlantSetupWorkflowState>(initialWorkflowState);
+	const [workflowState, setWorkflowState] =
+		useState<PlantSetupWorkflowState>(initialWorkflowState);
 
 	const activeStepIndex = plantSetupSteps.findIndex(
 		(step) => step.id === activeStepId,
@@ -63,6 +65,30 @@ export function usePlantSetupWorkflow() {
 		}
 	};
 
+	const setPlant = (plant: PlantSetupPlantInput) => {
+		setWorkflowState((currentState) => ({
+			...currentState,
+			plant: {
+				...plant,
+				id: plant.id ?? `plant-${crypto.randomUUID()}`,
+				accessibleBy: plant.accessibleBy ?? [],
+			},
+		}));
+	};
+
+	const updatePlant = (plant: Partial<PlantSetupPlantInput>) => {
+		setWorkflowState((currentState) => ({
+			...currentState,
+			plant: currentState.plant
+				? {
+						...currentState.plant,
+						...plant,
+						accessibleBy: plant.accessibleBy ?? currentState.plant.accessibleBy,
+					}
+				: null,
+		}));
+	};
+
 	return {
 		activeStep,
 		activeStepDescription,
@@ -74,8 +100,10 @@ export function usePlantSetupWorkflow() {
 		goForward,
 		goToStep: setActiveStepId,
 		hasSimulatorDevice,
+		setPlant,
 		stepDescriptions,
 		steps: plantSetupSteps,
+		updatePlant,
 		workflowState,
 	};
 }
