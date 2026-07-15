@@ -1,7 +1,8 @@
 import type {
+	PlantSetupPlantInput,
 	PlantSetupStep,
 	PlantSetupWorkflowState,
-} from "@/types/plant-setup";
+} from "@/features/plant/type";
 import {
 	appSurfaceVariants,
 	appTextVariants,
@@ -10,15 +11,18 @@ import {
 interface PlantSetupStepPanelProps {
 	activeStep: PlantSetupStep;
 	hasSimulatorDevice: boolean;
+	onSavePlant: (plant: PlantSetupPlantInput) => void;
 	workflowState: PlantSetupWorkflowState;
 }
 
 import { plantSetUpDetails } from "@/constants/plant_setup_details";
 import { stepIcons } from "@/constants/plant_setup_steps";
+import { PlantInformationStep } from "@/components/plant-setup/PlantInformationStep";
 
 export function PlantSetupStepPanel({
 	activeStep,
 	hasSimulatorDevice,
+	onSavePlant,
 	workflowState,
 }: PlantSetupStepPanelProps) {
 	const StepIcon = stepIcons[activeStep.id];
@@ -41,16 +45,23 @@ export function PlantSetupStepPanel({
 				</div>
 			</div>
 
-			<div className="grid gap-3 md:grid-cols-2">
-				{details.map((detail) => (
-					<div
-						className="rounded-md border border-line-subtle bg-white/60 p-4 text-sm leading-6 text-brand-muted"
-						key={detail}
-					>
-						{detail}
-					</div>
-				))}
-			</div>
+			{activeStep.id === "plant" ? (
+				<PlantInformationStep
+					onSavePlant={onSavePlant}
+					plant={workflowState.plant}
+				/>
+			) : (
+				<div className="grid gap-3 md:grid-cols-2">
+					{details.map((detail) => (
+						<div
+							className="rounded-md border border-line-subtle bg-white/60 p-4 text-sm leading-6 text-brand-muted"
+							key={detail}
+						>
+							{detail}
+						</div>
+					))}
+				</div>
+			)}
 
 			{isSimulationStep ? (
 				<div className="mt-4 rounded-md border border-chip-line bg-chip p-4 text-sm font-semibold text-brand-control">

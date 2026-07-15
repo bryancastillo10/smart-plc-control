@@ -3,7 +3,7 @@ import { CheckCircle2, Circle, CircleDot } from "lucide-react";
 import type {
 	PlantSetupStep,
 	PlantSetupStepId,
-} from "@/types/plant-setup";
+} from "@/features/plant/type";
 import { cn } from "@/utils/utils";
 
 interface PlantSetupStepperProps {
