@@ -1,4 +1,4 @@
-import type { PlantSetupStepId } from "@/types/plant-setup";
+import type { PlantSetupStepId } from "@/features/plant/type";
 
 export const plantSetUpDetails = {
 	plant: [

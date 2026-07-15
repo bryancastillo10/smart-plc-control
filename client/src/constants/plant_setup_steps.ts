@@ -16,7 +16,7 @@ import type {
 	PlantSetupStep,
 	PlantSetupStepId,
 	PlantSetupWorkflowState,
-} from "@/types/plant-setup";
+} from "@/features/plant/type";
 
 export const plantSetupSteps = [
 	{
