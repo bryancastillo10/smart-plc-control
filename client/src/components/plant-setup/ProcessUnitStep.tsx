@@ -210,7 +210,7 @@ function SavedProcessUnits({
 										<h4 className="truncate font-bold text-brand-ink">
 											{unit.name}
 										</h4>
-										<p className="mt-1 text-xs font-semibold uppercase tracking-[0.1em] text-brand-kicker">
+										<p className="mt-1 text-xs font-semibold uppercase tracking-widest text-brand-kicker">
 											{unit.type} &middot; {unit.status}
 										</p>
 									</div>

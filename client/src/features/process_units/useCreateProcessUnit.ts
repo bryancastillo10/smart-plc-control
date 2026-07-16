@@ -1,4 +1,4 @@
-﻿import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -58,6 +58,10 @@ export function useCreateProcessUnit() {
 				...processUnitData,
 				id: `process-unit-${crypto.randomUUID()}`,
 				plantId: plant.id,
+				position: {
+					x: 32 + (processUnits.length % 4) * 180,
+					y: 32 + Math.floor(processUnits.length / 4) * 108,
+				},
 				name: processUnitData.name.trim(),
 				type: processUnitData.type.trim(),
 				description: processUnitData.description?.trim(),
