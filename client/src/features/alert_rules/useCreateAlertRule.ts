@@ -1,68 +1,38 @@
-import { useState, type ChangeEvent, type SubmitEvent } from "react";
-
-import type {
-	CreateAlertRuleRequest,
-} from "@/types/alert-rule";
-import { useToast } from "@/integrations/sonner";
-import { useMutation } from "@tanstack/react-query";
+﻿import { useMutation } from "@tanstack/react-query";
+import { type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-const initialAlertRuleData: CreateAlertRuleRequest = {
-	tagId: "",
-	name: "",
-	operator: "GT",
-	threshold: "",
-	severity: "MEDIUM",
-	message: "",
-	enabled: true,
-};
+import { useToast } from "@/integrations/sonner";
+import { usePlantSetupStore } from "@/store/plantSetup";
+import { initialAlertRuleData, usePlantSetupFormStore } from "@/store/plantSetupForms";
 
 export function useCreateAlertRule() {
-	const { t } = useTranslation("toast")
-	const [alertRuleData, setAlertRuleData] = useState(initialAlertRuleData);
-	const [createAlertRuleLoading, setCreateAlertRuleLoading] = useState<boolean>(false);
+	const { t } = useTranslation("toast");
+	const alertRuleData = usePlantSetupFormStore((state) => state.alertRuleData);
+	const setAlertRuleData = usePlantSetupFormStore((state) => state.setAlertRuleData);
+	const alertRules = usePlantSetupStore((state) => state.workflowState.alertRules);
+	const setAlertRules = usePlantSetupStore((state) => state.setAlertRules);
 	const toast = useToast();
 
 	const createAlertRuleMutation = useMutation({
-		// mutationFn: () => {},
+		// mutationFn is called by the final plant setup submission workflow.
 		onMutate: () => toast.loading(t("alertRule.create.loading")),
-		onSuccess: async () => {
-				setCreateAlertRuleLoading(false);
-		},
-		onError: (error) => {
-				setCreateAlertRuleLoading(false);
-				toast.error(error, t("alertRule.create.failed"))
-		},
-		onSettled: (_data, _error, _variables, toastId) => {
-			toast.dismiss(toastId)
-		}
-	})
+		onError: (error) => toast.error(error, t("alertRule.create.failed")),
+		onSettled: (_data, _error, _variables, toastId) => toast.dismiss(toastId),
+	});
 
 	const onChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { id , value } = event.target;
-
-		setAlertRuleData((currentData) => ({
-			...currentData,
-			[id]: value,
-		}));
+		const { id, value } = event.target;
+		setAlertRuleData((current) => ({ ...current, [id]: value }));
 	};
-
 
 	const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
 		event.preventDefault();
-
-		// API call would be here
-
+		setAlertRules([...alertRules, { ...alertRuleData, id: `alert-rule-${crypto.randomUUID()}` }]);
+		setAlertRuleData(initialAlertRuleData);
 	};
 
-	return {
-		alertRuleData,
-		createAlertRuleLoading,
-		createAlertRuleMutation,
-		setAlertRuleData,
-		onChange,
-		handleSubmit,
-	};
+	return { alertRuleData, createAlertRuleLoading: createAlertRuleMutation.isPending, createAlertRuleMutation, setAlertRuleData, onChange, handleSubmit };
 }
 
 export default useCreateAlertRule;
