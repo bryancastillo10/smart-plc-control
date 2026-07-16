@@ -1,13 +1,11 @@
 import { CheckCircle2 } from "lucide-react";
-import { useEffect, useState, type SubmitEvent } from "react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Plant, PlantSetupPlantInput } from "@/features/plant/type";
 import { useCreatePlant } from "@/features/plant/useCreatePlant";
-import { appButtonVariants, appFeedbackVariants } from "@/styles/recipes";
+import { appButtonVariants } from "@/styles/recipes";
 
 interface PlantInformationStepProps {
 	plant: Plant | null;
@@ -16,48 +14,9 @@ interface PlantInformationStepProps {
 
 export function PlantInformationStep({
 	plant,
-	onSavePlant,
 }: PlantInformationStepProps) {
-	const { plantData, setPlantData, onChange } = useCreatePlant();
-	const [validationMessage, setValidationMessage] = useState<string | null>(null);
+	const { plantData, onChange, handleSubmit } = useCreatePlant();
 
-	useEffect(() => {
-		if (plant) {
-			setPlantData({
-				name: plant.name,
-				location: plant.location,
-				description: plant.description ?? "",
-				status: plant.status,
-			});
-		}
-	}, [plant, setPlantData]);
-
-	const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
-		event.preventDefault();
-
-		const name = plantData.name.trim();
-		const location = plantData.location.trim();
-
-		if (!name || !location) {
-			setValidationMessage("Plant name and location are required.");
-			return;
-		}
-
-		onSavePlant({
-			id: plant?.id,
-			name,
-			location,
-			description: plantData.description?.trim(),
-			status: plantData.status ?? "ACTIVE",
-			accessibleBy: plant?.accessibleBy ?? [],
-		});
-		setValidationMessage(null);
-	};
-
-	const handleChange: typeof onChange = (event) => {
-		onChange(event);
-		setValidationMessage(null);
-	};
 
 	return (
 		<div className="space-y-5">
@@ -66,7 +25,7 @@ export function PlantInformationStep({
 					<Label htmlFor="name">Plant Name</Label>
 					<Input
 						id="name"
-						onChange={handleChange}
+						onChange={onChange}
 						placeholder="Main Production Plant"
 						value={plantData.name}
 					/>
@@ -76,7 +35,7 @@ export function PlantInformationStep({
 					<Label htmlFor="location">Location</Label>
 					<Input
 						id="location"
-						onChange={handleChange}
+						onChange={onChange}
 						placeholder="Hsinchu, Taiwan"
 						value={plantData.location}
 					/>
@@ -87,7 +46,7 @@ export function PlantInformationStep({
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="status"
-						onChange={handleChange}
+						onChange={onChange}
 						value={plantData.status ?? "ACTIVE"}
 					>
 						<option value="ACTIVE">Active</option>
@@ -100,18 +59,11 @@ export function PlantInformationStep({
 					<Label htmlFor="description">Description</Label>
 					<Textarea
 						id="description"
-						onChange={handleChange}
+						onChange={onChange}
 						placeholder="Describe the plant scope, equipment area, or operating context."
 						value={plantData.description ?? ""}
 					/>
 				</div>
-
-				{validationMessage ? (
-					<div className={appFeedbackVariants({ tone: "error" })}>
-						{validationMessage}
-					</div>
-				) : null}
-
 				<div className="flex justify-end md:col-span-2">
 					<Button className={appButtonVariants({ size: "form" })} type="submit">
 						Save Plant Information
