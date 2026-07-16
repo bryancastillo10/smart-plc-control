@@ -19,6 +19,8 @@ import { plantSetUpDetails } from "@/constants/plant_setup_details";
 import { stepIcons } from "@/constants/plant_setup_steps";
 import { PlantInformationStep } from "@/components/plant-setup/PlantInformationStep";
 import { ProcessUnitStep } from "@/components/plant-setup/ProcessUnitStep";
+import { AddDeviceStep } from "@/components/plant-setup/AddDeviceStep";
+
 
 export function PlantSetupStepPanel({
 	activeStep,
@@ -53,6 +55,8 @@ export function PlantSetupStepPanel({
 				/>
 			) : activeStep.id === "processUnits" ? (
 				<ProcessUnitStep />
+			) : activeStep.id === "devices" ? (
+				<AddDeviceStep />
 			) : (
 				<div className="grid gap-3 md:grid-cols-2">
 					{details.map((detail) => (
