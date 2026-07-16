@@ -18,6 +18,7 @@ interface PlantSetupStepPanelProps {
 import { plantSetUpDetails } from "@/constants/plant_setup_details";
 import { stepIcons } from "@/constants/plant_setup_steps";
 import { PlantInformationStep } from "@/components/plant-setup/PlantInformationStep";
+import { ProcessUnitStep } from "@/components/plant-setup/ProcessUnitStep";
 
 export function PlantSetupStepPanel({
 	activeStep,
@@ -50,6 +51,8 @@ export function PlantSetupStepPanel({
 					onSavePlant={onSavePlant}
 					plant={workflowState.plant}
 				/>
+			) : activeStep.id === "processUnits" ? (
+				<ProcessUnitStep />
 			) : (
 				<div className="grid gap-3 md:grid-cols-2">
 					{details.map((detail) => (

@@ -1,67 +1,85 @@
-import { useMutation } from "@tanstack/react-query";
-import { useState, type ChangeEvent, type SubmitEvent } from "react";
+﻿import { useMutation } from "@tanstack/react-query";
+import { type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { useToast } from "@/integrations/sonner";
-import type { CreateProcessUnitLocalRequest } from "@/types/process-unit";
 
-const initialProcessUnitData: CreateProcessUnitLocalRequest = {
-	name: "",
-	type: "",
-	description: "",
-	status: "ACTIVE",
-	position: { x: 120, y: 120 },
-	ports: [
-		{ id: "in", label: "In", direction: "IN" },
-		{ id: "out", label: "Out", direction: "OUT" },
-	],
-	icon: "Factory",
-};
+import { useToast } from "@/integrations/sonner";
+import { usePlantSetupStore } from "@/store/plantSetup";
+import {
+	initialProcessUnitData,
+	usePlantSetupFormStore,
+} from "@/store/plantSetupForms";
 
 export function useCreateProcessUnit() {
 	const { t } = useTranslation("toast");
-	const [processUnitData, setProcessUnitData] = useState(
-		initialProcessUnitData,
+	const processUnitData = usePlantSetupFormStore(
+		(state) => state.processUnitData,
 	);
-	const [createProcessUnitLoading, setCreateProcessUnitLoading] =
-		useState<boolean>(false);
+	const setProcessUnitData = usePlantSetupFormStore(
+		(state) => state.setProcessUnitData,
+	);
+	const plant = usePlantSetupStore((state) => state.workflowState.plant);
+	const processUnits = usePlantSetupStore(
+		(state) => state.workflowState.processUnits,
+	);
+	const setProcessUnits = usePlantSetupStore(
+		(state) => state.setProcessUnits,
+	);
 	const toast = useToast();
 
 	const createProcessUnitMutation = useMutation({
-		// mutationFn: () => {},
+		// mutationFn is called by the final plant setup submission workflow.
 		onMutate: () => toast.loading(t("processUnit.create.loading")),
-		onSuccess: async () => {
-			setCreateProcessUnitLoading(false);
-		},
-		onError: (error) => {
-			setCreateProcessUnitLoading(false);
-			toast.error(error, t("processUnit.create.failed"));
-		},
-		onSettled: (_data, _error, _variables, toastId) => {
-			toast.dismiss(toastId);
-		},
+		onError: (error) =>
+			toast.error(error, t("processUnit.create.failed")),
+		onSettled: (_data, _error, _variables, toastId) =>
+			toast.dismiss(toastId),
 	});
 
-	const onChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { id , value } = event.target;
-
-		setProcessUnitData((currentData) => ({
-			...currentData,
-			[id]: value,
-		}));
+	const onChange = (
+		event: ChangeEvent<
+			HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+		>,
+	) => {
+		const { id, value } = event.target;
+		setProcessUnitData((current) => ({ ...current, [id]: value }));
 	};
+
 	const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		// API call would be here
+		if (!plant || !processUnitData.name.trim() || !processUnitData.type.trim()) {
+			toast.error(null, t("processUnit.create.failed"));
+			return;
+		}
+
+		setProcessUnits([
+			...processUnits,
+			{
+				...processUnitData,
+				id: `process-unit-${crypto.randomUUID()}`,
+				plantId: plant.id,
+				name: processUnitData.name.trim(),
+				type: processUnitData.type.trim(),
+				description: processUnitData.description?.trim(),
+			},
+		]);
+		setProcessUnitData(initialProcessUnitData);
+	};
+
+	const removeProcessUnit = (id: string) => {
+		setProcessUnits(processUnits.filter((unit) => unit.id !== id));
 	};
 
 	return {
 		processUnitData,
-		createProcessUnitLoading,
+		processUnits,
+		plantExists: plant !== null,
+		createProcessUnitLoading: createProcessUnitMutation.isPending,
 		createProcessUnitMutation,
 		setProcessUnitData,
 		onChange,
 		handleSubmit,
+		removeProcessUnit,
 	};
 }
 
