@@ -1,3 +1,5 @@
+import type { SetStateAction } from "react";
+
 import type { AlertRule } from "@/types/alert-rule";
 import type { Device } from "@/types/device";
 import type { Language, UserRole } from "@/types/enum";
@@ -7,6 +9,14 @@ import type { ProcessUnitConnection } from "@/types/process-unit-connection";
 import type { Simulation } from "@/types/simulation";
 import type { SimulationScenario } from "@/types/simulation-scenario";
 import type { Tag } from "@/types/tag";
+
+import type { CreatePlantRequest } from "@/features/plant/type";
+import type { CreateAlertRuleRequest } from "@/types/alert-rule";
+import type { CreateDeviceLocalRequest } from "@/types/device";
+import type { CreateProcessUnitConnectionLocalRequest } from "@/types/process-unit-connection";
+import type { CreateProcessUnitLocalRequest } from "@/types/process-unit";
+import type { CreateSimulationLocalRequest } from "@/types/simulation";
+import type { CreateTagLocalRequest } from "@/types/tag";
 
 export type PlantSetupStepId =
 	| "plant"
@@ -61,3 +71,22 @@ export type PlantSetupSimulationInput = PlantSetupEntityInput<Simulation>;
 export type PlantSetupSimulationScenarioInput =
 	PlantSetupEntityInput<SimulationScenario>;
 export type PlantSetupUserInput = PlantSetupEntityInput<PlantSetupUser>;
+
+
+export interface PlantSetupFormState {
+	plantData: CreatePlantRequest;
+	processUnitData: CreateProcessUnitLocalRequest;
+	connectionData: CreateProcessUnitConnectionLocalRequest;
+	deviceData: CreateDeviceLocalRequest;
+	tagData: CreateTagLocalRequest;
+	alertRuleData: CreateAlertRuleRequest;
+	simulationData: CreateSimulationLocalRequest;
+	setPlantData: (value: SetStateAction<CreatePlantRequest>) => void;
+	setProcessUnitData: (value: SetStateAction<CreateProcessUnitLocalRequest>) => void;
+	setConnectionData: (value: SetStateAction<CreateProcessUnitConnectionLocalRequest>) => void;
+	setDeviceData: (value: SetStateAction<CreateDeviceLocalRequest>) => void;
+	setTagData: (value: SetStateAction<CreateTagLocalRequest>) => void;
+	setAlertRuleData: (value: SetStateAction<CreateAlertRuleRequest>) => void;
+	setSimulationData: (value: SetStateAction<CreateSimulationLocalRequest>) => void;
+	resetForms: () => void;
+}
