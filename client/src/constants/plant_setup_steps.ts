@@ -30,14 +30,14 @@ export const plantSetupSteps = [
 		description: "Prepare placeholders for treatment stages and equipment areas.",
 	},
 	{
-		id: "diagram",
-		title: "Arrange Process Diagram",
-		description: "Plan the process layout and future unit connections.",
-	},
-	{
 		id: "devices",
 		title: "Create Devices",
 		description: "Set up PLCs, gateways, simulators, and device groups.",
+	},
+	{
+		id: "diagram",
+		title: "Arrange Process Diagram",
+		description: "Plan the process layout and future unit connections.",
 	},
 	{
 		id: "tags",
