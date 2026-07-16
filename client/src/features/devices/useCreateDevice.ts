@@ -89,6 +89,10 @@ export function useCreateDevice() {
 				...deviceData,
 				id: `device-${crypto.randomUUID()}`,
 				plantId: plant.id,
+				position: {
+					x: 32 + (devices.length % 4) * 180,
+					y: 300 + Math.floor(devices.length / 4) * 96,
+				},
 				name: deviceData.name.trim(),
 				description: deviceData.description?.trim(),
 				host: deviceData.host?.trim(),
