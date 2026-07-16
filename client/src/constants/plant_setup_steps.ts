@@ -1,4 +1,4 @@
-﻿import {
+import {
 	BellRing,
 	Cpu,
 	Factory,
@@ -38,16 +38,16 @@ export const plantSetupSteps = [
 			"Register the equipment used to monitor, control, and exchange information across the process.",
 	},
 	{
-		id: "diagram",
-		title: "Process Flow Arrangement",
-		description:
-			"Arrange the process units and show how materials or utilities move between them.",
-	},
-	{
 		id: "tags",
 		title: "Process Measurements and Signals",
 		description:
 			"Define the measurements, equipment states, and control signals used during operation.",
+	},
+	{
+		id: "diagram",
+		title: "Process Flow Arrangement",
+		description:
+			"Arrange the process units and show how materials or utilities move between them.",
 	},
 	{
 		id: "alertRules",
