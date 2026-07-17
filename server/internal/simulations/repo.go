@@ -43,6 +43,7 @@ func (r *Repository) FindSimulationByID(simulationID uuid.UUID) (*models.Simulat
 
 	return &simulation, nil
 }
+
 func (r *Repository) FindSimulations(filters SimulationFilters) ([]models.Simulations, error) {
 	var simulations []models.Simulations
 	query := r.db.Model(&models.Simulations{})
@@ -63,6 +64,14 @@ func (r *Repository) FindSimulations(filters SimulationFilters) ([]models.Simula
 
 func (r *Repository) CreateSimulation(simulation *models.Simulations) (*models.Simulations, error) {
 	if err := r.db.Create(simulation).Error; err != nil {
+		return nil, err
+	}
+
+	return simulation, nil
+}
+
+func (r *Repository) UpdateSimulation(simulation *models.Simulations) (*models.Simulations, error) {
+	if err := r.db.Save(simulation).Error; err != nil {
 		return nil, err
 	}
 
