@@ -78,3 +78,20 @@ func (h *Handler) UpdateSimulation(c *gin.Context) {
 
 	c.JSON(200, simulation)
 }
+
+func (h *Handler) DeleteSimulation(c *gin.Context) {
+	simulationID := c.Param("simulationId")
+
+	req, err := http.BindJSON[DeleteSimulationRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	if err := h.service.DeleteSimulation(simulationID, *req); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Simulation deleted successfully"})
+}
