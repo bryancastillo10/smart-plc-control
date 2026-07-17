@@ -44,6 +44,7 @@ func (h *Handler) GetSimulationByID(c *gin.Context) {
 
 	c.JSON(200, simulation)
 }
+
 func (h *Handler) CreateSimulation(c *gin.Context) {
 	req, err := http.BindJSON[CreateSimulationRequest](c)
 	if err != nil {
@@ -58,4 +59,22 @@ func (h *Handler) CreateSimulation(c *gin.Context) {
 	}
 
 	c.JSON(201, simulation)
+}
+
+func (h *Handler) UpdateSimulation(c *gin.Context) {
+	simulationID := c.Param("simulationId")
+
+	req, err := http.BindJSON[UpdateSimulationRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	simulation, err := h.service.UpdateSimulation(simulationID, *req)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, simulation)
 }
