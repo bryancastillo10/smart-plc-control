@@ -63,6 +63,10 @@ Content-Type: application/json
 	"noiseFactor": 0.03
 }
 
+### Start Simulation
+# Requires an authenticated ADMIN or OPERATOR user.
+POST http://localhost:8080/api/v1/simulations/{{simulationId}}/start
+
 ### Delete Simulation
 # Requires an authenticated ADMIN user.
 # Simulation must be IDLE or STOPPED before deletion.
