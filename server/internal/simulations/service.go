@@ -195,6 +195,39 @@ func (s *Service) UpdateSimulation(simulationID string, req UpdateSimulationRequ
 	return &res, nil
 }
 
+func (s *Service) DeleteSimulation(simulationID string, req DeleteSimulationRequest) error {
+	if req.Action != "delete" {
+		return appErr.NewBadRequest("Delete confirmation must be exactly 'delete'", nil)
+	}
+
+	if simulationID == "" {
+		return appErr.NewBadRequest("Missing simulation ID", nil)
+	}
+
+	parsedSimulationID, err := utils.ParseId(simulationID)
+	if err != nil {
+		return appErr.NewBadRequest("Invalid simulation ID", err)
+	}
+
+	simulation, err := s.repo.FindSimulationByID(parsedSimulationID)
+	if err != nil {
+		return appErr.NewInternal("Failed to find simulation", err)
+	}
+	if simulation == nil {
+		return appErr.NewNotFound("Simulation not found", nil)
+	}
+
+	if simulation.Status == models.SimulationRunning || simulation.Status == models.SimulationPaused {
+		return appErr.NewBadRequest("Simulation must be stopped before deletion", nil)
+	}
+
+	if err := s.repo.DeleteSimulation(simulation); err != nil {
+		return appErr.NewInternal("Failed to delete simulation", err)
+	}
+
+	return nil
+}
+
 func toSimulationResponses(simulations []models.Simulations) []SimulationResponse {
 	res := make([]SimulationResponse, 0, len(simulations))
 	for _, simulation := range simulations {
