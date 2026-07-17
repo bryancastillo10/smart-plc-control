@@ -77,3 +77,7 @@ func (r *Repository) UpdateSimulation(simulation *models.Simulations) (*models.S
 
 	return simulation, nil
 }
+
+func (r *Repository) DeleteSimulation(simulation *models.Simulations) error {
+	return r.db.Delete(simulation).Error
+}
