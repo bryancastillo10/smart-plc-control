@@ -18,6 +18,17 @@ type CreateSimulationRequest struct {
 	NoiseFactor      float64                 `json:"noiseFactor" binding:"omitempty,min=0"`
 }
 
+type UpdateSimulationRequest struct {
+	PlantID          string   `json:"plantId" binding:"omitempty"`
+	Name             string   `json:"name" binding:"omitempty,min=1,max=120"`
+	UpdateIntervalMS *int     `json:"updateIntervalMs" binding:"omitempty,min=1"`
+	NoiseFactor      *float64 `json:"noiseFactor" binding:"omitempty,min=0"`
+}
+
+type DeleteSimulationRequest struct {
+	Action string `json:"action" binding:"required"`
+}
+
 type SimulationResponse struct {
 	ID               string                  `json:"id"`
 	PlantID          string                  `json:"plantId"`
