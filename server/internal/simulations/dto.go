@@ -25,6 +25,10 @@ type UpdateSimulationRequest struct {
 	NoiseFactor      *float64 `json:"noiseFactor" binding:"omitempty,min=0"`
 }
 
+type DeleteSimulationRequest struct {
+	Action string `json:"action" binding:"required"`
+}
+
 type SimulationResponse struct {
 	ID               string                  `json:"id"`
 	PlantID          string                  `json:"plantId"`
