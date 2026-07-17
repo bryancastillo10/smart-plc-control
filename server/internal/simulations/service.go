@@ -4,6 +4,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	appErr "smart-plc-control-server/pkg/errors"
 	"smart-plc-control-server/pkg/utils"
+	"time"
 )
 
 const defaultUpdateIntervalMS = 1000
@@ -189,6 +190,43 @@ func (s *Service) UpdateSimulation(simulationID string, req UpdateSimulationRequ
 	updatedSimulation, err := s.repo.UpdateSimulation(simulation)
 	if err != nil {
 		return nil, appErr.NewInternal("Failed to update simulation", err)
+	}
+
+	res := toSimulationResponse(*updatedSimulation)
+	return &res, nil
+}
+
+func (s *Service) StartSimulation(simulationID string) (*SimulationResponse, error) {
+	if simulationID == "" {
+		return nil, appErr.NewBadRequest("Missing simulation ID", nil)
+	}
+
+	parsedSimulationID, err := utils.ParseId(simulationID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid simulation ID", err)
+	}
+
+	simulation, err := s.repo.FindSimulationByID(parsedSimulationID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find simulation", err)
+	}
+	if simulation == nil {
+		return nil, appErr.NewNotFound("Simulation not found", nil)
+	}
+
+	if simulation.Status == models.SimulationRunning {
+		return nil, appErr.NewBadRequest("Simulation is already running", nil)
+	}
+
+	now := time.Now()
+	simulation.Status = models.SimulationRunning
+	simulation.StartedAt = &now
+	simulation.PausedAt = nil
+	simulation.StoppedAt = nil
+
+	updatedSimulation, err := s.repo.UpdateSimulation(simulation)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to start simulation", err)
 	}
 
 	res := toSimulationResponse(*updatedSimulation)
