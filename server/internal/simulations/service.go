@@ -233,6 +233,44 @@ func (s *Service) StartSimulation(simulationID string) (*SimulationResponse, err
 	return &res, nil
 }
 
+func (s *Service) PauseSimulation(simulationID string) (*SimulationResponse, error) {
+	if simulationID == "" {
+		return nil, appErr.NewBadRequest("Missing simulation ID", nil)
+	}
+
+	parsedSimulationID, err := utils.ParseId(simulationID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid simulation ID", err)
+	}
+
+	simulation, err := s.repo.FindSimulationByID(parsedSimulationID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find simulation", err)
+	}
+	if simulation == nil {
+		return nil, appErr.NewNotFound("Simulation not found", nil)
+	}
+
+	if simulation.Status == models.SimulationPaused {
+		return nil, appErr.NewBadRequest("Simulation is already paused", nil)
+	}
+	if simulation.Status != models.SimulationRunning {
+		return nil, appErr.NewBadRequest("Only running simulations can be paused", nil)
+	}
+
+	now := time.Now()
+	simulation.Status = models.SimulationPaused
+	simulation.PausedAt = &now
+
+	updatedSimulation, err := s.repo.UpdateSimulation(simulation)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to pause simulation", err)
+	}
+
+	res := toSimulationResponse(*updatedSimulation)
+	return &res, nil
+}
+
 func (s *Service) DeleteSimulation(simulationID string, req DeleteSimulationRequest) error {
 	if req.Action != "delete" {
 		return appErr.NewBadRequest("Delete confirmation must be exactly 'delete'", nil)
