@@ -91,6 +91,18 @@ func (h *Handler) StartSimulation(c *gin.Context) {
 	c.JSON(200, simulation)
 }
 
+func (h *Handler) PauseSimulation(c *gin.Context) {
+	simulationID := c.Param("simulationId")
+
+	simulation, err := h.service.PauseSimulation(simulationID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, simulation)
+}
+
 func (h *Handler) DeleteSimulation(c *gin.Context) {
 	simulationID := c.Param("simulationId")
 
