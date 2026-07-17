@@ -67,6 +67,10 @@ Content-Type: application/json
 # Requires an authenticated ADMIN or OPERATOR user.
 POST http://localhost:8080/api/v1/simulations/{{simulationId}}/start
 
+### Pause Simulation
+# Requires an authenticated ADMIN or OPERATOR user.
+POST http://localhost:8080/api/v1/simulations/{{simulationId}}/pause
+
 ### Delete Simulation
 # Requires an authenticated ADMIN user.
 # Simulation must be IDLE or STOPPED before deletion.
