@@ -191,7 +191,7 @@ func registerSimulations(r *gin.RouterGroup, DB *gorm.DB) {
 		simulationGrp.GET("", simulation.GetSimulations)
 		simulationGrp.GET("/:simulationId", simulation.GetSimulationByID)
 		simulationGrp.PUT("/:simulationId", middleware.RequireRoles(models.Admin), simulation.UpdateSimulation)
-		simulationGrp.DELETE("/:simulationId")
+		simulationGrp.DELETE("/:simulationId", middleware.RequireRoles(models.Admin), simulation.DeleteSimulation)
 		simulationGrp.POST("/:simulationId/start")
 		simulationGrp.POST("/:simulationId/pause")
 		simulationGrp.POST("/:simulationId/stop")
