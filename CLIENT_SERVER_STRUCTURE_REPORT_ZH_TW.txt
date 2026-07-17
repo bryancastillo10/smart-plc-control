@@ -1,0 +1,347 @@
+Smart PLC Control 專案：Client / Server 基本資料夾結構報告
+============================================================
+
+文件目的
+--------
+本文件以一般架構觀點，說明本 repository 中 client 與 server 的資料夾、檔名及分類方式。
+重點不是逐一解釋每段程式碼，而是幫助開發者理解：某一類程式應放在哪裡、為何放在那裡，
+以及前後端如何透過清楚的責任邊界共同組成 PLC monitoring / simulation 系統。
+
+本文件反映撰寫當下實際存在的 repository 結構；README 中提到但尚未建立的規劃目錄，
+不列為現有結構的一部分。
+
+
+一、Repository 根目錄
+--------------------
+
+smart-plc-control/
+|-- client/       TanStack Start、React、TypeScript 前端應用程式
+|-- server/       Gin、GORM、Go 後端 API 應用程式
+|-- AGENTS.MD     repository 層級的開發規範與架構提示
+`-- README.MD     系統目標、主要功能與整體架構說明
+
+這是一個 monorepository（monorepo）：前端與後端放在同一個版本庫，但各自有獨立的
+dependency、build tool、啟動方式與設定檔。這種安排讓相關功能可在同一個 commit 中同步調整，
+同時避免 Node.js/TypeScript 與 Go 的工具鏈互相混雜。
+
+最重要的責任分界如下：
+
+* client 負責畫面、操作流程、瀏覽器端狀態、資料展示，以及呼叫 API。
+* server 負責 authentication / authorization、業務規則、資料庫存取、PLC simulation，
+  並作為日後實體 PLC protocol 的唯一入口。
+* client 不應直接連線實體 PLC；PLC 操作與資料取得應先經過 server，以便統一處理安全性、
+  audit、資料一致性及設備通訊。
+
+
+二、Client 的分類方式
+--------------------
+
+client 是一個 TanStack Start 應用程式。它採用「技術責任分層」與「業務 feature 分組」混合的方式：
+route、component、state、type 等共用技術角色分開；與某個業務功能直接相關的 API 操作與 hook，
+則集中在 features/<domain>/ 中。
+
+client/
+|-- src/                 主要 application source code
+|   |-- routes/          file-based routing 與頁面入口
+|   |-- components/      可重用 UI 與較大型畫面元件
+|   |-- features/        依業務 domain 分組的資料操作與流程邏輯
+|   |-- store/           跨元件共享的 client state
+|   |-- hooks/           跨 feature 可共用的 React hooks
+|   |-- types/           共用 TypeScript 型別
+|   |-- constants/       固定設定值、選項與文字 key
+|   |-- integrations/    第三方 library 的整合與初始化
+|   |-- utils/           無特定 domain 的小型共用函式
+|   |-- styles/          design tokens 與 style recipes
+|   |-- env.ts           環境變數讀取與型別驗證
+|   |-- router.tsx       TanStack Router 建立與 Query 整合
+|   |-- routeTree.gen.ts 自動產生的 route tree
+|   `-- styles.css       全域樣式進入點
+|-- public/              不經程式 import 的靜態資源
+|-- docs/                client 特定流程與設計文件
+|-- .tanstack/           TanStack tooling 相關資料
+|-- .vscode/             editor 層級設定
+|-- package.json         scripts、dependencies 與 package metadata
+|-- bun.lock             鎖定精確 dependency 版本
+|-- vite.config.ts       Vite build/dev server 設定
+|-- tsconfig.json        TypeScript compiler 與 path alias 設定
+|-- tsr.config.json      TanStack Router code generation 設定
+|-- biome.json           lint 與 format 規則
+|-- components.json      UI component generator 設定
+`-- README.md            client 開發與工具使用說明
+
+
+2.1 src/routes：URL 與頁面骨架
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TanStack Router 使用 file-based routing，因此 routes 內的路徑與檔名具有 framework 意義，
+不是單純用字母排序的任意分類。
+
+* __root.tsx 是所有 route 的最上層 document，負責 HTML shell、全域 CSS、Toaster 與 devtools。
+* index.tsx 代表某一層 URL 的預設頁面。
+* _authenticated.tsx 是 authenticated route group / layout，用來集中保護需要登入的頁面。
+* _authenticated/dashboard.tsx、alarms.tsx、tags.tsx 等檔名直接對應功能頁面與 URL。
+* 子資料夾（例如 plant-setup/）表示巢狀 route 或較完整的子流程。
+* routeTree.gen.ts 是 router tooling 自動產生的結果；它被 router.tsx 使用，通常不應手動編輯。
+
+如此安排的好處是：看到檔案位置即可推測 URL、layout 繼承與 access boundary，新增頁面時也有一致入口。
+
+
+2.2 src/components：依 UI 使用層級分類
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+components 內不是依 API resource 排列，而是依畫面用途分類：
+
+* ui/：Button、Input、Select、Label 等低階、可高度重用的 primitive component。
+* layout/：Sidebar、AppLayout 等決定整體頁面框架的元件。
+* auth/：登入畫面使用的 presentation components。
+* plant-setup/：工廠設定 wizard 的步驟、stepper、panel 與 process arrangement 視覺元件。
+
+低階 ui component 不應知道 plant、device 等業務細節；較高階 component 可以組合 ui primitives，
+並接收 feature hook 提供的資料。這種由小到大的組合方式，可降低重複程式碼並控制單一元件複雜度。
+
+同一個名稱可能同時出現在 routes 與 components，例如 PlantSetupWizard：route 檔案是 URL/page entry，
+components 中的檔案則是可組合的畫面實作。兩者責任不同，不應只因名稱相似就任意合併。
+
+
+2.3 src/features：依業務 domain 就近收納行為
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+features 以 plants、devices、tags、auth、simulations、process_units 等業務概念分組。
+每個 feature 可包含：
+
+* queries.ts：讀取資料的 query definition 或 query options。
+* useCreateXxx.ts：執行 create mutation 的 custom hook。
+* useXxxWorkflow.ts：跨步驟流程或 orchestration logic。
+* type.ts：只屬於該 feature、尚不適合成為全域型別的定義。
+
+這種 domain-first 的局部集中方式，讓開發者修改「建立 Device」時，不必在全專案搜尋 API、mutation、
+cache invalidation 等相關邏輯。若一個型別或 hook 被多個 domain 使用，再提升到 src/types 或 src/hooks。
+
+
+2.4 store、hooks、types、constants 與 utils
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* store/ 放 Zustand 等跨頁面共享狀態，例如 user、language 與 plant setup form state。
+  短暫且只屬於單一 component 的 state 不必放進全域 store。
+* hooks/ 放與單一業務 domain 無強綁定的 React 行為，例如 route guard、role guard。
+* types/ 放 API entity、enum、connection 等多處會引用的 TypeScript contract。
+* constants/ 放 navigation、error、setup steps 等不應在 component 內重複 hard-code 的固定值。
+* utils/ 放 fetch wrapper、error conversion、auth route 判斷等共用函式；若函式只服務一個 feature，
+  優先留在該 feature，避免 utils 變成無分類的雜物區。
+
+
+2.5 integrations、styles、public 與 docs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* integrations/ 封裝 i18n、TanStack Query、Sonner 等第三方工具。應用程式其他部分依賴此封裝，
+  可避免 library 初始化細節散落各處。
+* integrations/i18n/locales/en.ts 與 zh-TW.ts 以 locale 分檔，使翻譯 key 可以對照維護。
+* styles/tokens.css 定義 design token；recipes.ts 定義可重用的 styling pattern；styles.css 是全域入口。
+* public/ 放 favicon、logo、manifest、robots.txt 等由瀏覽器以固定 URL 取得的資源。
+* docs/ 放只與 client workflow 有關、但不應混入 source code 的說明文件。
+
+
+2.6 Client 命名慣例
+~~~~~~~~~~~~~~~~~~
+
+* React component 檔名使用 PascalCase，例如 LoginPage.tsx、AppLayout.tsx。
+* custom hook 以 use 開頭並使用 camelCase，例如 useCreateTag.ts、useRoleGuard.ts。
+* 一般 module 多使用 camelCase，例如 authRoutes.ts；route URL 檔案常使用 kebab-case，例如
+  no-plant-access.tsx，讓 URL 具可讀性。
+* domain 資料夾目前使用複數名詞，並有 snake_case（alert_rules、process_units）與單字複數並存。
+  這大致與 server domain 名稱對齊；後續新增功能時應沿用既有 domain 的拼法，避免建立同義目錄。
+* .tsx 表示包含 JSX / React component；.ts 表示純 TypeScript module；.css 表示 stylesheet。
+
+
+三、Server 的分類方式
+--------------------
+
+server 使用 Go、Gin 與 GORM。它先按執行入口、應用組裝、內部業務、外部基礎設施與通用 package 分層；
+在 internal 內，再依 domain（plants、devices、tags 等）分組。這是典型的「domain + layered architecture」。
+
+server/
+|-- cmd/api/              API executable 進入點
+|-- bootstrap/            啟動 Gin、組裝 middleware 與註冊 routes
+|-- internal/             此 server 私有的業務程式碼
+|   |-- <domain>/         各 domain 的 handler/service/repo/dto
+|   |-- models/           GORM database models 與共用 enum
+|   `-- middleware/       JWT、role 與 error middleware
+|-- platforms/            config、database 等 infrastructure adapter
+|-- pkg/                  跨 domain 可重用的小型 packages
+|-- api_tests/            可手動執行的 HTTP request 測試案例
+|-- API.MD                API endpoint contract 文件
+|-- SCHEMA.MD             database schema 與 relationship 文件
+|-- go.mod / go.sum       Go module 與 dependency lock/checksum
+|-- Makefile              常用開發命令入口
+|-- air.toml              Air hot reload 設定
+|-- .env                  本機 runtime 環境設定（應避免提交 secrets）
+`-- .gitignore            server 範圍的 Git ignore 規則
+
+
+3.1 cmd/api：最小化的 executable entry point
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+cmd/api/main.go 只負責啟動順序：load environment、處理 migration flag、連線 database、啟動 Gin。
+將 main 保持簡短，可讓真正的 route 與業務邏輯留在可測試、可重用的 package 中；未來若增加 worker、
+migration CLI 或 simulator process，也可以在 cmd 下增加另一個獨立 executable。
+
+
+3.2 bootstrap：應用程式組裝區
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* run_gin.go 建立 Gin engine、設定 CORS、全域 error middleware、port 與 trusted proxies。
+* routes.go 建立 /api/v1 route group，再把 auth、users、plants、devices 等 domain handler 接到 URL。
+
+bootstrap 的功能是 wiring / composition：它知道各模組如何接在一起，但不應承擔實際業務規則。
+集中 route registration 也能快速查看 API surface、authentication middleware 與 role requirement。
+
+
+3.3 internal/<domain>：固定的 request 處理鏈
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+目前主要 domain 包括 auth、users、plants、process_units、devices、tags、tag_readings、alert_rules、
+alerts、simulations、simulation_scenarios 與 audit_logs。多數 domain 具有以下四個固定檔名：
+
+* handler.go：HTTP boundary。接收 Gin context、解析 request、呼叫 service、輸出 HTTP response。
+* dto.go：Data Transfer Object。定義 request / response payload，不直接暴露 database model。
+* service.go：business logic。執行驗證、權限以外的業務規則與多步驟流程。
+* repo.go：repository / persistence layer。封裝 GORM query 與資料庫讀寫。
+
+典型資料流為：
+
+HTTP request -> middleware -> handler -> service -> repo -> database
+HTTP response <- handler  <- service <- repo <- database
+
+這些檔名在每個 domain 重複，是刻意的規則，而非重複設計。開發者先依業務名稱找到資料夾，
+再依責任找到固定檔案；同時可避免 SQL、HTTP status 與核心規則全部混在一個大型檔案中。
+
+
+3.4 internal/models 與 internal/middleware
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* models/ 以資料庫 entity 分檔，例如 plants.go、devices.go、tags.go；關聯資料則使用明確名稱，
+  如 process_unit_connections.go。這些 model 主要描述 GORM table、field 與 relationship。
+* enum.go 集中多個 model 共用的有限狀態值，減少 magic string。
+* middleware/jwt_auth.go 在進入 handler 前驗證身份。
+* middleware/role.go 統一 ADMIN、OPERATOR、VIEWER 等角色檢查。
+* middleware/error_handler.go 集中處理未預期錯誤與 HTTP error response。
+
+model 與 DTO 分離很重要：database schema 變更不一定要破壞 API contract，client 也不應看到 password hash、
+internal ID 或其他不應公開的 database field。
+
+
+3.5 platforms：外部環境與 infrastructure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* platforms/config/ 負責讀取環境變數、CORS 與 migration flag。
+* platforms/database/ 負責建立 database connection 與 schema synchronization。
+
+這些程式依賴 runtime environment 或第三方 infrastructure，而非特定 domain，因此與 internal 業務模組分開。
+未來若替換 database、增加 PLC adapter 或 message broker，也可沿用相同 boundary，降低業務邏輯受影響範圍。
+
+
+3.6 pkg：通用且穩定的小型能力
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* pkg/http/ 提供 bind JSON、extract user ID 等 HTTP helper。
+* pkg/errors/ 提供共用 application error。
+* pkg/utils/ 提供 JWT、bcrypt、cookie、UUID、patch 等跨 domain utility。
+
+pkg 與 internal/<domain> 的差別，在於 pkg 不應知道 plants 或 simulations 等特定業務情境。
+若一段程式只會在單一 domain 使用，應留在該 domain；只有明確可跨 domain 重用的能力才放入 pkg。
+
+
+3.7 api_tests 與 server 文件
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+api_tests 以 resource 命名 .http 檔案，例如 devices.http、tags.http、auth.http。這讓開發者可直接依
+API domain 找到 request 範例，手動驗證 authentication、CRUD 與錯誤情境。
+
+API.MD 描述 endpoint contract；SCHEMA.MD 描述資料表及關聯。兩者分開，是因為 HTTP resource shape
+與 database schema 並不完全相同，也不應被視為同一層設計。
+
+
+3.8 Server 命名慣例
+~~~~~~~~~~~~~~~~~~
+
+* Go package / directory 採小寫；多字 domain 使用 snake_case，例如 tag_readings。
+* Go source 檔名採小寫 snake_case，例如 extract_userid.go、connect_db.go。
+* domain 內使用固定角色檔名 handler.go、service.go、repo.go、dto.go，使結構可預測。
+* model 檔名多採複數 resource 名稱，對應資料集合或 table 概念。
+* exported Go identifier 使用 PascalCase；package-private identifier 使用 camelCase，這由 Go 慣例決定。
+* 文件目前使用大寫副檔名形式 API.MD、SCHEMA.MD；新增文件時應先沿用現有 convention。
+
+
+四、Client 與 Server 如何互相對應
+---------------------------------
+
+兩端不需要擁有完全相同的 directory tree，因為責任不同；但 domain vocabulary 應盡量一致：
+
+Client                         Server
+----------------------------   -------------------------------------------
+features/devices               internal/devices
+features/tags                  internal/tags
+features/process_units         internal/process_units
+features/alert_rules           internal/alert_rules
+features/simulations           internal/simulations
+types/device.ts                internal/models/devices.go + devices/dto.go
+utils/fetch.ts / queries.ts    bootstrap routes + domain handler.go
+hooks/useRoleGuard.ts          middleware/role.go
+
+Client 的 type 是瀏覽器端所需的 API contract；server 的 model 是 database representation；server DTO 則是
+兩者之間的公開傳輸格式。三者概念相關，但不應不加判斷地複製或視為完全相同。
+
+一次常見的資料操作如下：
+
+1. route page 組合 components。
+2. component 呼叫 features/<domain> 中的 query 或 mutation hook。
+3. client fetch wrapper 呼叫 /api/v1 endpoint。
+4. server middleware 驗證 JWT 與 role。
+5. domain handler 將 HTTP request 轉成 DTO。
+6. service 執行業務規則，repo 透過 GORM 存取 model。
+7. response DTO 回到 client，TanStack Query 更新 cache，React 重新顯示畫面。
+
+
+五、為何這種排序方式適合本專案
+--------------------------------
+
+1. 可預測性
+   新進開發者只要知道「業務 domain」與「技術責任」，就能快速推測檔案位置。
+
+2. 關注點分離（Separation of Concerns）
+   UI 不處理 SQL，handler 不堆積所有 business logic，database model 也不直接成為公開 API。
+
+3. 降低變更影響
+   UI library、database 或 authentication 細節的調整，可被 integrations、platforms、middleware 等
+   boundary 吸收，避免每個 feature 都同步大改。
+
+4. 支援擴充
+   新增一個 server domain 時可建立固定四層檔案；新增 client 功能時可建立 feature，再由 route 與
+   component 組合。PLC simulation 日後改接 Modbus TCP 或 OPC UA 時，也不需讓 client 直接承擔 protocol。
+
+5. 易於測試
+   service、repo、utility 與 UI component 責任較單純，較容易各自撰寫 unit / integration test；
+   api_tests 則補充端到端 HTTP request 驗證。
+
+
+六、維護與新增檔案時的判斷原則
+--------------------------------
+
+* 先問「這是特定 domain 還是跨 domain？」特定 domain 優先放在該 feature / internal package。
+* 再問「它扮演什麼責任？」前端分 route、component、hook、store、type；後端分 handler、service、repo、dto。
+* 不要因為檔案短就塞入不相關的 utils，也不要因為名稱相近就合併不同 architecture layer。
+* routeTree.gen.ts 等 generated file 應由工具更新，不應手動維護。
+* secrets 不應寫入 source code 或 commit；.env 應搭配安全的 ignore 與部署環境設定。
+* 新 domain 的前後端名稱、API resource、DTO/type 欄位應共同確認，避免 plant/process unit/device 等術語漂移。
+* 若單一 component 或 service 持續變大，應依實際責任拆分，而非只為了追求檔案數量而拆分。
+* 現有結構混合了少量不同命名風格；新增檔案時優先跟隨同一層級的現有慣例，並在需要全面
+  rename 時另行規劃，避免破壞 import、route generation 或 API contract。
+
+
+結論
+----
+
+本專案的 client 是以使用者介面與 browser data flow 為中心，server 是以 domain request pipeline 與
+data persistence 為中心。兩邊都利用「先找業務概念，再找技術責任」的思考方式，只是呈現比例不同。
+這種結構能讓 PLC monitoring、alert、simulation、role-based access 等功能在持續成長時仍維持清楚邊界，
+也能讓前端視覺需求、後端業務規則與未來實體 PLC integration 各自演進。
