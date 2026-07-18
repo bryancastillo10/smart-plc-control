@@ -6,6 +6,18 @@
 # Requires an authenticated user.
 GET http://localhost:8080/api/v1/simulation-scenarios
 
+### Get Simulation Scenario By ID
+# Requires an authenticated user.
+GET http://localhost:8080/api/v1/simulation-scenarios/{{simulationScenarioId}}
+
+### Validation: Invalid Simulation Scenario ID
+# Expected response: 400 Bad Request.
+GET http://localhost:8080/api/v1/simulation-scenarios/not-a-uuid
+
+### Validation: Simulation Scenario Not Found
+# Expected response: 404 Not Found.
+GET http://localhost:8080/api/v1/simulation-scenarios/00000000-0000-0000-0000-000000000000
+
 ### Create Simulation Scenario
 # Requires an authenticated ADMIN user.
 # Replace @simulationId with an existing simulation ID.
