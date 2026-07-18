@@ -28,6 +28,28 @@ func (s *Service) GetSimulationScenarios() ([]SimulationScenarioResponse, error)
 	return res, nil
 }
 
+func (s *Service) GetSimulationScenarioByID(scenarioID string) (*SimulationScenarioResponse, error) {
+	if scenarioID == "" {
+		return nil, appErr.NewBadRequest("Missing simulation scenario ID", nil)
+	}
+
+	parsedScenarioID, err := utils.ParseId(scenarioID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid simulation scenario ID", err)
+	}
+
+	scenario, err := s.repo.FindSimulationScenarioByID(parsedScenarioID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find simulation scenario", err)
+	}
+	if scenario == nil {
+		return nil, appErr.NewNotFound("Simulation scenario not found", nil)
+	}
+
+	res := toSimulationScenarioResponse(*scenario)
+	return &res, nil
+}
+
 func (s *Service) CreateSimulationScenario(simulationID string, req CreateSimulationScenarioRequest) (*SimulationScenarioResponse, error) {
 	if simulationID == "" {
 		return nil, appErr.NewBadRequest("Missing simulation ID", nil)
