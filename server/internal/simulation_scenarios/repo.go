@@ -43,3 +43,15 @@ func (r *Repository) FindSimulationScenarios() ([]models.SimulationScenarios, er
 
 	return scenarios, nil
 }
+
+func (r *Repository) FindSimulationScenarioByID(scenarioID uuid.UUID) (*models.SimulationScenarios, error) {
+	var scenario models.SimulationScenarios
+	if err := r.db.Where("id = ?", scenarioID).First(&scenario).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &scenario, nil
+}
