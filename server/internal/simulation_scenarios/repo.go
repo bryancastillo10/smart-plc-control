@@ -34,3 +34,12 @@ func (r *Repository) CreateSimulationScenario(scenario *models.SimulationScenari
 
 	return scenario, nil
 }
+
+func (r *Repository) FindSimulationScenarios() ([]models.SimulationScenarios, error) {
+	var scenarios []models.SimulationScenarios
+	if err := r.db.Order("created_at DESC, id DESC").Find(&scenarios).Error; err != nil {
+		return nil, err
+	}
+
+	return scenarios, nil
+}
