@@ -1,0 +1,37 @@
+@simulationId = 9305d20d-9660-43bc-88b1-841727adb8aa
+
+### Create Simulation Scenario
+# Requires an authenticated ADMIN user.
+# Replace @simulationId with an existing simulation ID.
+POST http://localhost:8080/api/v1/simulations/{{simulationId}}/scenarios
+Content-Type: application/json
+
+{
+	"name": "High Tank Level",
+	"description": "Raises the simulated tank level above its normal operating range.",
+	"config": {
+		"durationSeconds": 120,
+		"tagOverrides": {
+			"tank_level": 92.5,
+			"inlet_flow": 48
+		}
+	},
+	"enabled": true
+}
+
+### Create Simulation Scenario With Enabled Default
+# Defaults: enabled=true.
+POST http://localhost:8080/api/v1/simulations/{{simulationId}}/scenarios
+Content-Type: application/json
+
+{
+	"name": "Normal Operation",
+	"description": "Restores the simulation to representative normal operating values.",
+	"config": {
+		"durationSeconds": 300,
+		"tagOverrides": {
+			"tank_level": 65,
+			"inlet_flow": 30
+		}
+	}
+}
