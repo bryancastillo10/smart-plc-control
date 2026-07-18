@@ -205,11 +205,11 @@ func registerSimulations(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerSimulationScenarios(r *gin.RouterGroup, DB *gorm.DB) {
-	// simulationScenario := simulation_scenarios.NewHandler(DB)
+	simulationScenario := simulation_scenarios.NewHandler(DB)
 
-	simulationScenarioGrp := r.Group("/simulation-scenarios")
+	simulationScenarioGrp := r.Group("/simulation-scenarios", middleware.JWTAuthMiddleware())
 	{
-		simulationScenarioGrp.GET("")
+		simulationScenarioGrp.GET("", simulationScenario.GetSimulationScenarios)
 		simulationScenarioGrp.GET("/:scenarioId")
 		simulationScenarioGrp.PUT("/:scenarioId")
 		simulationScenarioGrp.DELETE("/:scenarioId")
