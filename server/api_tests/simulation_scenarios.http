@@ -1,5 +1,11 @@
 @simulationId = 9305d20d-9660-43bc-88b1-841727adb8aa
 
+@simulationScenarioId = d50698fb-173e-434f-8185-9f9f783c58d2
+
+### Get All Simulation Scenarios
+# Requires an authenticated user.
+GET http://localhost:8080/api/v1/simulation-scenarios
+
 ### Create Simulation Scenario
 # Requires an authenticated ADMIN user.
 # Replace @simulationId with an existing simulation ID.
