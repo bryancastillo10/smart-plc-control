@@ -14,6 +14,20 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
+func (s *Service) GetSimulationScenarios() ([]SimulationScenarioResponse, error) {
+	scenarios, err := s.repo.FindSimulationScenarios()
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to get simulation scenarios", err)
+	}
+
+	res := make([]SimulationScenarioResponse, 0, len(scenarios))
+	for _, scenario := range scenarios {
+		res = append(res, toSimulationScenarioResponse(scenario))
+	}
+
+	return res, nil
+}
+
 func (s *Service) CreateSimulationScenario(simulationID string, req CreateSimulationScenarioRequest) (*SimulationScenarioResponse, error) {
 	if simulationID == "" {
 		return nil, appErr.NewBadRequest("Missing simulation ID", nil)
