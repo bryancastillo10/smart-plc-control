@@ -17,6 +17,16 @@ func NewHandler(db *gorm.DB) *Handler {
 	return &Handler{service: service}
 }
 
+func (h *Handler) GetSimulationScenarios(c *gin.Context) {
+	scenarios, err := h.service.GetSimulationScenarios()
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, scenarios)
+}
+
 func (h *Handler) CreateSimulationScenario(c *gin.Context) {
 	simulationID := c.Param("simulationId")
 
