@@ -210,7 +210,7 @@ func registerSimulationScenarios(r *gin.RouterGroup, DB *gorm.DB) {
 	simulationScenarioGrp := r.Group("/simulation-scenarios", middleware.JWTAuthMiddleware())
 	{
 		simulationScenarioGrp.GET("", simulationScenario.GetSimulationScenarios)
-		simulationScenarioGrp.GET("/:scenarioId")
+		simulationScenarioGrp.GET("/:scenarioId", simulationScenario.GetSimulationScenarioByID)
 		simulationScenarioGrp.PUT("/:scenarioId")
 		simulationScenarioGrp.DELETE("/:scenarioId")
 	}
