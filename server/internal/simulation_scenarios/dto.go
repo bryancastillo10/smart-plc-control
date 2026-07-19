@@ -9,6 +9,13 @@ type CreateSimulationScenarioRequest struct {
 	Enabled     *bool                  `json:"enabled" binding:"omitempty"`
 }
 
+type UpdateSimulationScenarioRequest struct {
+	Name        string                 `json:"name" binding:"omitempty,min=1,max=120"`
+	Description string                 `json:"description" binding:"omitempty"`
+	Config      map[string]interface{} `json:"config" binding:"omitempty"`
+	Enabled     *bool                  `json:"enabled" binding:"omitempty"`
+}
+
 type SimulationScenarioResponse struct {
 	ID           string                 `json:"id"`
 	SimulationID string                 `json:"simulationId"`
