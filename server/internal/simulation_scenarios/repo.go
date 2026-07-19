@@ -56,6 +56,18 @@ func (r *Repository) FindSimulationScenarioByID(scenarioID uuid.UUID) (*models.S
 	return &scenario, nil
 }
 
+func (r *Repository) FindSimulationScenarioBySimulationIDAndID(simulationID, scenarioID uuid.UUID) (*models.SimulationScenarios, error) {
+	var scenario models.SimulationScenarios
+	if err := r.db.Where("simulation_id = ? AND id = ?", simulationID, scenarioID).First(&scenario).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &scenario, nil
+}
+
 func (r *Repository) UpdateSimulationScenario(scenario *models.SimulationScenarios) (*models.SimulationScenarios, error) {
 	if err := r.db.Save(scenario).Error; err != nil {
 		return nil, err
