@@ -200,7 +200,7 @@ func registerSimulations(r *gin.RouterGroup, DB *gorm.DB) {
 
 		// Simulation Scenarios
 		simulationGrp.POST("/:simulationId/scenarios", middleware.RequireRoles(models.Admin), simulationScenario.CreateSimulationScenario)
-		simulationGrp.POST("/:simulationId/scenarios/:scenarioId/trigger")
+		simulationGrp.POST("/:simulationId/scenarios/:scenarioId/trigger", middleware.RequireRoles(models.Admin, models.Operator), simulationScenario.TriggerSimulationScenario)
 	}
 }
 
