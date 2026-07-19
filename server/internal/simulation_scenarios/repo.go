@@ -55,3 +55,11 @@ func (r *Repository) FindSimulationScenarioByID(scenarioID uuid.UUID) (*models.S
 
 	return &scenario, nil
 }
+
+func (r *Repository) UpdateSimulationScenario(scenario *models.SimulationScenarios) (*models.SimulationScenarios, error) {
+	if err := r.db.Save(scenario).Error; err != nil {
+		return nil, err
+	}
+
+	return scenario, nil
+}
