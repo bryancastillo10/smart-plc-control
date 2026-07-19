@@ -63,3 +63,7 @@ func (r *Repository) UpdateSimulationScenario(scenario *models.SimulationScenari
 
 	return scenario, nil
 }
+
+func (r *Repository) DeleteSimulationScenario(scenario *models.SimulationScenarios) error {
+	return r.db.Delete(scenario).Error
+}
