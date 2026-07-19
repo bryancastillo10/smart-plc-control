@@ -66,6 +66,19 @@ func (s *Service) UpdateSimulationScenario(scenarioID string, req UpdateSimulati
 	return &res, nil
 }
 
+func (s *Service) DeleteSimulationScenario(scenarioID string) error {
+	scenario, err := s.findSimulationScenario(scenarioID)
+	if err != nil {
+		return err
+	}
+
+	if err := s.repo.DeleteSimulationScenario(scenario); err != nil {
+		return appErr.NewInternal("Failed to delete simulation scenario", err)
+	}
+
+	return nil
+}
+
 func (s *Service) CreateSimulationScenario(simulationID string, req CreateSimulationScenarioRequest) (*SimulationScenarioResponse, error) {
 	if simulationID == "" {
 		return nil, appErr.NewBadRequest("Missing simulation ID", nil)
