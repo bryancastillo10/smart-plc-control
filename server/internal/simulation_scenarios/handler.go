@@ -57,6 +57,17 @@ func (h *Handler) UpdateSimulationScenario(c *gin.Context) {
 	c.JSON(200, scenario)
 }
 
+func (h *Handler) DeleteSimulationScenario(c *gin.Context) {
+	scenarioID := c.Param("scenarioId")
+
+	if err := h.service.DeleteSimulationScenario(scenarioID); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Simulation scenario deleted successfully"})
+}
+
 func (h *Handler) CreateSimulationScenario(c *gin.Context) {
 	simulationID := c.Param("simulationId")
 
