@@ -212,7 +212,7 @@ func registerSimulationScenarios(r *gin.RouterGroup, DB *gorm.DB) {
 		simulationScenarioGrp.GET("", simulationScenario.GetSimulationScenarios)
 		simulationScenarioGrp.GET("/:scenarioId", simulationScenario.GetSimulationScenarioByID)
 		simulationScenarioGrp.PUT("/:scenarioId", middleware.RequireRoles(models.Admin), simulationScenario.UpdateSimulationScenario)
-		simulationScenarioGrp.DELETE("/:scenarioId")
+		simulationScenarioGrp.DELETE("/:scenarioId", middleware.RequireRoles(models.Admin), simulationScenario.DeleteSimulationScenario)
 	}
 }
 
