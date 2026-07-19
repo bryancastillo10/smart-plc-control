@@ -13,6 +13,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	"smart-plc-control-server/internal/plants"
 	"smart-plc-control-server/internal/process_units"
+	"smart-plc-control-server/internal/simulation_scenarios"
 	"smart-plc-control-server/internal/simulations"
 	"smart-plc-control-server/internal/tag_readings"
 	"smart-plc-control-server/internal/tags"
@@ -184,6 +185,7 @@ func registerAlerts(r *gin.RouterGroup, DB *gorm.DB) {
 
 func registerSimulations(r *gin.RouterGroup, DB *gorm.DB) {
 	simulation := simulations.NewHandler(DB)
+	simulationScenario := simulation_scenarios.NewHandler(DB)
 
 	simulationGrp := r.Group("/simulations", middleware.JWTAuthMiddleware())
 	{
@@ -197,20 +199,20 @@ func registerSimulations(r *gin.RouterGroup, DB *gorm.DB) {
 		simulationGrp.POST("/:simulationId/stop", middleware.RequireRoles(models.Admin, models.Operator), simulation.StopSimulation)
 
 		// Simulation Scenarios
-		simulationGrp.POST("/:simulationId/scenarios")
-		simulationGrp.POST("/:simulationId/scenarios/:scenarioId/trigger")
+		simulationGrp.POST("/:simulationId/scenarios", middleware.RequireRoles(models.Admin), simulationScenario.CreateSimulationScenario)
+		simulationGrp.POST("/:simulationId/scenarios/:scenarioId/trigger", middleware.RequireRoles(models.Admin, models.Operator), simulationScenario.TriggerSimulationScenario)
 	}
 }
 
 func registerSimulationScenarios(r *gin.RouterGroup, DB *gorm.DB) {
-	// simulationScenario := simulation_scenarios.NewHandler(DB)
+	simulationScenario := simulation_scenarios.NewHandler(DB)
 
-	simulationScenarioGrp := r.Group("/simulation-scenarios")
+	simulationScenarioGrp := r.Group("/simulation-scenarios", middleware.JWTAuthMiddleware())
 	{
-		simulationScenarioGrp.GET("")
-		simulationScenarioGrp.GET("/:scenarioId")
-		simulationScenarioGrp.PUT("/:scenarioId")
-		simulationScenarioGrp.DELETE("/:scenarioId")
+		simulationScenarioGrp.GET("", simulationScenario.GetSimulationScenarios)
+		simulationScenarioGrp.GET("/:scenarioId", simulationScenario.GetSimulationScenarioByID)
+		simulationScenarioGrp.PUT("/:scenarioId", middleware.RequireRoles(models.Admin), simulationScenario.UpdateSimulationScenario)
+		simulationScenarioGrp.DELETE("/:scenarioId", middleware.RequireRoles(models.Admin), simulationScenario.DeleteSimulationScenario)
 	}
 }
 

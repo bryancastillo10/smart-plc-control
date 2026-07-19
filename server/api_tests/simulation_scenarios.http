@@ -1,0 +1,86 @@
+@simulationId = 9305d20d-9660-43bc-88b1-841727adb8aa
+
+@simulationScenarioId = d50698fb-173e-434f-8185-9f9f783c58d2
+
+@deleteSimulationScenarioId = 85eae652-f8ec-46b0-9933-e106ec15dd45
+
+### Get All Simulation Scenarios
+# Requires an authenticated user.
+GET http://localhost:8080/api/v1/simulation-scenarios
+
+### Get Simulation Scenario By ID
+# Requires an authenticated user.
+GET http://localhost:8080/api/v1/simulation-scenarios/{{simulationScenarioId}}
+
+### Update Simulation Scenario
+# Requires an authenticated ADMIN user.
+PUT http://localhost:8080/api/v1/simulation-scenarios/{{simulationScenarioId}}
+Content-Type: application/json
+
+{
+	"name": "High Tank Level - Critical",
+	"description": "Raises the tank level to a critical simulated threshold.",
+	"config": {
+		"durationSeconds": 180,
+		"tagOverrides": {
+			"tank_level": 97.5,
+			"inlet_flow": 52
+		}
+	},
+	"enabled": true
+}
+
+### Update Simulation Scenario Enabled State
+# Confirms that the false zero value is handled when explicitly provided.
+PUT http://localhost:8080/api/v1/simulation-scenarios/{{simulationScenarioId}}
+Content-Type: application/json
+
+{
+	"enabled": true
+}
+
+### Delete Simulation Scenario
+# Requires an authenticated ADMIN user. No request body is required.
+DELETE http://localhost:8080/api/v1/simulation-scenarios/{{deleteSimulationScenarioId}}
+
+### Trigger Simulation Scenario
+# Requires an authenticated ADMIN or OPERATOR user.
+# The simulation must be RUNNING, and the scenario must belong to it and be enabled.
+POST http://localhost:8080/api/v1/simulations/{{simulationId}}/scenarios/{{simulationScenarioId}}/trigger
+
+
+### Create Simulation Scenario
+# Requires an authenticated ADMIN user.
+# Replace @simulationId with an existing simulation ID.
+POST http://localhost:8080/api/v1/simulations/{{simulationId}}/scenarios
+Content-Type: application/json
+
+{
+	"name": "High Tank Level",
+	"description": "Raises the simulated tank level above its normal operating range.",
+	"config": {
+		"durationSeconds": 120,
+		"tagOverrides": {
+			"tank_level": 92.5,
+			"inlet_flow": 48
+		}
+	},
+	"enabled": true
+}
+
+### Create Simulation Scenario With Enabled Default
+# Defaults: enabled=true.
+POST http://localhost:8080/api/v1/simulations/{{simulationId}}/scenarios
+Content-Type: application/json
+
+{
+	"name": "Normal Operation",
+	"description": "Restores the simulation to representative normal operating values.",
+	"config": {
+		"durationSeconds": 300,
+		"tagOverrides": {
+			"tank_level": 65,
+			"inlet_flow": 30
+		}
+	}
+}
