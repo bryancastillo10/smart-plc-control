@@ -39,6 +39,24 @@ func (h *Handler) GetSimulationScenarioByID(c *gin.Context) {
 	c.JSON(200, scenario)
 }
 
+func (h *Handler) UpdateSimulationScenario(c *gin.Context) {
+	scenarioID := c.Param("scenarioId")
+
+	req, err := http.BindJSON[UpdateSimulationScenarioRequest](c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	scenario, err := h.service.UpdateSimulationScenario(scenarioID, *req)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, scenario)
+}
+
 func (h *Handler) CreateSimulationScenario(c *gin.Context) {
 	simulationID := c.Param("simulationId")
 
