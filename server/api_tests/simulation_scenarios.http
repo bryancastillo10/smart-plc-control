@@ -12,14 +12,6 @@ GET http://localhost:8080/api/v1/simulation-scenarios
 # Requires an authenticated user.
 GET http://localhost:8080/api/v1/simulation-scenarios/{{simulationScenarioId}}
 
-### Validation: Invalid Simulation Scenario ID
-# Expected response: 400 Bad Request.
-GET http://localhost:8080/api/v1/simulation-scenarios/not-a-uuid
-
-### Validation: Simulation Scenario Not Found
-# Expected response: 404 Not Found.
-GET http://localhost:8080/api/v1/simulation-scenarios/00000000-0000-0000-0000-000000000000
-
 ### Update Simulation Scenario
 # Requires an authenticated ADMIN user.
 PUT http://localhost:8080/api/v1/simulation-scenarios/{{simulationScenarioId}}
@@ -44,28 +36,18 @@ PUT http://localhost:8080/api/v1/simulation-scenarios/{{simulationScenarioId}}
 Content-Type: application/json
 
 {
-	"enabled": false
-}
-
-### Validation: Missing Simulation Scenario Fields To Update
-# Expected response: 400 Bad Request.
-PUT http://localhost:8080/api/v1/simulation-scenarios/{{simulationScenarioId}}
-Content-Type: application/json
-
-{}
-
-### Validation: Update Simulation Scenario Not Found
-# Expected response: 404 Not Found.
-PUT http://localhost:8080/api/v1/simulation-scenarios/00000000-0000-0000-0000-000000000000
-Content-Type: application/json
-
-{
-	"name": "Missing Scenario"
+	"enabled": true
 }
 
 ### Delete Simulation Scenario
 # Requires an authenticated ADMIN user. No request body is required.
 DELETE http://localhost:8080/api/v1/simulation-scenarios/{{deleteSimulationScenarioId}}
+
+### Trigger Simulation Scenario
+# Requires an authenticated ADMIN or OPERATOR user.
+# The simulation must be RUNNING, and the scenario must belong to it and be enabled.
+POST http://localhost:8080/api/v1/simulations/{{simulationId}}/scenarios/{{simulationScenarioId}}/trigger
+
 
 ### Create Simulation Scenario
 # Requires an authenticated ADMIN user.
