@@ -4,6 +4,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	appErr "smart-plc-control-server/pkg/errors"
 	"smart-plc-control-server/pkg/utils"
+	"time"
 )
 
 type Service struct {
@@ -77,6 +78,55 @@ func (s *Service) DeleteSimulationScenario(scenarioID string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) TriggerSimulationScenario(simulationID, scenarioID string) (*TriggerSimulationScenarioResponse, error) {
+	if simulationID == "" {
+		return nil, appErr.NewBadRequest("Missing simulation ID", nil)
+	}
+	if scenarioID == "" {
+		return nil, appErr.NewBadRequest("Missing simulation scenario ID", nil)
+	}
+
+	parsedSimulationID, err := utils.ParseId(simulationID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid simulation ID", err)
+	}
+	parsedScenarioID, err := utils.ParseId(scenarioID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid simulation scenario ID", err)
+	}
+
+	simulation, err := s.repo.FindSimulationByID(parsedSimulationID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find simulation", err)
+	}
+	if simulation == nil {
+		return nil, appErr.NewNotFound("Simulation not found", nil)
+	}
+	if simulation.Status != models.SimulationRunning {
+		return nil, appErr.NewBadRequest("Simulation must be running to trigger a scenario", nil)
+	}
+
+	scenario, err := s.repo.FindSimulationScenarioBySimulationIDAndID(parsedSimulationID, parsedScenarioID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find simulation scenario", err)
+	}
+	if scenario == nil {
+		return nil, appErr.NewNotFound("Simulation scenario not found for simulation", nil)
+	}
+	if !scenario.Enabled {
+		return nil, appErr.NewBadRequest("Simulation scenario is disabled", nil)
+	}
+
+	return &TriggerSimulationScenarioResponse{
+		Message:      "Simulation scenario triggered successfully",
+		SimulationID: simulation.ID.String(),
+		ScenarioID:   scenario.ID.String(),
+		ScenarioName: scenario.Name,
+		Config:       scenario.Config,
+		TriggeredAt:  time.Now().UTC(),
+	}, nil
 }
 
 func (s *Service) CreateSimulationScenario(simulationID string, req CreateSimulationScenarioRequest) (*SimulationScenarioResponse, error) {
