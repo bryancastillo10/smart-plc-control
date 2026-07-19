@@ -29,24 +29,40 @@ func (s *Service) GetSimulationScenarios() ([]SimulationScenarioResponse, error)
 }
 
 func (s *Service) GetSimulationScenarioByID(scenarioID string) (*SimulationScenarioResponse, error) {
-	if scenarioID == "" {
-		return nil, appErr.NewBadRequest("Missing simulation scenario ID", nil)
-	}
-
-	parsedScenarioID, err := utils.ParseId(scenarioID)
+	scenario, err := s.findSimulationScenario(scenarioID)
 	if err != nil {
-		return nil, appErr.NewBadRequest("Invalid simulation scenario ID", err)
-	}
-
-	scenario, err := s.repo.FindSimulationScenarioByID(parsedScenarioID)
-	if err != nil {
-		return nil, appErr.NewInternal("Failed to find simulation scenario", err)
-	}
-	if scenario == nil {
-		return nil, appErr.NewNotFound("Simulation scenario not found", nil)
+		return nil, err
 	}
 
 	res := toSimulationScenarioResponse(*scenario)
+	return &res, nil
+}
+
+func (s *Service) UpdateSimulationScenario(scenarioID string, req UpdateSimulationScenarioRequest) (*SimulationScenarioResponse, error) {
+	if req.Name == "" && req.Description == "" && req.Config == nil && req.Enabled == nil {
+		return nil, appErr.NewBadRequest("Missing simulation scenario fields to update", nil)
+	}
+
+	scenario, err := s.findSimulationScenario(scenarioID)
+	if err != nil {
+		return nil, err
+	}
+
+	utils.PatchIfNotZero(&scenario.Name, req.Name)
+	utils.PatchIfNotZero(&scenario.Description, req.Description)
+	if req.Config != nil {
+		scenario.Config = req.Config
+	}
+	if req.Enabled != nil {
+		scenario.Enabled = *req.Enabled
+	}
+
+	updatedScenario, err := s.repo.UpdateSimulationScenario(scenario)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to update simulation scenario", err)
+	}
+
+	res := toSimulationScenarioResponse(*updatedScenario)
 	return &res, nil
 }
 
@@ -105,4 +121,25 @@ func toSimulationScenarioResponse(scenario models.SimulationScenarios) Simulatio
 		CreatedAt:    scenario.CreatedAt,
 		UpdatedAt:    scenario.UpdatedAt,
 	}
+}
+
+func (s *Service) findSimulationScenario(scenarioID string) (*models.SimulationScenarios, error) {
+	if scenarioID == "" {
+		return nil, appErr.NewBadRequest("Missing simulation scenario ID", nil)
+	}
+
+	parsedScenarioID, err := utils.ParseId(scenarioID)
+	if err != nil {
+		return nil, appErr.NewBadRequest("Invalid simulation scenario ID", err)
+	}
+
+	scenario, err := s.repo.FindSimulationScenarioByID(parsedScenarioID)
+	if err != nil {
+		return nil, appErr.NewInternal("Failed to find simulation scenario", err)
+	}
+	if scenario == nil {
+		return nil, appErr.NewNotFound("Simulation scenario not found", nil)
+	}
+
+	return scenario, nil
 }
