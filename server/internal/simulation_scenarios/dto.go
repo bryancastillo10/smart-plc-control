@@ -26,3 +26,12 @@ type SimulationScenarioResponse struct {
 	CreatedAt    time.Time              `json:"createdAt"`
 	UpdatedAt    time.Time              `json:"updatedAt"`
 }
+
+type TriggerSimulationScenarioResponse struct {
+	Message      string                 `json:"message"`
+	SimulationID string                 `json:"simulationId"`
+	ScenarioID   string                 `json:"scenarioId"`
+	ScenarioName string                 `json:"scenarioName"`
+	Config       map[string]interface{} `json:"config"`
+	TriggeredAt  time.Time              `json:"triggeredAt"`
+}
