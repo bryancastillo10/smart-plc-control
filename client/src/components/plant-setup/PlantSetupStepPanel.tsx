@@ -22,6 +22,7 @@ import { AddDeviceStep } from "@/components/plant-setup/AddDeviceStep";
 import { AddTagStep } from "@/components/plant-setup/AddTagStep";
 import { AddAlertRuleStep } from "@/components/plant-setup/AddAlertRuleStep";
 import { AddSimulationStep } from "@/components/plant-setup/AddSimulationStep";
+import { PlantUsersStep } from "@/components/plant-setup/PlantUsersStep";
 import { ProcessArrangementStep } from "@/components/plant-setup/process-arrangement/ProcessArrangementStep";
 
 
@@ -66,6 +67,8 @@ export function PlantSetupStepPanel({
 				<AddAlertRuleStep />
 			) : activeStep.id === "simulation" ? (
 				<AddSimulationStep />
+			) : activeStep.id === "users" ? (
+				<PlantUsersStep />
 			) : (
 				<div className="grid gap-3 md:grid-cols-2">
 					{details.map((detail) => (
