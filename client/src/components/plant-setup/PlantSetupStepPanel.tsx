@@ -21,6 +21,7 @@ import { PlantInformationStep } from "@/components/plant-setup/PlantInformationS
 import { ProcessUnitStep } from "@/components/plant-setup/ProcessUnitStep";
 import { AddDeviceStep } from "@/components/plant-setup/AddDeviceStep";
 import { AddTagStep } from "@/components/plant-setup/AddTagStep";
+import { AddAlertRuleStep } from "@/components/plant-setup/AddAlertRuleStep";
 import { ProcessArrangementStep } from "@/components/plant-setup/process-arrangement/ProcessArrangementStep";
 
 
@@ -63,6 +64,8 @@ export function PlantSetupStepPanel({
 				<AddTagStep />
 			) : activeStep.id === "diagram" ? (
 				<ProcessArrangementStep />
+			) : activeStep.id === "alertRules" ? (
+				<AddAlertRuleStep />
 			) : (
 				<div className="grid gap-3 md:grid-cols-2">
 					{details.map((detail) => (
