@@ -19,6 +19,22 @@ export interface SignInVariables extends SignInRequest {
 	language: Language;
 }
 
+
+export interface SignUpRequest {
+	username: string;
+	email: string;
+	password: string;
+	confirmPassword: string;
+	role: Role;
+	language: Language;
+}
+
+export type SignUpVariables = SignUpRequest;
+
+export interface SignUpResponse {
+	message: string;
+	user: SignInUser;
+}
 export interface LogoutResponse {
 	message: string;
 }

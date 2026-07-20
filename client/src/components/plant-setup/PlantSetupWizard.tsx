@@ -41,7 +41,6 @@ export function PlantSetupWizard() {
 			<section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
 				<PlantSetupStepPanel
 					activeStep={workflow.activeStep}
-					hasSimulatorDevice={workflow.hasSimulatorDevice}
 					onSavePlant={workflow.setPlant}
 					workflowState={workflow.workflowState}
 				/>
