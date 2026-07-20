@@ -10,7 +10,6 @@ import {
 
 interface PlantSetupStepPanelProps {
 	activeStep: PlantSetupStep;
-	hasSimulatorDevice: boolean;
 	onSavePlant: (plant: PlantSetupPlantInput) => void;
 	workflowState: PlantSetupWorkflowState;
 }
@@ -22,18 +21,17 @@ import { ProcessUnitStep } from "@/components/plant-setup/ProcessUnitStep";
 import { AddDeviceStep } from "@/components/plant-setup/AddDeviceStep";
 import { AddTagStep } from "@/components/plant-setup/AddTagStep";
 import { AddAlertRuleStep } from "@/components/plant-setup/AddAlertRuleStep";
+import { AddSimulationStep } from "@/components/plant-setup/AddSimulationStep";
 import { ProcessArrangementStep } from "@/components/plant-setup/process-arrangement/ProcessArrangementStep";
 
 
 export function PlantSetupStepPanel({
 	activeStep,
-	hasSimulatorDevice,
 	onSavePlant,
 	workflowState,
 }: PlantSetupStepPanelProps) {
 	const StepIcon = stepIcons[activeStep.id];
 	const details = plantSetUpDetails[activeStep.id];
-	const isSimulationStep = activeStep.id === "simulation";
 
 	return (
 		<section className={appSurfaceVariants({ variant: "card" })}>
@@ -66,6 +64,8 @@ export function PlantSetupStepPanel({
 				<ProcessArrangementStep />
 			) : activeStep.id === "alertRules" ? (
 				<AddAlertRuleStep />
+			) : activeStep.id === "simulation" ? (
+				<AddSimulationStep />
 			) : (
 				<div className="grid gap-3 md:grid-cols-2">
 					{details.map((detail) => (
@@ -79,13 +79,7 @@ export function PlantSetupStepPanel({
 				</div>
 			)}
 
-			{isSimulationStep ? (
-				<div className="mt-4 rounded-md border border-chip-line bg-chip p-4 text-sm font-semibold text-brand-control">
-					{hasSimulatorDevice
-						? "A simulator device exists in local state, so this step can collect simulation details later."
-						: "No simulator device exists in local state yet, so this step is a disabled placeholder."}
-				</div>
-			) : null}
+
 
 			{activeStep.id === "review" ? (
 				<LocalStateSummary workflowState={workflowState} />
