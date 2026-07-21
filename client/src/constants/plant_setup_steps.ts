@@ -5,7 +5,6 @@ import {
 	Gauge,
 	GitBranch,
 	LayoutDashboard,
-	Map,
 	Network,
 	Tags,
 	Users,
@@ -68,12 +67,6 @@ export const plantSetupSteps = [
 			"Assign the people responsible for operating, supervising, and reviewing the plant.",
 	},
 	{
-		id: "review",
-		title: "Review Plant Setup",
-		description:
-			"Check that the plant structure, equipment, measurements, and operating rules are complete and consistent.",
-	},
-	{
 		id: "dashboard",
 		title: "Open Plant Overview",
 		description:
@@ -122,10 +115,8 @@ export const plantSetupStepDescriptions = {
 		workflowState.users.length > 0
 			? `${formatCount(workflowState.users.length, "team member")} assigned. Confirm that operating, supervisory, and review responsibilities are appropriately covered.`
 			: "Identify who will operate the plant, supervise performance, review conditions, or maintain the setup. Assign responsibilities according to each person's role.",
-	review: (workflowState) =>
-		`Review the plant as a complete operating system: ${formatCount(workflowState.processUnits.length, "process unit")}, ${formatCount(workflowState.devices.length, "device")}, ${formatCount(workflowState.tags.length, "measurement or signal")}, and ${formatCount(workflowState.alertRules.length, "operating alert")}. Check names, assignments, flow direction, and operating limits before continuing.`,
 	dashboard: () =>
-		"The plant setup is ready for completion. Continue to the plant overview to begin reviewing its structure and operating information.",
+		"Open the plant overview to view the current local setup values before continuing.",
 } satisfies Record<PlantSetupStepId, PlantSetupStepDescriptionResolver>;
 
 export const stepIcons = {
@@ -137,7 +128,6 @@ export const stepIcons = {
 	alertRules: BellRing,
 	simulation: Gauge,
 	users: Users,
-	review: Map,
 	dashboard: LayoutDashboard,
 } as const satisfies Record<PlantSetupStepId, LucideIcon>;
 

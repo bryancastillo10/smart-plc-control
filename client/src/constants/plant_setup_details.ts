@@ -33,12 +33,8 @@ export const plantSetUpDetails = {
 		"Admin-created users and operator invitations will be represented here later.",
 		"No emails or user-management API calls are made in this static phase.",
 	],
-	review: [
-		"A final review summary will show the local workflow state before finishing.",
-		"This shell already reserves the review step for accumulated setup data.",
-	],
 	dashboard: [
-		"The final action will eventually navigate to /dashboard.",
-		"For this phase, the dashboard destination remains a placeholder.",
+		"View the current local setup draft values before opening the plant overview.",
+		"No navigation or backend completion action is made in this static phase.",
 	],
 } as const satisfies Record<PlantSetupStepId, readonly string[]>;
