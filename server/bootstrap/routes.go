@@ -18,6 +18,7 @@ import (
 	"smart-plc-control-server/internal/tag_readings"
 	"smart-plc-control-server/internal/tags"
 	"smart-plc-control-server/internal/users"
+	"smart-plc-control-server/internal/websockets"
 )
 
 func RegisterRoutes(r *gin.Engine, DB *gorm.DB) {
@@ -48,8 +49,7 @@ func registerAuth(r *gin.RouterGroup, DB *gorm.DB) {
 
 	authGrp := r.Group("/auth")
 	{
-		// TODO: Restrict registration to ADMIN users after the initial admin/bootstrap flow exists.
-		authGrp.POST("/register", auth.SignUp)
+		authGrp.POST("/register", middleware.RequireRoles(models.Admin), auth.SignUp)
 		authGrp.POST("/login", auth.LogIn)
 		authGrp.POST("/logout", auth.LogOut)
 		authGrp.GET("/me", middleware.JWTAuthMiddleware(), auth.GetCurrentUser)
@@ -227,10 +227,11 @@ func registerAuditLogs(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerWebSockets(r *gin.RouterGroup, DB *gorm.DB) {
-	// websocket := websockets.NewHandler(DB)
+	websocket := websockets.NewHandler(DB)
 
+	// Note: temporarily disabled JWT Middleware on dev mode
 	wsGrp := r.Group("/ws")
 	{
-		wsGrp.GET("/simulation")
+		wsGrp.GET("/simulation", websocket.Simulation)
 	}
 }
