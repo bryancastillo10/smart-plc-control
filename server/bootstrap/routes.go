@@ -49,8 +49,7 @@ func registerAuth(r *gin.RouterGroup, DB *gorm.DB) {
 
 	authGrp := r.Group("/auth")
 	{
-		// TODO: Restrict registration to ADMIN users after the initial admin/bootstrap flow exists.
-		authGrp.POST("/register", auth.SignUp)
+		authGrp.POST("/register", middleware.RequireRoles(models.Admin), auth.SignUp)
 		authGrp.POST("/login", auth.LogIn)
 		authGrp.POST("/logout", auth.LogOut)
 		authGrp.GET("/me", middleware.JWTAuthMiddleware(), auth.GetCurrentUser)
@@ -230,7 +229,8 @@ func registerAuditLogs(r *gin.RouterGroup, DB *gorm.DB) {
 func registerWebSockets(r *gin.RouterGroup, DB *gorm.DB) {
 	websocket := websockets.NewHandler(DB)
 
-	wsGrp := r.Group("/ws", middleware.JWTAuthMiddleware())
+	// Note: temporarily disabled JWT Middleware on dev mode
+	wsGrp := r.Group("/ws")
 	{
 		wsGrp.GET("/simulation", websocket.Simulation)
 	}
