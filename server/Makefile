@@ -1,3 +1,5 @@
+WS_URL = ws://localhost:8080/api/v1/ws/simulation
+
 run:
 	go run cmd/api/main.go
 
@@ -12,3 +14,6 @@ fmt:
 
 dev:
 	air -c air.toml
+
+ws:
+	wscat -c ${WS_URL}
