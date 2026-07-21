@@ -18,6 +18,7 @@ import (
 	"smart-plc-control-server/internal/tag_readings"
 	"smart-plc-control-server/internal/tags"
 	"smart-plc-control-server/internal/users"
+	"smart-plc-control-server/internal/websockets"
 )
 
 func RegisterRoutes(r *gin.Engine, DB *gorm.DB) {
@@ -227,10 +228,10 @@ func registerAuditLogs(r *gin.RouterGroup, DB *gorm.DB) {
 }
 
 func registerWebSockets(r *gin.RouterGroup, DB *gorm.DB) {
-	// websocket := websockets.NewHandler(DB)
+	websocket := websockets.NewHandler(DB)
 
-	wsGrp := r.Group("/ws")
+	wsGrp := r.Group("/ws", middleware.JWTAuthMiddleware())
 	{
-		wsGrp.GET("/simulation")
+		wsGrp.GET("/simulation", websocket.Simulation)
 	}
 }
