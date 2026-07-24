@@ -22,3 +22,18 @@ export interface CreateAlertRuleRequest {
 	message?: string;
 	enabled: boolean;
 }
+
+export type CreateAlertRuleVariables = CreateAlertRuleRequest;
+export type UpdateAlertRuleRequest = Partial<CreateAlertRuleRequest>;
+
+export interface UpdateAlertRuleVariables {
+	ruleId: string;
+	body: UpdateAlertRuleRequest;
+}
+
+export interface AlertRuleFilters {
+	plantId?: string;
+	tagId?: string;
+	enabled?: boolean;
+	severity?: AlertSeverity;
+}
