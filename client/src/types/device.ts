@@ -32,3 +32,18 @@ export interface CreateDeviceLocalRequest {
 }
 
 export type CreateDeviceLocalVariables = CreateDeviceLocalRequest;
+export type CreateDeviceRequest = CreateDeviceLocalRequest;
+export type CreateDeviceVariables = CreateDeviceRequest;
+export type UpdateDeviceRequest = Partial<CreateDeviceRequest>;
+
+export interface UpdateDeviceVariables {
+	deviceId: string;
+	body: UpdateDeviceRequest;
+}
+
+export interface DeviceFilters {
+	plantId?: string;
+	status?: ConnectionStatus;
+	type?: DeviceType;
+	protocol?: Protocol;
+}
