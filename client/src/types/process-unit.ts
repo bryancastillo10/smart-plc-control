@@ -1,4 +1,5 @@
 import type { PlantStatus } from "@/types/enum";
+import type { ProcessUnitConnection } from "@/types/process-unit-connection";
 
 export type ProcessUnitPortDirection = "IN" | "OUT";
 
@@ -37,3 +38,22 @@ export interface CreateProcessUnitLocalRequest {
 }
 
 export type CreateProcessUnitLocalVariables = CreateProcessUnitLocalRequest;
+export type CreateProcessUnitRequest = Omit<CreateProcessUnitLocalRequest, "plantId">;
+
+export interface CreateProcessUnitVariables {
+	plantId: string;
+	body: CreateProcessUnitRequest;
+}
+
+export type UpdateProcessUnitRequest = Partial<CreateProcessUnitRequest>;
+
+export interface UpdateProcessUnitVariables {
+	processUnitId: string;
+	body: UpdateProcessUnitRequest;
+}
+
+export interface ProcessUnitMutationResponse {
+	processUnit?: ProcessUnit;
+	deletedProcessUnitId?: string;
+	connections: ProcessUnitConnection[];
+}
