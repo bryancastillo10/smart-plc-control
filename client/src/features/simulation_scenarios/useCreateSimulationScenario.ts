@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
+
+import { createSimulationScenario } from "@/features/simulation_scenarios/queries";
 import { useToast } from "@/integrations/sonner";
 import type { CreateSimulationScenarioLocalRequest } from "@/types/simulation-scenario";
 
@@ -14,18 +16,20 @@ const initialScenarioData: CreateSimulationScenarioLocalRequest = {
 export function useCreateSimulationScenario() {
 	const { t } = useTranslation("toast");
 	const [scenarioData, setScenarioData] = useState(initialScenarioData);
-	const [createScenarioLoading, setCreateScenarioLoading] =
-		useState<boolean>(false);
 	const toast = useToast();
 
 	const createScenarioMutation = useMutation({
-		// mutationFn: () => {},
+		mutationFn: (variables: CreateSimulationScenarioLocalRequest) =>
+			createSimulationScenario({
+				body: {
+					description: variables.description,
+					enabled: variables.enabled,
+					name: variables.name,
+				},
+				simulationId: variables.simulationId,
+			}),
 		onMutate: () => toast.loading(t("simulationScenario.create.loading")),
-		onSuccess: async () => {
-			setCreateScenarioLoading(false);
-		},
 		onError: (error) => {
-			setCreateScenarioLoading(false);
 			toast.error(error, t("simulationScenario.create.failed"));
 		},
 		onSettled: (_data, _error, _variables, toastId) => {
@@ -33,8 +37,10 @@ export function useCreateSimulationScenario() {
 		},
 	});
 
-	const onChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { id , value } = event.target;
+	const onChange = (
+		event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+	) => {
+		const { id, value } = event.target;
 
 		setScenarioData((currentData) => ({
 			...currentData,
@@ -44,17 +50,19 @@ export function useCreateSimulationScenario() {
 
 	const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
 		event.preventDefault();
-
-		// API call would be here
 	};
 
 	return {
-		scenarioData,
-		createScenarioLoading,
+		createScenario: createScenarioMutation.mutate,
+		createScenarioAsync: createScenarioMutation.mutateAsync,
+		createScenarioError: createScenarioMutation.error,
+		createScenarioLoading: createScenarioMutation.isPending,
 		createScenarioMutation,
-		setScenarioData,
-		onChange,
+		createScenarioResponse: createScenarioMutation.data,
 		handleSubmit,
+		onChange,
+		scenarioData,
+		setScenarioData,
 	};
 }
 
