@@ -26,3 +26,23 @@ export interface CreateTagLocalRequest {
 }
 
 export type CreateTagLocalVariables = CreateTagLocalRequest;
+export type CreateTagRequest = Omit<CreateTagLocalRequest, "plantId">;
+
+export interface CreateTagVariables {
+	deviceId: string;
+	body: CreateTagRequest;
+}
+
+export type UpdateTagRequest = Partial<CreateTagRequest>;
+
+export interface UpdateTagVariables {
+	tagId: string;
+	body: UpdateTagRequest;
+}
+
+export interface TagFilters {
+	plantId?: string;
+	deviceId?: string;
+	processUnitId?: string;
+	enabled?: boolean;
+}

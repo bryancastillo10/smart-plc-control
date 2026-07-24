@@ -23,3 +23,16 @@ export interface CreateSimulationLocalRequest {
 }
 
 export type CreateSimulationLocalVariables = CreateSimulationLocalRequest;
+export type CreateSimulationRequest = CreateSimulationLocalRequest;
+export type CreateSimulationVariables = CreateSimulationRequest;
+export type UpdateSimulationRequest = Partial<CreateSimulationRequest>;
+
+export interface UpdateSimulationVariables {
+	simulationId: string;
+	body: UpdateSimulationRequest;
+}
+
+export interface SimulationFilters {
+	plantId?: string;
+	status?: SimulationStatus;
+}

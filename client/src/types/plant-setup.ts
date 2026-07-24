@@ -27,7 +27,6 @@ export type PlantSetupStepId =
 	| "alertRules"
 	| "simulation"
 	| "users"
-	| "review"
 	| "dashboard";
 
 export interface PlantSetupStep {

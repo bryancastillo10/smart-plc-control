@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 
+import { createProcessUnit } from "@/features/process_units/queries";
+
 import { useToast } from "@/integrations/sonner";
 import { usePlantSetupStore } from "@/store/plantSetup";
 import {
@@ -27,7 +29,7 @@ export function useCreateProcessUnit() {
 	const toast = useToast();
 
 	const createProcessUnitMutation = useMutation({
-		// mutationFn is called by the final plant setup submission workflow.
+		mutationFn: createProcessUnit,
 		onMutate: () => toast.loading(t("processUnit.create.loading")),
 		onError: (error) =>
 			toast.error(error, t("processUnit.create.failed")),
@@ -79,6 +81,10 @@ export function useCreateProcessUnit() {
 		processUnits,
 		plantExists: plant !== null,
 		createProcessUnitLoading: createProcessUnitMutation.isPending,
+		createProcessUnit: createProcessUnitMutation.mutate,
+		createProcessUnitResponse: createProcessUnitMutation.data,
+		createProcessUnitError: createProcessUnitMutation.error,
+		createProcessUnitAsync: createProcessUnitMutation.mutateAsync,
 		createProcessUnitMutation,
 		setProcessUnitData,
 		onChange,

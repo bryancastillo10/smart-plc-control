@@ -1,5 +1,7 @@
-﻿import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+
+import { createProcessUnitConnection } from "@/features/process_units/queries";
 
 import { useToast } from "@/integrations/sonner";
 import { usePlantSetupStore } from "@/store/plantSetup";
@@ -35,7 +37,7 @@ export function useCreateProcessUnitConnection() {
 	const toast = useToast();
 
 	const createConnectionMutation = useMutation({
-		// mutationFn is called by the final plant setup submission workflow.
+		mutationFn: createProcessUnitConnection,
 		onMutate: () =>
 			toast.loading(t("processUnitConnection.create.loading")),
 		onError: (error) =>
@@ -127,6 +129,9 @@ export function useCreateProcessUnitConnection() {
 		connections,
 		createConnection,
 		createConnectionLoading: createConnectionMutation.isPending,
+		createConnectionResponse: createConnectionMutation.data,
+		createConnectionError: createConnectionMutation.error,
+		createConnectionAsync: createConnectionMutation.mutateAsync,
 		createConnectionMutation,
 		devices,
 		moveDevice,

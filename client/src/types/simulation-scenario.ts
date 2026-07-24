@@ -15,3 +15,25 @@ export interface CreateSimulationScenarioLocalRequest {
 
 export type CreateSimulationScenarioLocalVariables =
 	CreateSimulationScenarioLocalRequest;
+export type CreateSimulationScenarioRequest = Omit<
+	CreateSimulationScenarioLocalRequest,
+	"simulationId"
+>;
+
+export interface CreateSimulationScenarioVariables {
+	simulationId: string;
+	body: CreateSimulationScenarioRequest;
+}
+
+export type UpdateSimulationScenarioRequest =
+	Partial<CreateSimulationScenarioRequest>;
+
+export interface UpdateSimulationScenarioVariables {
+	scenarioId: string;
+	body: UpdateSimulationScenarioRequest;
+}
+
+export interface SimulationScenarioFilters {
+	simulationId?: string;
+	enabled?: boolean;
+}

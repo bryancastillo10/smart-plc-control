@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 
+import { createDevice } from "@/features/devices/queries";
+
 import { useToast } from "@/integrations/sonner";
 import { usePlantSetupStore } from "@/store/plantSetup";
 import {
@@ -22,7 +24,7 @@ export function useCreateDevice() {
 	const toast = useToast();
 
 	const createDeviceMutation = useMutation({
-		// mutationFn is called by the final plant setup submission workflow.
+		mutationFn: createDevice,
 		onMutate: () => toast.loading(t("device.create.loading")),
 		onError: (error) => toast.error(error, t("device.create.failed")),
 		onSettled: (_data, _error, _variables, toastId) =>
@@ -110,6 +112,10 @@ export function useCreateDevice() {
 		devices,
 		plantExists: plant !== null,
 		createDeviceLoading: createDeviceMutation.isPending,
+		createDevice: createDeviceMutation.mutate,
+		createDeviceResponse: createDeviceMutation.data,
+		createDeviceError: createDeviceMutation.error,
+		createDeviceAsync: createDeviceMutation.mutateAsync,
 		createDeviceMutation,
 		setDeviceData,
 		onChange,

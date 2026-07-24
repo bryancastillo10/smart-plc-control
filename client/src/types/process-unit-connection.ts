@@ -30,3 +30,20 @@ export interface CreateProcessUnitConnectionLocalRequest {
 
 export type CreateProcessUnitConnectionLocalVariables =
 	CreateProcessUnitConnectionLocalRequest;
+export type CreateProcessUnitConnectionRequest = Omit<
+	CreateProcessUnitConnectionLocalRequest,
+	"plantId"
+>;
+
+export interface CreateProcessUnitConnectionVariables {
+	plantId: string;
+	body: CreateProcessUnitConnectionRequest;
+}
+
+export type UpdateProcessUnitConnectionRequest =
+	Partial<CreateProcessUnitConnectionRequest>;
+
+export interface UpdateProcessUnitConnectionVariables {
+	connectionId: string;
+	body: UpdateProcessUnitConnectionRequest;
+}
