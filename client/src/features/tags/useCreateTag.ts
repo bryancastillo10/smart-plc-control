@@ -1,6 +1,8 @@
-﻿import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
+
+import { createTag } from "@/features/tags/queries";
 
 import { useToast } from "@/integrations/sonner";
 import { usePlantSetupStore } from "@/store/plantSetup";
@@ -24,7 +26,7 @@ export function useCreateTag() {
 	const toast = useToast();
 
 	const createTagMutation = useMutation({
-		// mutationFn is called by the final plant setup submission workflow.
+		mutationFn: createTag,
 		onMutate: () => toast.loading(t("tag.create.loading")),
 		onError: (error) => toast.error(error, t("tag.create.failed")),
 		onSettled: (_data, _error, _variables, toastId) =>
@@ -92,6 +94,10 @@ export function useCreateTag() {
 
 	return {
 		createTagLoading: createTagMutation.isPending,
+		createTag: createTagMutation.mutate,
+		createTagResponse: createTagMutation.data,
+		createTagError: createTagMutation.error,
+		createTagAsync: createTagMutation.mutateAsync,
 		createTagMutation,
 		devices,
 		handleSubmit,
