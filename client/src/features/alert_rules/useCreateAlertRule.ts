@@ -1,6 +1,8 @@
-﻿import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { type ChangeEvent, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
+
+import { createAlertRule } from "@/features/alert_rules/queries";
 
 import { useToast } from "@/integrations/sonner";
 import { usePlantSetupStore } from "@/store/plantSetup";
@@ -31,7 +33,7 @@ export function useCreateAlertRule() {
 	const toast = useToast();
 
 	const createAlertRuleMutation = useMutation({
-		// mutationFn is called by the final plant setup submission workflow.
+		mutationFn: createAlertRule,
 		onMutate: () => toast.loading(t("alertRule.create.loading")),
 		onError: (error) => toast.error(error, t("alertRule.create.failed")),
 		onSettled: (_data, _error, _variables, toastId) =>
@@ -107,6 +109,10 @@ export function useCreateAlertRule() {
 		alertRuleData,
 		alertRules,
 		createAlertRuleLoading: createAlertRuleMutation.isPending,
+		createAlertRule: createAlertRuleMutation.mutate,
+		createAlertRuleResponse: createAlertRuleMutation.data,
+		createAlertRuleError: createAlertRuleMutation.error,
+		createAlertRuleAsync: createAlertRuleMutation.mutateAsync,
 		createAlertRuleMutation,
 		devices,
 		handleSubmit,
