@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useModalStore } from "@/store/modal";
 import { usePlantSetupFormStore } from "@/store/plantSetupForms";
 import { appButtonVariants } from "@/styles/recipes";
+import PlantFinalStep from "./PlantFinalStep";
 
 export function PlantOverviewStep() {
 	const {
@@ -14,6 +16,18 @@ export function PlantOverviewStep() {
 		simulationData,
 		tagData,
 	} = usePlantSetupFormStore();
+	const openModal = useModalStore((state) => state.openModal);
+
+	const handleSubmit = () => {
+		openModal({
+			cancelLabel: "Keep Editing",
+			confirmLabel: "Open Plant Overview",
+			content: <PlantFinalStep/>,
+			description:
+				"Your local plant setup draft is ready to view in the plant overview step.",
+			title: "Plant setup draft ready",
+		});
+	};
 
 	return (
 		<div className="space-y-4">
@@ -103,11 +117,15 @@ export function PlantOverviewStep() {
 				</OverviewCard>
 			</div>
 
-			<Button className={appButtonVariants({ size: "form" })}
-									
-										type="submit">
-				Submit
-			</Button>
+			<div className="flex justify-end">
+				<Button
+					className={appButtonVariants({ size: "form" })}
+					onClick={handleSubmit}
+					type="button"
+				>
+					Submit
+				</Button>
+			</div>
 		</div>
 	);
 }
