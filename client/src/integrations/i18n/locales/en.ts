@@ -12,14 +12,15 @@ export const en = {
 		password: "Password",
 		passwordPlaceholder: "Enter password",
 		language: "Language",
-		signIn:"Sign In",
+		signIn: "Sign In",
 		notice: "Administrator-managed access only. Public sign-up is disabled.",
 		adminOnly: "Admin provisioned",
 		processes: "AD, AO, A2O, SBR, MBR and pilot processes",
 		role: "Role-aware access",
 		roleText: "Admin, operator and viewer permissions are enforced by the API.",
 		control: "PLC-ready",
-		controlText: "Designed for devices, tags, live readings, alarms and audit trails.",
+		controlText:
+			"Designed for devices, tags, live readings, alarms and audit trails.",
 		required: "Enter both email and password",
 		unavailable:
 			"Login service is not available yet. The client is ready for POST /api/v1/auth/login.",
@@ -66,6 +67,141 @@ export const en = {
 			cardTitle: "Access Required",
 			cardDescription:
 				"An admin user needs to allow your account access to a plant. Once access is granted, the dashboard and operating pages will become available automatically after your session refreshes.",
+		},
+	},
+	plantSetup: {
+		wizard: {
+			kicker: "First-run setup",
+			title: "Plant Setup Workflow",
+			description:
+				"Move through the static setup shell for plant configuration before backend integration is added.",
+			progress: "Step {{current}} of {{total}}",
+			currentStep: "Current step",
+			previous: "Previous",
+			next: "Next",
+		},
+		plantInformation: {
+			name: {
+				label: "Plant Name",
+				placeholder: "Main Production Plant",
+			},
+			location: {
+				label: "Location",
+				placeholder: "Hsinchu, Taiwan",
+			},
+			status: {
+				label: "Initial Status",
+				options: {
+					active: "Active",
+					inactive: "Inactive",
+					maintenance: "Maintenance",
+				},
+			},
+			description: {
+				label: "Description",
+				placeholder:
+					"Describe the plant scope, equipment area, or operating context.",
+			},
+			save: "Save Plant Information",
+			savedTitle: "Saved Plant Information",
+			notProvided: "Not provided",
+		},
+		addDevice: {
+			plantRequired: "Save the Plant Information step before adding devices.",
+			name: {
+				label: "Device Name",
+				placeholder: "Main Process PLC",
+			},
+			typeLabel: "Device Type",
+			types: {
+				plc: "PLC",
+				simulator: "Simulator",
+				gateway: "Gateway",
+				sensorGroup: "Sensor Group",
+				actuatorGroup: "Actuator Group",
+			},
+			protocolLabel: "Communication Method",
+			protocols: {
+				modbusTcp: "Modbus TCP",
+				opcUa: "OPC UA",
+				simulator: "Simulator",
+			},
+			icon: {
+				label: "Display Icon",
+				placeholder: "Select a device icon",
+			},
+			icons: {
+				controller: "Controller",
+				server: "Server",
+				gateway: "Gateway",
+				instrumentGroup: "Instrument Group",
+				connectedEquipment: "Connected Equipment",
+			},
+			host: "Host or Address",
+			port: "Port",
+			description: {
+				label: "Description",
+				placeholder:
+					"Describe the device's responsibility and the process area it serves.",
+			},
+			enabled: "Include this device in plant operation",
+			add: "Add Device",
+			empty: "No devices have been added yet.",
+			saved: "Saved Devices",
+			internalSimulation: "Internal simulation",
+			addressNotProvided: "Address not provided",
+			remove: "Remove {{name}}",
+			noDescription: "No description provided.",
+			included: "Included",
+			notIncluded: "Not included",
+		},
+		processUnit: {
+			plantRequired:
+				"Save the Plant Information step before adding process units.",
+			name: {
+				label: "Unit Name",
+				placeholder: "Aeration Tank 1",
+			},
+			typeLabel: "Unit Type",
+			typePlaceholder: "Select a unit type",
+			types: {
+				tank: "Tank",
+				reactor: "Reactor",
+				clarifier: "Clarifier",
+				pumpStation: "Pump Station",
+				filter: "Filter",
+				custom: "Custom",
+			},
+			status: {
+				label: "Initial Status",
+				options: {
+					active: "Active",
+					inactive: "Inactive",
+					maintenance: "Maintenance",
+				},
+			},
+			icon: {
+				label: "Diagram Icon",
+				placeholder: "Select a diagram icon",
+			},
+			icons: {
+				factory: "Factory",
+				tank: "Tank",
+				waterProcess: "Water Process",
+				meteredUnit: "Metered Unit",
+			},
+			description: {
+				label: "Description",
+				placeholder: "Describe this unit's purpose in the plant process.",
+			},
+			add: "Add Process Unit",
+			empty: "No process units have been added yet.",
+			saved: "Saved Process Units",
+			remove: "Remove {{name}}",
+			noDescription: "No description provided.",
+			connectionPorts_one: "{{count}} connection port",
+			connectionPorts_other: "{{count}} connection ports",
+			iconValue: "{{icon}} icon",
 		},
 	},
 	toast: {
@@ -286,4 +422,4 @@ export const en = {
 			},
 		},
 	},
-}
+};

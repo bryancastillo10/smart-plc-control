@@ -11,7 +11,7 @@ export const zhTW = {
 		password: "密碼",
 		passwordPlaceholder: "輸入密碼",
 		language: "語言",
-		signIn:"登入",
+		signIn: "登入",
 		notice: "帳號由管理員建立，不開放公開註冊。",
 		adminOnly: "管理員建立帳號",
 		processes: "支援 AD、AO、A2O、SBR、MBR 與試驗程序",
@@ -20,8 +20,7 @@ export const zhTW = {
 		control: "PLC 就緒",
 		controlText: "適用於設備、標籤、即時讀值、警報與稽核紀錄。",
 		required: "請輸入電子郵件地址和密碼",
-		unavailable:
-			"登入服務尚未啟用。前端已準備串接 POST /api/v1/auth/login。",
+		unavailable: "登入服務尚未啟用。前端已準備串接 POST /api/v1/auth/login。",
 		failed: "無法登入，請確認帳號密碼後再試一次。",
 		success: "登入成功。",
 		navigation: {
@@ -65,6 +64,137 @@ export const zhTW = {
 			cardTitle: "需要授權",
 			cardDescription:
 				"管理員需要先允許你的帳號存取工廠。授權完成後，重新整理工作階段即可使用儀表板與操作頁面。",
+		},
+	},
+	plantSetup: {
+		wizard: {
+			kicker: "首次設定",
+			title: "工廠設定流程",
+			description: "依序完成工廠設定；後端整合將於後續加入。",
+			progress: "步驟 {{current}} / {{total}}",
+			currentStep: "目前步驟",
+			previous: "上一步",
+			next: "下一步",
+		},
+		plantInformation: {
+			name: {
+				label: "工廠名稱",
+				placeholder: "主要生產工廠",
+			},
+			location: {
+				label: "地點",
+				placeholder: "新竹，台灣",
+			},
+			status: {
+				label: "初始狀態",
+				options: {
+					active: "運作中",
+					inactive: "停用",
+					maintenance: "維護中",
+				},
+			},
+			description: {
+				label: "描述",
+				placeholder: "說明工廠範圍、設備區域或運作情境。",
+			},
+			save: "儲存工廠資訊",
+			savedTitle: "已儲存工廠資訊",
+			notProvided: "未提供",
+		},
+		addDevice: {
+			plantRequired: "請先儲存「工廠資訊」步驟，再新增設備。",
+			name: {
+				label: "設備名稱",
+				placeholder: "主要製程 PLC",
+			},
+			typeLabel: "設備類型",
+			types: {
+				plc: "PLC",
+				simulator: "模擬器",
+				gateway: "閘道器",
+				sensorGroup: "感測器群組",
+				actuatorGroup: "致動器群組",
+			},
+			protocolLabel: "通訊方式",
+			protocols: {
+				modbusTcp: "Modbus TCP",
+				opcUa: "OPC UA",
+				simulator: "模擬器",
+			},
+			icon: {
+				label: "顯示圖示",
+				placeholder: "選擇設備圖示",
+			},
+			icons: {
+				controller: "控制器",
+				server: "伺服器",
+				gateway: "閘道器",
+				instrumentGroup: "儀表群組",
+				connectedEquipment: "連接設備",
+			},
+			host: "主機或位址",
+			port: "通訊埠",
+			description: {
+				label: "描述",
+				placeholder: "說明設備的職責及其服務的製程區域。",
+			},
+			enabled: "將此設備納入工廠運作",
+			add: "新增設備",
+			empty: "尚未新增任何設備。",
+			saved: "已儲存的設備",
+			internalSimulation: "內部模擬",
+			addressNotProvided: "未提供位址",
+			remove: "移除 {{name}}",
+			noDescription: "未提供描述。",
+			included: "已納入",
+			notIncluded: "未納入",
+		},
+		processUnit: {
+			plantRequired: "請先儲存「工廠資訊」步驟，再新增程序單元。",
+			name: {
+				label: "單元名稱",
+				placeholder: "曝氣槽 1",
+			},
+			typeLabel: "單元類型",
+			typePlaceholder: "選擇單元類型",
+			types: {
+				tank: "槽體",
+				reactor: "反應槽",
+				clarifier: "澄清池",
+				pumpStation: "泵浦站",
+				filter: "過濾器",
+				custom: "自訂",
+			},
+			status: {
+				label: "初始狀態",
+				options: {
+					active: "運作中",
+					inactive: "停用",
+					maintenance: "維護中",
+				},
+			},
+			icon: {
+				label: "流程圖圖示",
+				placeholder: "選擇流程圖圖示",
+			},
+			icons: {
+				factory: "工廠",
+				tank: "槽體",
+				waterProcess: "水處理",
+				meteredUnit: "計量單元",
+			},
+			description: {
+				label: "描述",
+				placeholder: "說明此單元在工廠程序中的用途。",
+			},
+			add: "新增程序單元",
+			empty: "尚未新增任何程序單元。",
+			saved: "已儲存的程序單元",
+			remove: "移除 {{name}}",
+			noDescription: "未提供描述。",
+			connectionPorts_one: "{{count}} 個連接埠",
+			connectionPorts_other: "{{count}} 個連接埠",
+			iconValue: "{{icon}} 圖示",
 		},
 	},
 	toast: {
@@ -285,4 +415,4 @@ export const zhTW = {
 			},
 		},
 	},
-}
+};
