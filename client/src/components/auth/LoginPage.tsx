@@ -165,7 +165,7 @@ const LoginPage = () => {
 									className={appButtonVariants({ size: "form", width: "full" })}
 								>
 									<ShieldCheck className="size-4" aria-hidden="true" />
-									{signInLoading ? t("signingIn") : t("signIn")}
+									{signInLoading ? t("toast:auth.signIn.loading") : t("signIn")}
 								</Button>
 
 								<p className={appTextVariants({ role: "helper", align: "center" })}>
