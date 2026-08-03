@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { logout } from "@/features/auth/queries";
+import { clearCurrentUserCache, logout } from "@/features/auth/queries";
 import { useToast } from "@/integrations/sonner";
 import { useUserStore } from "@/store/user";
 
@@ -16,6 +16,7 @@ export function useLogout() {
 		mutationFn: logout,
 		onMutate: () => toast.loading(t("auth.signOut.loading")),
 		onSuccess: async (response) => {
+			clearCurrentUserCache();
 			clearUser();
 			toast.success(response.message || t("auth.signOut.success"));
 			await navigate({ to: "/" });
