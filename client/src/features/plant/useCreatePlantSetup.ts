@@ -1,11 +1,11 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-
 import {
 	createAlertRuleRequest,
 	useCreateAlertRule,
 } from "@/features/alert_rules/useCreateAlertRule";
+import { markCurrentUserPlantSetupComplete } from "@/features/auth/queries";
 import { useCreateDevice } from "@/features/devices/useCreateDevice";
 import { useCreatePlant } from "@/features/plant/useCreatePlant";
 import { useCreateProcessUnit } from "@/features/process_units/useCreateProcessUnit";
@@ -14,6 +14,7 @@ import { useCreateSimulation } from "@/features/simulations/useCreateSimulation"
 import { useCreateTag } from "@/features/tags/useCreateTag";
 import { useModalStore } from "@/store/modal";
 import { usePlantSetupFormStore } from "@/store/plantSetupForms";
+import { useUserStore } from "@/store/user";
 
 export type PlantSetupRequestStatus =
 	| "pending"
@@ -62,6 +63,9 @@ export function useCreatePlantSetup() {
 	const { createSimulationAsync, createSimulationLoading, simulations } =
 		useCreateSimulation();
 	const closeModal = useModalStore((state) => state.closeModal);
+	const markPlantSetupComplete = useUserStore(
+		(state) => state.markPlantSetupComplete,
+	);
 	const navigate = useNavigate();
 	const started = useRef(false);
 	const [requests, setRequests] = useState(initialRequests);
@@ -198,6 +202,8 @@ export function useCreatePlantSetup() {
 						plantId: plant.id,
 					});
 				});
+				markCurrentUserPlantSetupComplete();
+				markPlantSetupComplete();
 				toast.success("Plant Set up is complete");
 				closeModal();
 				void navigate({ to: "/", replace: true });
@@ -237,6 +243,7 @@ export function useCreatePlantSetup() {
 		tags,
 		closeModal,
 		navigate,
+		markPlantSetupComplete,
 	]);
 
 	return {
