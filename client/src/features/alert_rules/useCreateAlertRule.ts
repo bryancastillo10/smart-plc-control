@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { type ChangeEvent, type SubmitEvent } from "react";
+import type { ChangeEvent, SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { createAlertRule } from "@/features/alert_rules/queries";
@@ -10,13 +10,12 @@ import {
 	initialAlertRuleData,
 	usePlantSetupFormStore,
 } from "@/store/plantSetupForms";
-import type { AlertOperator, AlertSeverity } from "@/types/enum";
+import type { AlertRule, CreateAlertRuleVariables } from "@/types/alert-rule";
+import type { AlertOperator, AlertSeverity, TagDataType } from "@/types/enum";
 
 export function useCreateAlertRule() {
 	const { t } = useTranslation("toast");
-	const alertRuleData = usePlantSetupFormStore(
-		(state) => state.alertRuleData,
-	);
+	const alertRuleData = usePlantSetupFormStore((state) => state.alertRuleData);
 	const setAlertRuleData = usePlantSetupFormStore(
 		(state) => state.setAlertRuleData,
 	);
@@ -36,8 +35,7 @@ export function useCreateAlertRule() {
 		mutationFn: createAlertRule,
 		onMutate: () => toast.loading(t("alertRule.create.loading")),
 		onError: (error) => toast.error(error, t("alertRule.create.failed")),
-		onSettled: (_data, _error, _variables, toastId) =>
-			toast.dismiss(toastId),
+		onSettled: (_data, _error, _variables, toastId) => toast.dismiss(toastId),
 	});
 
 	const onChange = (
@@ -125,4 +123,43 @@ export function useCreateAlertRule() {
 	};
 }
 
+export function createAlertRuleRequest(
+	rule: AlertRule,
+	tagId: string,
+	dataType: TagDataType,
+): CreateAlertRuleVariables {
+	const request = {
+		tagId,
+		name: rule.name,
+		operator: rule.operator,
+		severity: rule.severity,
+		message: rule.message,
+		enabled: rule.enabled,
+	};
+
+	if (dataType === "BOOL") {
+		if (
+			(rule.threshold !== "true" && rule.threshold !== "false") ||
+			(rule.operator !== "EQ" && rule.operator !== "NEQ")
+		) {
+			throw new Error(
+				"BOOL alert rules require a true/false threshold and EQ or NEQ operator.",
+			);
+		}
+		return { ...request, thresholdBool: rule.threshold === "true" };
+	}
+
+	if (dataType === "STRING") {
+		if (rule.operator !== "EQ" && rule.operator !== "NEQ") {
+			throw new Error("STRING alert rules only support EQ or NEQ operators.");
+		}
+		return { ...request, thresholdText: String(rule.threshold) };
+	}
+
+	const thresholdNumeric = Number(rule.threshold);
+	if (!Number.isFinite(thresholdNumeric)) {
+		throw new Error("Numeric alert rules require a valid numeric threshold.");
+	}
+	return { ...request, thresholdNumeric };
+}
 export default useCreateAlertRule;
