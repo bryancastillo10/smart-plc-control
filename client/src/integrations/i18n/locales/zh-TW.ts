@@ -11,6 +11,7 @@ export const zhTW = {
 		password: "密碼",
 		passwordPlaceholder: "輸入密碼",
 		language: "語言",
+		signIn:"登入",
 		notice: "帳號由管理員建立，不開放公開註冊。",
 		adminOnly: "管理員建立帳號",
 		processes: "支援 AD、AO、A2O、SBR、MBR 與試驗程序",

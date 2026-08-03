@@ -12,6 +12,7 @@ export const en = {
 		password: "Password",
 		passwordPlaceholder: "Enter password",
 		language: "Language",
+		signIn:"Sign In",
 		notice: "Administrator-managed access only. Public sign-up is disabled.",
 		adminOnly: "Admin provisioned",
 		processes: "AD, AO, A2O, SBR, MBR and pilot processes",
