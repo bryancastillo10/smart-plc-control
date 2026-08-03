@@ -8,6 +8,9 @@ import type {
 } from "@/features/auth/type";
 import { apiFetch } from "@/utils/fetch";
 
+let currentUserCache: CurrentUserResponse | null = null;
+let currentUserRequest: Promise<CurrentUserResponse> | null = null;
+
 export function signIn({ language, ...body }: SignInVariables) {
 	return apiFetch<SignInResponse>("/auth/login", {
 		method: "POST",
@@ -19,7 +22,6 @@ export function signIn({ language, ...body }: SignInVariables) {
 	});
 }
 
-
 export function signUp(body: SignUpVariables) {
 	return apiFetch<SignUpResponse, SignUpVariables>("/auth/register", {
 		method: "POST",
@@ -30,6 +32,7 @@ export function signUp(body: SignUpVariables) {
 		},
 	});
 }
+
 export function logout() {
 	return apiFetch<LogoutResponse>("/auth/logout", {
 		method: "POST",
@@ -38,8 +41,32 @@ export function logout() {
 }
 
 export function currentUser() {
-	return apiFetch<CurrentUserResponse>("/auth/me", {
+	if (currentUserCache) return Promise.resolve(currentUserCache);
+	if (currentUserRequest) return currentUserRequest;
+
+	currentUserRequest = apiFetch<CurrentUserResponse>("/auth/me", {
 		method: "GET",
 		credentials: "include",
-	});
+	})
+		.then((user) => {
+			currentUserCache = user;
+			return user;
+		})
+		.catch((error: unknown) => {
+			currentUserRequest = null;
+			throw error;
+		});
+
+	return currentUserRequest;
+}
+
+export function clearCurrentUserCache() {
+	currentUserCache = null;
+	currentUserRequest = null;
+}
+
+export function markCurrentUserPlantSetupComplete() {
+	if (currentUserCache) {
+		currentUserCache = { ...currentUserCache, hasOwnedPlant: true };
+	}
 }
