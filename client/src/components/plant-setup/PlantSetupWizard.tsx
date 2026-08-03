@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
+import { LanguageSelect } from "@/components/layout/LanguageSelect";
 import { PlantSetupStepPanel } from "@/components/plant-setup/PlantSetupStepPanel";
 import { PlantSetupStepper } from "@/components/plant-setup/PlantSetupStepper";
 import { Button } from "@/components/ui/button";
@@ -30,8 +31,11 @@ export function PlantSetupWizard() {
 							backend integration is added.
 						</p>
 					</div>
-					<div className="text-sm font-semibold text-brand-muted">
-						Step {workflow.activeStepIndex + 1} of {workflow.steps.length}
+					<div className="flex items-center gap-3">
+						<LanguageSelect />
+						<span className="text-sm font-semibold text-brand-muted">
+							Step {workflow.activeStepIndex + 1} of {workflow.steps.length}
+						</span>
 					</div>
 				</section>
 
