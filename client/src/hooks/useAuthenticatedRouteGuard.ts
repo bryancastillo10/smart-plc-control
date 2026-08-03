@@ -1,56 +1,31 @@
-import { currentUser } from "@/features/auth/queries";
-import { toUserProfile } from "@/features/auth/userProfile";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect } from "react";
+
 import { useUserStore } from "@/store/user";
 import {
 	canAccessAuthenticatedPath,
 	getAuthenticatedRedirectPath,
 } from "@/utils/authRoutes";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 
 export function useAuthenticatedRouteGuard() {
 	const navigate = useNavigate();
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
-	const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+	const user = useUserStore((state) => state.user);
 
 	useEffect(() => {
-		let isMounted = true;
-		const store = useUserStore.getState();
-
-		async function verifyAuthenticatedUser() {
-			try {
-				const user = await currentUser();
-				const redirectPath = getAuthenticatedRedirectPath(user);
-
-				if (!isMounted) {
-					return;
-				}
-
-				store.setUser(toUserProfile(user));
-
-				if (!canAccessAuthenticatedPath(user, pathname)) {
-					void navigate({ to: redirectPath, replace: true });
-					return;
-				}
-
-				setIsCheckingAuth(false);
-			} catch {
-				store.clearUser();
-
-				if (isMounted) {
-					void navigate({ to: "/", replace: true });
-				}
-			}
+		if (!user) {
+			void navigate({ to: "/", replace: true });
+			return;
 		}
+		if (!canAccessAuthenticatedPath(user, pathname)) {
+			void navigate({
+				to: getAuthenticatedRedirectPath(user),
+				replace: true,
+			});
+		}
+	}, [navigate, pathname, user]);
 
-		void verifyAuthenticatedUser();
-
-		return () => {
-			isMounted = false;
-		};
-	}, [navigate, pathname]);
-
-	return { isCheckingAuth };
+	return { isCheckingAuth: user === null };
 }
