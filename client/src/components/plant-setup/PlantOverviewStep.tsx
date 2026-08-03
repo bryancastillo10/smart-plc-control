@@ -20,19 +20,21 @@ export function PlantOverviewStep() {
 
 	const handleSubmit = () => {
 		openModal({
-			cancelLabel: "Keep Editing",
-			confirmLabel: "Open Plant Overview",
-			content: <PlantFinalStep/>,
+			cancelLabel: "Close",
+			confirmLabel: "Done",
+			content: <PlantFinalStep />,
 			description:
-				"Your local plant setup draft is ready to view in the plant overview step.",
-			title: "Plant setup draft ready",
+				"Each setup request runs in dependency order. Follow its progress below.",
+			title: "Creating plant setup",
 		});
 	};
 
 	return (
 		<div className="space-y-4">
 			<div className="rounded-md border border-line-subtle bg-white/70 p-4">
-				<h4 className="text-sm font-bold text-brand-ink">Open Plant Overview</h4>
+				<h4 className="text-sm font-bold text-brand-ink">
+					Open Plant Overview
+				</h4>
 				<p className="mt-1 text-sm leading-6 text-brand-muted">
 					View the current local draft values before opening the plant overview.
 					These values are read from the plant setup form store only.
@@ -51,20 +53,38 @@ export function PlantOverviewStep() {
 					<OverviewItem label="Name" value={processUnitData.name} />
 					<OverviewItem label="Type" value={processUnitData.type} />
 					<OverviewItem label="Status" value={processUnitData.status} />
-					<OverviewItem label="Description" value={processUnitData.description} />
+					<OverviewItem
+						label="Description"
+						value={processUnitData.description}
+					/>
 					<OverviewItem
 						label="Position"
 						value={formatPosition(processUnitData.position)}
 					/>
-					<OverviewItem label="Ports" value={formatPorts(processUnitData.ports)} />
+					<OverviewItem
+						label="Ports"
+						value={formatPorts(processUnitData.ports)}
+					/>
 					<OverviewItem label="Icon" value={processUnitData.icon} />
 				</OverviewCard>
 
 				<OverviewCard title="Process Connection">
-					<OverviewItem label="Source Unit" value={connectionData.sourceUnitId} />
-					<OverviewItem label="Source Port" value={connectionData.sourcePortId} />
-					<OverviewItem label="Target Unit" value={connectionData.targetUnitId} />
-					<OverviewItem label="Target Port" value={connectionData.targetPortId} />
+					<OverviewItem
+						label="Source Unit"
+						value={connectionData.sourceUnitId}
+					/>
+					<OverviewItem
+						label="Source Port"
+						value={connectionData.sourcePortId}
+					/>
+					<OverviewItem
+						label="Target Unit"
+						value={connectionData.targetUnitId}
+					/>
+					<OverviewItem
+						label="Target Port"
+						value={connectionData.targetPortId}
+					/>
 					<OverviewItem label="Flow Type" value={connectionData.flowType} />
 					<OverviewItem label="Label" value={connectionData.label} />
 				</OverviewCard>
@@ -77,7 +97,10 @@ export function PlantOverviewStep() {
 					<OverviewItem label="Port" value={deviceData.port} />
 					<OverviewItem label="Status" value={deviceData.connectionStatus} />
 					<OverviewItem label="Enabled" value={deviceData.enabled} />
-					<OverviewItem label="Position" value={formatPosition(deviceData.position)} />
+					<OverviewItem
+						label="Position"
+						value={formatPosition(deviceData.position)}
+					/>
 					<OverviewItem label="Icon" value={deviceData.icon} />
 					<OverviewItem label="Description" value={deviceData.description} />
 				</OverviewCard>
@@ -113,13 +136,17 @@ export function PlantOverviewStep() {
 						label="Update Interval"
 						value={`${simulationData.updateIntervalMs} ms`}
 					/>
-					<OverviewItem label="Noise Factor" value={simulationData.noiseFactor} />
+					<OverviewItem
+						label="Noise Factor"
+						value={simulationData.noiseFactor}
+					/>
 				</OverviewCard>
 			</div>
 
-			<div className="flex justify-end">
+			<div className="flex w-full justify-center pt-2">
 				<Button
-					className={appButtonVariants({ size: "form" })}
+					className={appButtonVariants({ className: "w-full", size: "form" })}
+					disabled={!plantData.name.trim() || !plantData.location.trim()}
 					onClick={handleSubmit}
 					type="button"
 				>
@@ -155,7 +182,9 @@ function OverviewItem({
 	return (
 		<div className="grid grid-cols-[8rem_1fr] gap-3 text-sm">
 			<span className="font-semibold text-brand-muted">{label}</span>
-			<span className="wrap-break-word text-brand-ink">{formatValue(value)}</span>
+			<span className="wrap-break-word text-brand-ink">
+				{formatValue(value)}
+			</span>
 		</div>
 	);
 }
@@ -169,7 +198,9 @@ function formatPosition(position: { x: number; y: number } | undefined) {
 }
 
 function formatPorts(
-	ports: readonly { direction: string; id: string; label: string }[] | undefined,
+	ports:
+		| readonly { direction: string; id: string; label: string }[]
+		| undefined,
 ) {
 	if (!ports || ports.length === 0) {
 		return "Not set";

@@ -23,8 +23,19 @@ export interface CreateAlertRuleRequest {
 	enabled: boolean;
 }
 
-export type CreateAlertRuleVariables = CreateAlertRuleRequest;
-export type UpdateAlertRuleRequest = Partial<CreateAlertRuleRequest>;
+export interface CreateAlertRuleVariables {
+	tagId: string;
+	name: string;
+	operator: AlertOperator;
+	thresholdNumeric?: number;
+	thresholdText?: string;
+	thresholdBool?: boolean;
+	severity: AlertSeverity;
+	delaySeconds?: number;
+	message?: string;
+	enabled?: boolean;
+}
+export type UpdateAlertRuleRequest = Partial<CreateAlertRuleVariables>;
 
 export interface UpdateAlertRuleVariables {
 	ruleId: string;

@@ -8,6 +8,7 @@ export interface AuthState {
 	user: UserProfile | null;
 	setUser: (user: UserProfile) => void;
 	clearUser: () => void;
+	markPlantSetupComplete: () => void;
 	validateAuth: () => boolean;
 }
 
@@ -20,6 +21,10 @@ export const useUserStore = create(
 				useLanguageStore.getState().setLanguage(user.language);
 			},
 			clearUser: () => set({ user: null }),
+			markPlantSetupComplete: () =>
+				set((state) => ({
+					user: state.user ? { ...state.user, hasOwnedPlant: true } : null,
+				})),
 			validateAuth: () => get().user !== null,
 		}),
 		{
