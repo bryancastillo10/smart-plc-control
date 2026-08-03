@@ -2,12 +2,13 @@ import {
 	Cable,
 	Cpu,
 	Gauge,
+	type LucideIcon,
 	Plus,
 	RadioTower,
 	Server,
 	Trash2,
-	type LucideIcon,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,29 +25,37 @@ import { useCreateDevice } from "@/features/devices/useCreateDevice";
 import { appButtonVariants } from "@/styles/recipes";
 import type { Device } from "@/types/device";
 
-const deviceTypes = [
-	{ value: "PLC", label: "PLC" },
-	{ value: "SIMULATOR", label: "Simulator" },
-	{ value: "GATEWAY", label: "Gateway" },
-	{ value: "SENSOR_GROUP", label: "Sensor Group" },
-	{ value: "ACTUATOR_GROUP", label: "Actuator Group" },
-] as const;
+const deviceTypeLabelKeys = {
+	PLC: "addDevice.types.plc",
+	SIMULATOR: "addDevice.types.simulator",
+	GATEWAY: "addDevice.types.gateway",
+	SENSOR_GROUP: "addDevice.types.sensorGroup",
+	ACTUATOR_GROUP: "addDevice.types.actuatorGroup",
+} as const satisfies Record<Device["type"], string>;
 
-const protocols = [
-	{ value: "MODBUS_TCP", label: "Modbus TCP" },
-	{ value: "OPC_UA", label: "OPC UA" },
-	{ value: "SIMULATOR", label: "Simulator" },
-] as const;
+const protocolLabelKeys = {
+	MODBUS_TCP: "addDevice.protocols.modbusTcp",
+	OPC_UA: "addDevice.protocols.opcUa",
+	SIMULATOR: "addDevice.protocols.simulator",
+} as const satisfies Record<Device["protocol"], string>;
 
 const deviceIconOptions = [
-	{ value: "Cpu", label: "Controller", Icon: Cpu },
-	{ value: "Server", label: "Server", Icon: Server },
-	{ value: "RadioTower", label: "Gateway", Icon: RadioTower },
-	{ value: "Gauge", label: "Instrument Group", Icon: Gauge },
-	{ value: "Cable", label: "Connected Equipment", Icon: Cable },
+	{ value: "Cpu", labelKey: "addDevice.icons.controller", Icon: Cpu },
+	{ value: "Server", labelKey: "addDevice.icons.server", Icon: Server },
+	{
+		value: "RadioTower",
+		labelKey: "addDevice.icons.gateway",
+		Icon: RadioTower,
+	},
+	{ value: "Gauge", labelKey: "addDevice.icons.instrumentGroup", Icon: Gauge },
+	{
+		value: "Cable",
+		labelKey: "addDevice.icons.connectedEquipment",
+		Icon: Cable,
+	},
 ] as const satisfies readonly {
 	value: string;
-	label: string;
+	labelKey: string;
 	Icon: LucideIcon;
 }[];
 
@@ -57,6 +66,7 @@ function getDeviceIcon(iconName: string) {
 }
 
 export function AddDeviceStep() {
+	const { t } = useTranslation("plantSetup");
 	const {
 		deviceData,
 		devices,
@@ -73,56 +83,56 @@ export function AddDeviceStep() {
 		<div className="space-y-6">
 			{!plantExists ? (
 				<div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-900">
-					Save the Plant Information step before adding devices.
+					{t("addDevice.plantRequired")}
 				</div>
 			) : null}
 
 			<form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
 				<div className="space-y-2">
-					<Label htmlFor="name">Device Name</Label>
+					<Label htmlFor="name">{t("addDevice.name.label")}</Label>
 					<Input
 						id="name"
 						onChange={onChange}
-						placeholder="Main Process PLC"
+						placeholder={t("addDevice.name.placeholder")}
 						required
 						value={deviceData.name}
 					/>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="type">Device Type</Label>
+					<Label htmlFor="type">{t("addDevice.typeLabel")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="type"
 						onChange={onChange}
 						value={deviceData.type}
 					>
-						{deviceTypes.map((type) => (
-							<option key={type.value} value={type.value}>
-								{type.label}
+						{Object.entries(deviceTypeLabelKeys).map(([value, labelKey]) => (
+							<option key={value} value={value}>
+								{t(labelKey)}
 							</option>
 						))}
 					</select>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="protocol">Communication Method</Label>
+					<Label htmlFor="protocol">{t("addDevice.protocolLabel")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="protocol"
 						onChange={onChange}
 						value={deviceData.protocol}
 					>
-						{protocols.map((protocol) => (
-							<option key={protocol.value} value={protocol.value}>
-								{protocol.label}
+						{Object.entries(protocolLabelKeys).map(([value, labelKey]) => (
+							<option key={value} value={value}>
+								{t(labelKey)}
 							</option>
 						))}
 					</select>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="icon">Display Icon</Label>
+					<Label htmlFor="icon">{t("addDevice.icon.label")}</Label>
 					<Select
 						onValueChange={(icon) =>
 							setDeviceData((current) => ({ ...current, icon }))
@@ -130,13 +140,13 @@ export function AddDeviceStep() {
 						value={deviceData.icon}
 					>
 						<SelectTrigger className="w-full" id="icon">
-							<SelectValue placeholder="Select a device icon" />
+							<SelectValue placeholder={t("addDevice.icon.placeholder")} />
 						</SelectTrigger>
 						<SelectContent>
-							{deviceIconOptions.map(({ value, label, Icon }) => (
+							{deviceIconOptions.map(({ value, labelKey, Icon }) => (
 								<SelectItem key={value} value={value}>
 									<Icon className="size-4" />
-									{label}
+									{t(labelKey)}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -144,7 +154,7 @@ export function AddDeviceStep() {
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="host">Host or Address</Label>
+					<Label htmlFor="host">{t("addDevice.host")}</Label>
 					<Input
 						disabled={isSimulator}
 						id="host"
@@ -155,7 +165,7 @@ export function AddDeviceStep() {
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="port">Port</Label>
+					<Label htmlFor="port">{t("addDevice.port")}</Label>
 					<Input
 						disabled={isSimulator}
 						id="port"
@@ -168,11 +178,13 @@ export function AddDeviceStep() {
 				</div>
 
 				<div className="space-y-2 md:col-span-2">
-					<Label htmlFor="description">Description</Label>
+					<Label htmlFor="description">
+						{t("addDevice.description.label")}
+					</Label>
 					<Textarea
 						id="description"
 						onChange={onChange}
-						placeholder="Describe the device's responsibility and the process area it serves."
+						placeholder={t("addDevice.description.placeholder")}
 						value={deviceData.description ?? ""}
 					/>
 				</div>
@@ -185,7 +197,7 @@ export function AddDeviceStep() {
 						onChange={onChange}
 						type="checkbox"
 					/>
-					Include this device in plant operation
+					{t("addDevice.enabled")}
 				</label>
 
 				<div className="flex justify-end md:col-span-2">
@@ -195,7 +207,7 @@ export function AddDeviceStep() {
 						type="submit"
 					>
 						<Plus className="size-4" />
-						Add Device
+						{t("addDevice.add")}
 					</Button>
 				</div>
 			</form>
@@ -212,10 +224,12 @@ function SavedDevices({
 	devices: Device[];
 	onRemove: (id: string) => void;
 }) {
+	const { t } = useTranslation("plantSetup");
+
 	if (devices.length === 0) {
 		return (
 			<div className="rounded-md border border-dashed border-line-subtle p-6 text-center text-sm text-brand-muted">
-				No devices have been added yet.
+				{t("addDevice.empty")}
 			</div>
 		);
 	}
@@ -225,7 +239,7 @@ function SavedDevices({
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2 font-bold text-brand-ink">
 					<Cpu className="size-4 text-brand-control" />
-					Saved Devices
+					{t("addDevice.saved")}
 				</div>
 				<span className="rounded-full bg-chip px-2.5 py-1 text-xs font-bold text-brand-control">
 					{devices.length}
@@ -237,9 +251,9 @@ function SavedDevices({
 					const DeviceIcon = getDeviceIcon(device.icon);
 					const endpoint =
 						device.protocol === "SIMULATOR"
-							? "Internal simulation"
+							? t("addDevice.internalSimulation")
 							: [device.host, device.port].filter(Boolean).join(":") ||
-								"Address not provided";
+								t("addDevice.addressNotProvided");
 
 					return (
 						<article
@@ -256,12 +270,13 @@ function SavedDevices({
 											{device.name}
 										</h4>
 										<p className="mt-1 text-xs font-semibold uppercase tracking-widest text-brand-kicker">
-											{device.type.replaceAll("_", " ")} &middot; {device.protocol.replaceAll("_", " ")}
+											{t(deviceTypeLabelKeys[device.type])} &middot;{" "}
+											{t(protocolLabelKeys[device.protocol])}
 										</p>
 									</div>
 								</div>
 								<Button
-									aria-label={`Remove ${device.name}`}
+									aria-label={t("addDevice.remove", { name: device.name })}
 									onClick={() => onRemove(device.id)}
 									size="icon-sm"
 									type="button"
@@ -271,12 +286,16 @@ function SavedDevices({
 								</Button>
 							</div>
 							<p className="mt-3 text-sm leading-5 text-brand-muted">
-								{device.description || "No description provided."}
+								{device.description || t("addDevice.noDescription")}
 							</p>
 							<div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-brand-muted">
 								<span>{endpoint}</span>
 								<span aria-hidden="true">&middot;</span>
-								<span>{device.enabled ? "Included" : "Not included"}</span>
+								<span>
+									{device.enabled
+										? t("addDevice.included")
+										: t("addDevice.notIncluded")}
+								</span>
 							</div>
 						</article>
 					);
