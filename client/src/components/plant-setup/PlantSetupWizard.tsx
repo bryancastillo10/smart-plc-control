@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { LanguageSelect } from "@/components/layout/LanguageSelect";
 import { PlantSetupStepPanel } from "@/components/plant-setup/PlantSetupStepPanel";
@@ -13,6 +14,7 @@ import {
 } from "@/styles/recipes";
 
 export function PlantSetupWizard() {
+	const { t } = useTranslation("plantSetup");
 	const workflow = usePlantSetupWorkflow();
 
 	return (
@@ -21,20 +23,22 @@ export function PlantSetupWizard() {
 				<section className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 					<div className="space-y-2">
 						<p className={appTextVariants({ role: "kicker" })}>
-							First-run setup
+							{t("wizard.kicker")}
 						</p>
 						<h2 className={appTextVariants({ role: "sectionTitle" })}>
-							Plant Setup Workflow
+							{t("wizard.title")}
 						</h2>
 						<p className={appTextVariants({ role: "helper" })}>
-							Move through the static setup shell for plant configuration before
-							backend integration is added.
+							{t("wizard.description")}
 						</p>
 					</div>
 					<div className="flex items-center gap-3">
 						<LanguageSelect />
 						<span className="text-sm font-semibold text-brand-muted">
-							Step {workflow.activeStepIndex + 1} of {workflow.steps.length}
+							{t("wizard.progress", {
+								current: workflow.activeStepIndex + 1,
+								total: workflow.steps.length,
+							})}
 						</span>
 					</div>
 				</section>
@@ -54,7 +58,9 @@ export function PlantSetupWizard() {
 					/>
 
 					<aside className={appSurfaceVariants({ variant: "card" })}>
-						<p className={appTextVariants({ role: "kicker" })}>Current step</p>
+						<p className={appTextVariants({ role: "kicker" })}>
+							{t("wizard.currentStep")}
+						</p>
 						<h3 className="mt-2 text-lg font-bold text-brand-ink">
 							{workflow.activeStep.title}
 						</h3>
@@ -75,7 +81,7 @@ export function PlantSetupWizard() {
 						variant="outline"
 					>
 						<ArrowLeft className="size-4" />
-						Previous
+						{t("wizard.previous")}
 					</Button>
 					<Button
 						className={appButtonVariants({ size: "form" })}
@@ -83,7 +89,7 @@ export function PlantSetupWizard() {
 						onClick={workflow.goForward}
 						type="button"
 					>
-						Next
+						{t("wizard.next")}
 						<ArrowRight className="size-4" />
 					</Button>
 				</div>
