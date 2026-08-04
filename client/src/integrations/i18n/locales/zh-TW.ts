@@ -337,6 +337,22 @@ export const zhTW = {
 				processUnit: "程序單元：{{name}}",
 			},
 		},
+		processArrangement: {
+			instructions:
+				"拖曳各卡片以配置工廠。若要建立程序流程，請拖曳程序單元右側的箭頭控制點，並在另一個程序單元上放開。",
+			connectionsTitle: "程序流程連線（{{count}}）",
+			empty: "尚未新增任何程序流程連線。",
+			remove: "移除程序連線",
+			flowTypes: {
+				water: "水",
+				wastewater: "廢水",
+				sludge: "污泥",
+				gas: "氣體",
+				chemical: "化學品",
+				rawMaterial: "原料",
+				others: "其他",
+			},
+		},
 	},
 	toast: {
 		auth: {

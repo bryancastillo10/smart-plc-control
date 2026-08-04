@@ -356,6 +356,22 @@ export const en = {
 				processUnit: "Process Unit: {{name}}",
 			},
 		},
+		processArrangement: {
+			instructions:
+				"Drag each card to arrange the plant. To create a process flow, drag the arrow handle on the right side of one process unit and release it over another process unit.",
+			connectionsTitle: "Process Flow Connections ({{count}})",
+			empty: "No process-flow connections have been added yet.",
+			remove: "Remove process connection",
+			flowTypes: {
+				water: "Water",
+				wastewater: "Wastewater",
+				sludge: "Sludge",
+				gas: "Gas",
+				chemical: "Chemical",
+				rawMaterial: "Raw Material",
+				others: "Others",
+			},
+		},
 	},
 	toast: {
 		auth: {
