@@ -1,31 +1,22 @@
 import { BellRing, Plus, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { alertOperators, alertSeverities } from "@/constants/alerts";
 import { useCreateAlertRule } from "@/features/alert_rules/useCreateAlertRule";
 import { appButtonVariants } from "@/styles/recipes";
 import type { AlertRule } from "@/types/alert-rule";
 import type { Device } from "@/types/device";
-import type { AlertOperator, AlertSeverity } from "@/types/enum";
 import type { ProcessUnit } from "@/types/process-unit";
 import type { Tag } from "@/types/tag";
 
-import { alertOperators, alertSeverities } from "@/constants/alerts";
-
-const operatorLabelByValue = Object.fromEntries(
-	alertOperators.map(({ value, label }) => [value, label]),
-) as Record<AlertOperator, string>;
-
-const severityClasses: Record<AlertSeverity, string> = {
-	LOW: "bg-blue-100 text-blue-800",
-	MEDIUM: "bg-amber-100 text-amber-800",
-	HIGH: "bg-orange-100 text-orange-800",
-	CRITICAL: "bg-red-100 text-red-800",
-};
+import { operatorLabelKeys, severityLabelKeys, tagDataTypeLabelKeys, severityClasses } from "@/constants/alerts";
 
 export function AddAlertRuleStep() {
+	const { t } = useTranslation("plantSetup");
 	const {
 		alertRuleData,
 		alertRules,
@@ -50,13 +41,13 @@ export function AddAlertRuleStep() {
 		<div className="space-y-6">
 			{tags.length === 0 ? (
 				<div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-900">
-					Add at least one measurement or signal before defining operating alerts.
+					{t("addAlertRule.tagRequired")}
 				</div>
 			) : null}
 
 			<form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
 				<div className="space-y-2 md:col-span-2">
-					<Label htmlFor="tagId">Measurement or Signal</Label>
+					<Label htmlFor="tagId">{t("addAlertRule.tag.label")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						disabled={tags.length === 0}
@@ -65,7 +56,7 @@ export function AddAlertRuleStep() {
 						required
 						value={alertRuleData.tagId}
 					>
-						<option value="">Select a measurement or signal</option>
+						<option value="">{t("addAlertRule.tag.placeholder")}</option>
 						{devices.map((device) => {
 							const deviceTags = tags.filter(
 								(tag) => tag.deviceId === device.id,
@@ -86,30 +77,39 @@ export function AddAlertRuleStep() {
 
 				{selectedTag ? (
 					<div className="grid gap-2 rounded-md border border-chip-line bg-chip p-3 text-xs font-semibold text-brand-muted md:col-span-2 sm:grid-cols-3">
-						<p>Device: {selectedDevice?.name ?? "Unknown"}</p>
 						<p>
-							Process Unit: {selectedProcessUnit?.name ?? "Not assigned"}
+							{t("addAlertRule.selected.device", {
+								name: selectedDevice?.name ?? t("addAlertRule.unknown"),
+							})}
 						</p>
 						<p>
-							Value: {selectedTag.dataType}
+							{t("addAlertRule.selected.processUnit", {
+								name:
+									selectedProcessUnit?.name ?? t("addAlertRule.notAssigned"),
+							})}
+						</p>
+						<p>
+							{t("addAlertRule.selected.value", {
+								type: t(tagDataTypeLabelKeys[selectedTag.dataType]),
+							})}
 							{selectedTag.unit ? ` (${selectedTag.unit})` : ""}
 						</p>
 					</div>
 				) : null}
 
 				<div className="space-y-2">
-					<Label htmlFor="name">Alert Name</Label>
+					<Label htmlFor="name">{t("addAlertRule.name.label")}</Label>
 					<Input
 						id="name"
 						onChange={onChange}
-						placeholder="High tank level"
+						placeholder={t("addAlertRule.name.placeholder")}
 						required
 						value={alertRuleData.name}
 					/>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="severity">Urgency</Label>
+					<Label htmlFor="severity">{t("addAlertRule.severityLabel")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="severity"
@@ -118,14 +118,14 @@ export function AddAlertRuleStep() {
 					>
 						{alertSeverities.map((severity) => (
 							<option key={severity.value} value={severity.value}>
-								{severity.label}
+								{t(severityLabelKeys[severity.value])}
 							</option>
 						))}
 					</select>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="operator">Condition</Label>
+					<Label htmlFor="operator">{t("addAlertRule.operatorLabel")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="operator"
@@ -134,14 +134,14 @@ export function AddAlertRuleStep() {
 					>
 						{alertOperators.map((operator) => (
 							<option key={operator.value} value={operator.value}>
-								{operator.label}
+								{t(operatorLabelKeys[operator.value])}
 							</option>
 						))}
 					</select>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="threshold">Operating Limit</Label>
+					<Label htmlFor="threshold">{t("addAlertRule.threshold.label")}</Label>
 					{selectedTag?.dataType === "BOOL" ? (
 						<select
 							className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
@@ -149,15 +149,19 @@ export function AddAlertRuleStep() {
 							onChange={onChange}
 							value={String(alertRuleData.threshold)}
 						>
-							<option value="">Select a state</option>
-							<option value="true">True</option>
-							<option value="false">False</option>
+							<option value="">
+								{t("addAlertRule.threshold.statePlaceholder")}
+							</option>
+							<option value="true">{t("addAlertRule.threshold.true")}</option>
+							<option value="false">{t("addAlertRule.threshold.false")}</option>
 						</select>
 					) : (
 						<Input
 							id="threshold"
 							onChange={onChange}
-							placeholder={selectedTag?.unit || "Limit value"}
+							placeholder={
+								selectedTag?.unit || t("addAlertRule.threshold.placeholder")
+							}
 							required
 							step={selectedTag?.dataType === "FLOAT" ? "any" : undefined}
 							type={
@@ -172,11 +176,11 @@ export function AddAlertRuleStep() {
 				</div>
 
 				<div className="space-y-2 md:col-span-2">
-					<Label htmlFor="message">Operator Message</Label>
+					<Label htmlFor="message">{t("addAlertRule.message.label")}</Label>
 					<Textarea
 						id="message"
 						onChange={onChange}
-						placeholder="Describe the condition and the response expected from the operator."
+						placeholder={t("addAlertRule.message.placeholder")}
 						value={alertRuleData.message ?? ""}
 					/>
 				</div>
@@ -189,7 +193,7 @@ export function AddAlertRuleStep() {
 						onChange={onChange}
 						type="checkbox"
 					/>
-					Enable this operating alert
+					{t("addAlertRule.enabled")}
 				</label>
 
 				<div className="flex justify-end md:col-span-2">
@@ -199,7 +203,7 @@ export function AddAlertRuleStep() {
 						type="submit"
 					>
 						<Plus className="size-4" />
-						Add Alert Rule
+						{t("addAlertRule.add")}
 					</Button>
 				</div>
 			</form>
@@ -228,16 +232,15 @@ function SavedAlertRules({
 	processUnits: ProcessUnit[];
 	tags: Tag[];
 }) {
+	const { t } = useTranslation("plantSetup");
 	const tagById = new Map(tags.map((tag) => [tag.id, tag]));
 	const deviceById = new Map(devices.map((device) => [device.id, device]));
-	const processUnitById = new Map(
-		processUnits.map((unit) => [unit.id, unit]),
-	);
+	const processUnitById = new Map(processUnits.map((unit) => [unit.id, unit]));
 
 	if (alertRules.length === 0) {
 		return (
 			<div className="rounded-md border border-dashed border-line-subtle p-6 text-center text-sm text-brand-muted">
-				No operating alerts have been added yet.
+				{t("addAlertRule.empty")}
 			</div>
 		);
 	}
@@ -247,7 +250,7 @@ function SavedAlertRules({
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2 font-bold text-brand-ink">
 					<BellRing className="size-4 text-brand-control" />
-					Saved Operating Alerts
+					{t("addAlertRule.saved")}
 				</div>
 				<span className="rounded-full bg-chip px-2.5 py-1 text-xs font-bold text-brand-control">
 					{alertRules.length}
@@ -276,15 +279,17 @@ function SavedAlertRules({
 										<span
 											className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${severityClasses[rule.severity]}`}
 										>
-											{rule.severity}
+											{t(severityLabelKeys[rule.severity])}
 										</span>
 									</div>
 									<p className="mt-2 text-sm font-semibold text-brand-control">
-										{tag?.name ?? "Unknown tag"} {operatorLabelByValue[rule.operator].toLocaleLowerCase()} {String(rule.threshold)} {tag?.unit ?? ""}
+										{tag?.name ?? t("addAlertRule.unknownTag")}{" "}
+										{t(operatorLabelKeys[rule.operator])}{" "}
+										{String(rule.threshold)} {tag?.unit ?? ""}
 									</p>
 								</div>
 								<Button
-									aria-label={`Remove ${rule.name}`}
+									aria-label={t("addAlertRule.remove", { name: rule.name })}
 									onClick={() => onRemove(rule.id)}
 									size="icon-sm"
 									type="button"
@@ -294,8 +299,16 @@ function SavedAlertRules({
 								</Button>
 							</div>
 							<div className="mt-3 space-y-1 text-xs font-semibold text-brand-muted">
-								<p>Device: {device?.name ?? "Unknown"}</p>
-								<p>Process Unit: {processUnit?.name ?? "Not assigned"}</p>
+								<p>
+									{t("addAlertRule.savedDetails.device", {
+										name: device?.name ?? t("addAlertRule.unknown"),
+									})}
+								</p>
+								<p>
+									{t("addAlertRule.savedDetails.processUnit", {
+										name: processUnit?.name ?? t("addAlertRule.notAssigned"),
+									})}
+								</p>
 							</div>
 							{rule.message ? (
 								<p className="mt-3 text-sm leading-5 text-brand-muted">

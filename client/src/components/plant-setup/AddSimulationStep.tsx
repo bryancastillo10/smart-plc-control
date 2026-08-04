@@ -1,4 +1,5 @@
 import { Cpu, Gauge, Plus, Trash2, Waves } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +8,14 @@ import { useCreateSimulation } from "@/features/simulations/useCreateSimulation"
 import { appButtonVariants } from "@/styles/recipes";
 import type { Simulation } from "@/types/simulation";
 
+const simulationStatusLabelKeys = {
+	IDLE: "addSimulation.statuses.idle",
+	RUNNING: "addSimulation.statuses.running",
+	PAUSED: "addSimulation.statuses.paused",
+	STOPPED: "addSimulation.statuses.stopped",
+} as const satisfies Record<Simulation["status"], string>;
 export function AddSimulationStep() {
+	const { t } = useTranslation("plantSetup");
 	const {
 		handleSubmit,
 		hasSimulatorDevice,
@@ -27,11 +35,9 @@ export function AddSimulationStep() {
 						<Gauge className="size-5" />
 					</div>
 					<div>
-						<h4 className="font-bold">Simulation setup is optional</h4>
+						<h4 className="font-bold">{t("addSimulation.optional.title")}</h4>
 						<p className="mt-1 text-sm leading-6 text-blue-800">
-							No Simulator device was added during Device setup. You may skip
-							this step and continue, or return to Devices and add a Simulator
-							if representative process behavior is needed.
+							{t("addSimulation.optional.description")}
 						</p>
 					</div>
 				</div>
@@ -43,7 +49,7 @@ export function AddSimulationStep() {
 		<div className="space-y-6">
 			<div className="rounded-md border border-chip-line bg-chip p-4">
 				<p className="text-sm font-bold text-brand-ink">
-					Available Simulator Devices
+					{t("addSimulation.availableDevices")}
 				</p>
 				<div className="mt-3 flex flex-wrap gap-2">
 					{simulatorDevices.map((device) => (
@@ -57,25 +63,26 @@ export function AddSimulationStep() {
 					))}
 				</div>
 				<p className="mt-3 text-xs leading-5 text-brand-muted">
-					Simulation profiles apply to the Plant as a whole. Simulator Devices
-					enable representative values to be supplied during testing.
+					{t("addSimulation.deviceDescription")}
 				</p>
 			</div>
 
 			<form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
 				<div className="space-y-2 md:col-span-2">
-					<Label htmlFor="name">Simulation Name</Label>
+					<Label htmlFor="name">{t("addSimulation.name.label")}</Label>
 					<Input
 						id="name"
 						onChange={onChange}
-						placeholder="Normal operation profile"
+						placeholder={t("addSimulation.name.placeholder")}
 						required
 						value={simulationData.name}
 					/>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="updateIntervalMs">Update Interval (milliseconds)</Label>
+					<Label htmlFor="updateIntervalMs">
+						{t("addSimulation.updateInterval.label")}
+					</Label>
 					<Input
 						id="updateIntervalMs"
 						min={100}
@@ -86,13 +93,14 @@ export function AddSimulationStep() {
 						value={simulationData.updateIntervalMs ?? ""}
 					/>
 					<p className="text-xs leading-5 text-brand-muted">
-						How often representative process values are refreshed. Minimum 100
-						milliseconds.
+						{t("addSimulation.updateInterval.help")}
 					</p>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="noiseFactor">Variation Factor</Label>
+					<Label htmlFor="noiseFactor">
+						{t("addSimulation.variation.label")}
+					</Label>
 					<Input
 						id="noiseFactor"
 						max={1}
@@ -104,8 +112,7 @@ export function AddSimulationStep() {
 						value={simulationData.noiseFactor ?? ""}
 					/>
 					<p className="text-xs leading-5 text-brand-muted">
-						Adds natural variation to generated values, from 0 for steady values
-						to 1 for maximum variation.
+						{t("addSimulation.variation.help")}
 					</p>
 				</div>
 
@@ -116,15 +123,12 @@ export function AddSimulationStep() {
 						type="submit"
 					>
 						<Plus className="size-4" />
-						Add Simulation Profile
+						{t("addSimulation.add")}
 					</Button>
 				</div>
 			</form>
 
-			<SavedSimulations
-				onRemove={removeSimulation}
-				simulations={simulations}
-			/>
+			<SavedSimulations onRemove={removeSimulation} simulations={simulations} />
 		</div>
 	);
 }
@@ -136,10 +140,12 @@ function SavedSimulations({
 	onRemove: (id: string) => void;
 	simulations: Simulation[];
 }) {
+	const { t } = useTranslation("plantSetup");
+
 	if (simulations.length === 0) {
 		return (
 			<div className="rounded-md border border-dashed border-line-subtle p-6 text-center text-sm text-brand-muted">
-				No simulation profiles have been added yet.
+				{t("addSimulation.empty")}
 			</div>
 		);
 	}
@@ -149,7 +155,7 @@ function SavedSimulations({
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2 font-bold text-brand-ink">
 					<Waves className="size-4 text-brand-control" />
-					Saved Simulation Profiles
+					{t("addSimulation.saved")}
 				</div>
 				<span className="rounded-full bg-chip px-2.5 py-1 text-xs font-bold text-brand-control">
 					{simulations.length}
@@ -164,15 +170,15 @@ function SavedSimulations({
 					>
 						<div className="flex items-start justify-between gap-3">
 							<div>
-								<h4 className="font-bold text-brand-ink">
-									{simulation.name}
-								</h4>
+								<h4 className="font-bold text-brand-ink">{simulation.name}</h4>
 								<p className="mt-1 text-xs font-semibold uppercase tracking-widest text-brand-kicker">
-									{simulation.status}
+									{t(simulationStatusLabelKeys[simulation.status])}
 								</p>
 							</div>
 							<Button
-								aria-label={`Remove ${simulation.name}`}
+								aria-label={t("addSimulation.remove", {
+									name: simulation.name,
+								})}
 								onClick={() => onRemove(simulation.id)}
 								size="icon-sm"
 								type="button"
@@ -182,8 +188,16 @@ function SavedSimulations({
 							</Button>
 						</div>
 						<div className="mt-3 space-y-1 text-xs font-semibold text-brand-muted">
-							<p>Update interval: {simulation.updateIntervalMs} ms</p>
-							<p>Variation factor: {simulation.noiseFactor}</p>
+							<p>
+								{t("addSimulation.savedDetails.updateInterval", {
+									value: simulation.updateIntervalMs,
+								})}
+							</p>
+							<p>
+								{t("addSimulation.savedDetails.variation", {
+									value: simulation.noiseFactor,
+								})}
+							</p>
 						</div>
 					</article>
 				))}
