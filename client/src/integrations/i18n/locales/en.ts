@@ -80,6 +80,117 @@ export const en = {
 			previous: "Previous",
 			next: "Next",
 		},
+		steps: {
+			plant: {
+				title: "Plant Information",
+				description:
+					"Define the plant identity, location, operating status, and overall purpose.",
+				details: {
+					configured:
+						"{{name}} has been identified as the plant for this setup. Review its location, status, and description before defining the process.",
+					empty:
+						"Begin with the basic plant information. Use the description to summarize the plant's purpose, production scope, treatment capacity, or main operating responsibilities.",
+				},
+			},
+			processUnits: {
+				title: "Process Units",
+				description:
+					"Identify the main treatment stages, production areas, and supporting units in the plant.",
+				details: {
+					configured_one:
+						"{{count}} process unit defined. Confirm that the list represents the major stages and supporting areas needed to understand the complete process.",
+					configured_other:
+						"{{count}} process units defined. Confirm that the list represents the major stages and supporting areas needed to understand the complete process.",
+					empty:
+						"Break the plant into meaningful operating areas or unit operations, such as tanks, reactors, clarifiers, filters, pump stations, storage areas, and utility systems.",
+				},
+			},
+			devices: {
+				title: "Devices and Control Equipment",
+				description:
+					"Register the equipment used to monitor, control, and exchange information across the process.",
+				details: {
+					configured_one:
+						"{{count}} device identified. Check that the equipment needed to observe and control each process area is represented.",
+					configured_other:
+						"{{count}} devices identified. Check that the equipment needed to observe and control each process area is represented.",
+					empty:
+						"Identify the PLCs, gateways, simulators, and other control equipment that collect measurements, issue commands, or connect plant areas.",
+				},
+			},
+			tags: {
+				title: "Process Measurements and Signals",
+				description:
+					"Define the measurements, equipment states, and control signals used during operation.",
+				details: {
+					configured_one:
+						"{{count}} measurement or signal defined. Confirm that each item is associated with the correct device and process area.",
+					configured_other:
+						"{{count}} measurements or signals defined. Confirm that each item is associated with the correct device and process area.",
+					empty:
+						"List the values operators need to monitor or control, such as flow, level, pressure, temperature, quality, equipment status, setpoints, and commands.",
+				},
+			},
+			diagram: {
+				title: "Process Flow Arrangement",
+				description:
+					"Arrange the process units and show how materials or utilities move between them.",
+				details: {
+					configured_one:
+						"{{count}} process connection defined. Review the sequence and direction of flow between units.",
+					configured_other:
+						"{{count}} process connections defined. Review the sequence and direction of flow between units.",
+					empty:
+						"Arrange the process units in their normal operating sequence, then describe how water, product, waste, chemicals, gas, or utilities pass from one unit to another.",
+				},
+			},
+			alertRules: {
+				title: "Operating Alerts",
+				description:
+					"Set the operating conditions that require attention and indicate their level of urgency.",
+				details: {
+					configured_one:
+						"{{count}} operating alert defined. Review each limit, urgency, and message to ensure it supports an appropriate operator response.",
+					configured_other:
+						"{{count}} operating alerts defined. Review each limit, urgency, and message to ensure it supports an appropriate operator response.",
+					empty:
+						"Define when an operating value requires attention. Consider normal limits, warning conditions, critical conditions, equipment protection, and the action expected from the operator.",
+				},
+			},
+			simulation: {
+				title: "Process Simulation",
+				description:
+					"Prepare representative operating behavior for testing process conditions and responses.",
+				details: {
+					available:
+						"A simulation source is available. Define representative values and operating changes that can be used to examine plant behavior under expected and unusual conditions.",
+					unavailable:
+						"Add a simulator under Devices and Control Equipment if you want to examine plant behavior using representative operating values and scenarios.",
+				},
+			},
+			users: {
+				title: "Team and Responsibilities",
+				description:
+					"Assign the people responsible for operating, supervising, and reviewing the plant.",
+				details: {
+					configured_one:
+						"{{count}} team member assigned. Confirm that operating, supervisory, and review responsibilities are appropriately covered.",
+					configured_other:
+						"{{count}} team members assigned. Confirm that operating, supervisory, and review responsibilities are appropriately covered.",
+					empty:
+						"Identify who will operate the plant, supervise performance, review conditions, or maintain the setup. Assign responsibilities according to each person's role.",
+				},
+			},
+			dashboard: {
+				title: "Open Plant Overview",
+				description:
+					"Complete the setup and continue to the plant's operational overview.",
+				details: {
+					default:
+						"Open the plant overview to view the current local setup values before continuing.",
+				},
+			},
+		},
 		plantInformation: {
 			name: {
 				label: "Plant Name",
@@ -202,6 +313,48 @@ export const en = {
 			connectionPorts_one: "{{count}} connection port",
 			connectionPorts_other: "{{count}} connection ports",
 			iconValue: "{{icon}} icon",
+		},
+		addTag: {
+			deviceRequired:
+				"Add at least one Device before defining its measurements and signals.",
+			device: {
+				label: "Device",
+				placeholder: "Select a device",
+			},
+			processUnit: {
+				label: "Process Unit",
+				unassigned: "Not assigned to a process unit",
+			},
+			name: {
+				label: "Tag Name",
+				placeholder: "Aeration Tank Level",
+			},
+			address: "Device Address",
+			dataTypeLabel: "Value Type",
+			dataTypes: {
+				boolean: "Boolean",
+				integer: "Integer",
+				decimal: "Decimal",
+				text: "Text",
+			},
+			engineeringUnit: "Engineering Unit",
+			description: {
+				label: "Description",
+				placeholder:
+					"Describe what this value represents and how it is used during operation.",
+			},
+			enabled: "Include this measurement or signal in plant operation",
+			add: "Add Tag",
+			empty: "No tags have been added yet.",
+			saved: "Saved Measurements and Signals",
+			remove: "Remove {{name}}",
+			unknownDevice: "Unknown device",
+			notAssigned: "Not assigned",
+			savedDetails: {
+				device: "Device: {{name}}",
+				address: "Address: {{address}}",
+				processUnit: "Process Unit: {{name}}",
+			},
 		},
 	},
 	toast: {

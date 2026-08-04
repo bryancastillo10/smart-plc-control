@@ -76,6 +76,107 @@ export const zhTW = {
 			previous: "上一步",
 			next: "下一步",
 		},
+		steps: {
+			plant: {
+				title: "工廠資訊",
+				description: "定義工廠識別資訊、地點、運作狀態及整體用途。",
+				details: {
+					configured:
+						"已將 {{name}} 設為本次設定的工廠。定義程序前，請檢查其地點、狀態及描述。",
+					empty:
+						"先填寫基本工廠資訊。請在描述中摘要工廠用途、生產範圍、處理能力或主要運作職責。",
+				},
+			},
+			processUnits: {
+				title: "程序單元",
+				description: "識別工廠的主要處理階段、生產區域及支援單元。",
+				details: {
+					configured_one:
+						"已定義 {{count}} 個程序單元。請確認清單涵蓋理解完整程序所需的主要階段及支援區域。",
+					configured_other:
+						"已定義 {{count}} 個程序單元。請確認清單涵蓋理解完整程序所需的主要階段及支援區域。",
+					empty:
+						"將工廠劃分為有意義的運作區域或單元操作，例如槽體、反應槽、澄清池、過濾器、泵浦站、儲存區及公用系統。",
+				},
+			},
+			devices: {
+				title: "設備與控制裝置",
+				description: "登錄用於監控、控制及跨程序交換資訊的設備。",
+				details: {
+					configured_one:
+						"已識別 {{count}} 個設備。請確認各程序區域所需的觀測與控制設備皆已列入。",
+					configured_other:
+						"已識別 {{count}} 個設備。請確認各程序區域所需的觀測與控制設備皆已列入。",
+					empty:
+						"識別收集量測值、發出命令或連接工廠區域的 PLC、閘道器、模擬器及其他控制設備。",
+				},
+			},
+			tags: {
+				title: "程序量測與訊號",
+				description: "定義運作期間使用的量測值、設備狀態及控制訊號。",
+				details: {
+					configured_one:
+						"已定義 {{count}} 個量測值或訊號。請確認每個項目皆連結至正確的設備與程序區域。",
+					configured_other:
+						"已定義 {{count}} 個量測值或訊號。請確認每個項目皆連結至正確的設備與程序區域。",
+					empty:
+						"列出操作員需要監控或控制的值，例如流量、液位、壓力、溫度、品質、設備狀態、設定值及命令。",
+				},
+			},
+			diagram: {
+				title: "程序流程配置",
+				description: "排列程序單元，並顯示物料或公用介質如何在單元間流動。",
+				details: {
+					configured_one:
+						"已定義 {{count}} 個程序連線。請檢查單元間的流程順序與方向。",
+					configured_other:
+						"已定義 {{count}} 個程序連線。請檢查單元間的流程順序與方向。",
+					empty:
+						"依正常運作順序排列程序單元，再說明水、產品、廢棄物、藥劑、氣體或公用介質如何由一個單元流向另一個單元。",
+				},
+			},
+			alertRules: {
+				title: "運作警報",
+				description: "設定需要注意的運作條件，並指出其緊急程度。",
+				details: {
+					configured_one:
+						"已定義 {{count}} 個運作警報。請檢查各項限制、緊急程度及訊息，確保能支援適當的操作員應對。",
+					configured_other:
+						"已定義 {{count}} 個運作警報。請檢查各項限制、緊急程度及訊息，確保能支援適當的操作員應對。",
+					empty:
+						"定義運作值何時需要注意。請考量正常限制、警告條件、嚴重條件、設備保護及操作員應採取的行動。",
+				},
+			},
+			simulation: {
+				title: "程序模擬",
+				description: "準備具代表性的運作行為，以測試程序條件及反應。",
+				details: {
+					available:
+						"已有模擬來源。請定義具代表性的數值及運作變化，以檢視工廠在預期與異常條件下的行為。",
+					unavailable:
+						"若要使用具代表性的運作值及情境檢視工廠行為，請在「設備與控制裝置」中新增模擬器。",
+				},
+			},
+			users: {
+				title: "團隊與職責",
+				description: "指派負責操作、監督及檢查工廠的人員。",
+				details: {
+					configured_one:
+						"已指派 {{count}} 位團隊成員。請確認操作、監督及檢查職責皆已適當涵蓋。",
+					configured_other:
+						"已指派 {{count}} 位團隊成員。請確認操作、監督及檢查職責皆已適當涵蓋。",
+					empty:
+						"識別負責操作工廠、監督效能、檢查條件或維護設定的人員，並依各自角色指派職責。",
+				},
+			},
+			dashboard: {
+				title: "開啟工廠總覽",
+				description: "完成設定並前往工廠運作總覽。",
+				details: {
+					default: "繼續前，請開啟工廠總覽以查看目前的本機設定值。",
+				},
+			},
+		},
 		plantInformation: {
 			name: {
 				label: "工廠名稱",
@@ -195,6 +296,46 @@ export const zhTW = {
 			connectionPorts_one: "{{count}} 個連接埠",
 			connectionPorts_other: "{{count}} 個連接埠",
 			iconValue: "{{icon}} 圖示",
+		},
+		addTag: {
+			deviceRequired: "請先新增至少一個設備，再定義其量測與訊號。",
+			device: {
+				label: "設備",
+				placeholder: "選擇設備",
+			},
+			processUnit: {
+				label: "程序單元",
+				unassigned: "未指派程序單元",
+			},
+			name: {
+				label: "標籤名稱",
+				placeholder: "曝氣槽液位",
+			},
+			address: "設備位址",
+			dataTypeLabel: "數值類型",
+			dataTypes: {
+				boolean: "布林值",
+				integer: "整數",
+				decimal: "小數",
+				text: "文字",
+			},
+			engineeringUnit: "工程單位",
+			description: {
+				label: "描述",
+				placeholder: "說明此數值代表的意義及其在運作期間的用途。",
+			},
+			enabled: "將此量測或訊號納入工廠運作",
+			add: "新增標籤",
+			empty: "尚未新增任何標籤。",
+			saved: "已儲存的量測與訊號",
+			remove: "移除 {{name}}",
+			unknownDevice: "未知設備",
+			notAssigned: "未指派",
+			savedDetails: {
+				device: "設備：{{name}}",
+				address: "位址：{{address}}",
+				processUnit: "程序單元：{{name}}",
+			},
 		},
 	},
 	toast: {
