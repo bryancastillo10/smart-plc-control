@@ -1,15 +1,22 @@
 import { Crown, Plus, UserRound } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { UserRolesList } from "@/constants/userRoles";
 import useSignUp from "@/features/auth/useSignUp";
 import { appButtonVariants } from "@/styles/recipes";
-
-import { UserRolesList } from "@/constants/userRoles";
 import type { UserRole } from "@/types/enum";
 
+const userRoleLabelKeys = {
+	ADMIN: "plantUsers.roles.admin",
+	OPERATOR: "plantUsers.roles.operator",
+	VIEWER: "plantUsers.roles.viewer",
+} as const satisfies Record<UserRole, string>;
+
 export function PlantUsersStep() {
+	const { t } = useTranslation("plantSetup");
 	const {
 		handleChange,
 		handleSubmit,
@@ -28,10 +35,18 @@ export function PlantUsersStep() {
 				<table className="w-full min-w-180 border-collapse text-left text-sm">
 					<thead className="bg-chip text-xs uppercase tracking-wider text-brand-muted">
 						<tr>
-							<th className="px-4 py-3 font-bold">User</th>
-							<th className="px-4 py-3 font-bold">Plant Responsibility</th>
-							<th className="px-4 py-3 font-bold">Role</th>
-							<th className="px-4 py-3 font-bold">Language</th>
+							<th className="px-4 py-3 font-bold">
+								{t("plantUsers.table.user")}
+							</th>
+							<th className="px-4 py-3 font-bold">
+								{t("plantUsers.table.responsibility")}
+							</th>
+							<th className="px-4 py-3 font-bold">
+								{t("plantUsers.table.role")}
+							</th>
+							<th className="px-4 py-3 font-bold">
+								{t("plantUsers.table.language")}
+							</th>
 						</tr>
 					</thead>
 					<tbody className="divide-y divide-line-subtle">
@@ -57,15 +72,19 @@ export function PlantUsersStep() {
 										{isOwner ? (
 											<span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-900">
 												<Crown className="size-3.5" />
-												Plant Owner
+												{t("plantUsers.owner")}
 											</span>
 										) : (
-											<span className="text-brand-muted">Team member</span>
+											<span className="text-brand-muted">
+												{t("plantUsers.teamMember")}
+											</span>
 										)}
 									</td>
 									<td className="px-4 py-3">
 										<select
-											aria-label={`Role for ${user.username}`}
+											aria-label={t("plantUsers.roleFor", {
+												name: user.username,
+											})}
 											className="h-9 rounded-md border border-input bg-transparent px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
 											disabled={!isAdmin || isOwner}
 											onChange={(event) =>
@@ -74,16 +93,19 @@ export function PlantUsersStep() {
 											value={user.role}
 										>
 											{UserRolesList.map((role) => (
-												<option key={role} value={role}>
-													{role}
+												<option
+													key={t(userRoleLabelKeys[role])}
+													value={t(userRoleLabelKeys[role])}
+												>
+													{t(userRoleLabelKeys[role])}
 												</option>
 											))}
 										</select>
 									</td>
 									<td className="px-4 py-3 text-brand-muted">
 										{user.language === "ZH-TW"
-											? "Traditional Chinese"
-											: "English"}
+											? t("plantUsers.languages.traditionalChinese")
+											: t("plantUsers.languages.english")}
 									</td>
 								</tr>
 							);
@@ -94,7 +116,7 @@ export function PlantUsersStep() {
 									className="px-4 py-8 text-center text-brand-muted"
 									colSpan={4}
 								>
-									No users have been assigned to this Plant.
+									{t("plantUsers.empty")}
 								</td>
 							</tr>
 						) : null}
@@ -108,14 +130,16 @@ export function PlantUsersStep() {
 					onSubmit={handleSubmit}
 				>
 					<div className="md:col-span-2">
-						<h4 className="font-bold text-brand-ink">Add Team Member</h4>
+						<h4 className="font-bold text-brand-ink">
+							{t("plantUsers.addMember.title")}
+						</h4>
 						<p className="mt-1 text-sm text-brand-muted">
-							Create an account and grant access to this Plant.
+							{t("plantUsers.addMember.description")}
 						</p>
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="username">User Name</Label>
+						<Label htmlFor="username">{t("plantUsers.fields.username")}</Label>
 						<Input
 							autoComplete="off"
 							id="username"
@@ -126,7 +150,7 @@ export function PlantUsersStep() {
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
+						<Label htmlFor="email">{t("plantUsers.fields.email")}</Label>
 						<Input
 							autoComplete="off"
 							id="email"
@@ -138,7 +162,7 @@ export function PlantUsersStep() {
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="role">Role</Label>
+						<Label htmlFor="role">{t("plantUsers.fields.role")}</Label>
 						<select
 							className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
 							id="role"
@@ -146,28 +170,35 @@ export function PlantUsersStep() {
 							value={signUpData.role}
 						>
 							{UserRolesList.map((role) => (
-								<option key={role} value={role}>
-									{role}
+								<option
+									key={t(userRoleLabelKeys[role])}
+									value={t(userRoleLabelKeys[role])}
+								>
+									{t(userRoleLabelKeys[role])}
 								</option>
 							))}
 						</select>
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="language">Language</Label>
+						<Label htmlFor="language">{t("plantUsers.fields.language")}</Label>
 						<select
 							className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
 							id="language"
 							onChange={handleChange}
 							value={signUpData.language}
 						>
-							<option value="EN">English</option>
-							<option value="ZH-TW">Traditional Chinese</option>
+							<option value="EN">{t("plantUsers.languages.english")}</option>
+							<option value="ZH-TW">
+								{t("plantUsers.languages.traditionalChinese")}
+							</option>
 						</select>
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="password">Temporary Password</Label>
+						<Label htmlFor="password">
+							{t("plantUsers.fields.temporaryPassword")}
+						</Label>
 						<Input
 							autoComplete="new-password"
 							id="password"
@@ -179,7 +210,9 @@ export function PlantUsersStep() {
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="confirmPassword">Confirm Password</Label>
+						<Label htmlFor="confirmPassword">
+							{t("plantUsers.fields.confirmPassword")}
+						</Label>
 						<Input
 							autoComplete="new-password"
 							id="confirmPassword"
@@ -192,7 +225,7 @@ export function PlantUsersStep() {
 
 					{validationMessage ? (
 						<p className="text-sm font-semibold text-red-700 md:col-span-2">
-							{validationMessage}
+							{t("plantUsers.validation")}
 						</p>
 					) : null}
 
@@ -203,13 +236,15 @@ export function PlantUsersStep() {
 							type="submit"
 						>
 							<Plus className="size-4" />
-							{registerUserLoading ? "Creating Account..." : "Add User"}
+							{registerUserLoading
+								? t("plantUsers.creating")
+								: t("plantUsers.add")}
 						</Button>
 					</div>
 				</form>
 			) : (
 				<div className="rounded-md border border-line-subtle bg-white/60 p-4 text-sm text-brand-muted">
-					Only an ADMIN user can create accounts or change team member roles.
+					{t("plantUsers.adminOnly")}
 				</div>
 			)}
 		</div>
