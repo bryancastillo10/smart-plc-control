@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import {
 	BellRing,
 	Cpu,
@@ -5,14 +6,13 @@ import {
 	Gauge,
 	GitBranch,
 	LayoutDashboard,
+	type LucideIcon,
 	Network,
 	Tags,
 	Users,
-	type LucideIcon,
 } from "lucide-react";
 
 import type {
-	PlantSetupStep,
 	PlantSetupStepId,
 	PlantSetupWorkflowState,
 } from "@/features/plant/type";
@@ -20,103 +20,108 @@ import type {
 export const plantSetupSteps = [
 	{
 		id: "plant",
-		title: "Plant Information",
-		description:
-			"Define the plant identity, location, operating status, and overall purpose.",
+		titleKey: "steps.plant.title",
+		descriptionKey: "steps.plant.description",
 	},
 	{
 		id: "processUnits",
-		title: "Process Units",
-		description:
-			"Identify the main treatment stages, production areas, and supporting units in the plant.",
+		titleKey: "steps.processUnits.title",
+		descriptionKey: "steps.processUnits.description",
 	},
 	{
 		id: "devices",
-		title: "Devices and Control Equipment",
-		description:
-			"Register the equipment used to monitor, control, and exchange information across the process.",
+		titleKey: "steps.devices.title",
+		descriptionKey: "steps.devices.description",
 	},
 	{
 		id: "tags",
-		title: "Process Measurements and Signals",
-		description:
-			"Define the measurements, equipment states, and control signals used during operation.",
+		titleKey: "steps.tags.title",
+		descriptionKey: "steps.tags.description",
 	},
 	{
 		id: "diagram",
-		title: "Process Flow Arrangement",
-		description:
-			"Arrange the process units and show how materials or utilities move between them.",
+		titleKey: "steps.diagram.title",
+		descriptionKey: "steps.diagram.description",
 	},
 	{
 		id: "alertRules",
-		title: "Operating Alerts",
-		description:
-			"Set the operating conditions that require attention and indicate their level of urgency.",
+		titleKey: "steps.alertRules.title",
+		descriptionKey: "steps.alertRules.description",
 	},
 	{
 		id: "simulation",
-		title: "Process Simulation",
-		description:
-			"Prepare representative operating behavior for testing process conditions and responses.",
+		titleKey: "steps.simulation.title",
+		descriptionKey: "steps.simulation.description",
 	},
 	{
 		id: "users",
-		title: "Team and Responsibilities",
-		description:
-			"Assign the people responsible for operating, supervising, and reviewing the plant.",
+		titleKey: "steps.users.title",
+		descriptionKey: "steps.users.description",
 	},
 	{
 		id: "dashboard",
-		title: "Open Plant Overview",
-		description:
-			"Complete the setup and continue to the plant's operational overview.",
+		titleKey: "steps.dashboard.title",
+		descriptionKey: "steps.dashboard.description",
 	},
-] as const satisfies readonly PlantSetupStep[];
+] as const satisfies readonly {
+	id: PlantSetupStepId;
+	titleKey: string;
+	descriptionKey: string;
+}[];
 
 type PlantSetupStepDescriptionResolver = (
 	workflowState: PlantSetupWorkflowState,
+	t: TFunction<"plantSetup">,
 ) => string;
 
-function formatCount(count: number, singular: string, plural = `${singular}s`) {
-	return `${count} ${count === 1 ? singular : plural}`;
-}
-
 export const plantSetupStepDescriptions = {
-	plant: (workflowState) =>
+	plant: (workflowState, t) =>
 		workflowState.plant
-			? `${workflowState.plant.name} has been identified as the plant for this setup. Review its location, status, and description before defining the process.`
-			: "Begin with the basic plant information. Use the description to summarize the plant's purpose, production scope, treatment capacity, or main operating responsibilities.",
-	processUnits: (workflowState) =>
+			? t("steps.plant.details.configured", {
+					name: workflowState.plant.name,
+				})
+			: t("steps.plant.details.empty"),
+	processUnits: (workflowState, t) =>
 		workflowState.processUnits.length > 0
-			? `${formatCount(workflowState.processUnits.length, "process unit")} defined. Confirm that the list represents the major stages and supporting areas needed to understand the complete process.`
-			: "Break the plant into meaningful operating areas or unit operations, such as tanks, reactors, clarifiers, filters, pump stations, storage areas, and utility systems.",
-	devices: (workflowState) =>
+			? t("steps.processUnits.details.configured", {
+					count: workflowState.processUnits.length,
+				})
+			: t("steps.processUnits.details.empty"),
+	devices: (workflowState, t) =>
 		workflowState.devices.length > 0
-			? `${formatCount(workflowState.devices.length, "device")} identified. Check that the equipment needed to observe and control each process area is represented.`
-			: "Identify the PLCs, gateways, simulators, and other control equipment that collect measurements, issue commands, or connect plant areas.",
-	diagram: (workflowState) =>
+			? t("steps.devices.details.configured", {
+					count: workflowState.devices.length,
+				})
+			: t("steps.devices.details.empty"),
+	diagram: (workflowState, t) =>
 		workflowState.processUnitConnections.length > 0
-			? `${formatCount(workflowState.processUnitConnections.length, "process connection")} defined. Review the sequence and direction of flow between units.`
-			: "Arrange the process units in their normal operating sequence, then describe how water, product, waste, chemicals, gas, or utilities pass from one unit to another.",
-	tags: (workflowState) =>
+			? t("steps.diagram.details.configured", {
+					count: workflowState.processUnitConnections.length,
+				})
+			: t("steps.diagram.details.empty"),
+	tags: (workflowState, t) =>
 		workflowState.tags.length > 0
-			? `${formatCount(workflowState.tags.length, "measurement or signal")} defined. Confirm that each item is associated with the correct device and process area.`
-			: "List the values operators need to monitor or control, such as flow, level, pressure, temperature, quality, equipment status, setpoints, and commands.",
-	alertRules: (workflowState) =>
+			? t("steps.tags.details.configured", {
+					count: workflowState.tags.length,
+				})
+			: t("steps.tags.details.empty"),
+	alertRules: (workflowState, t) =>
 		workflowState.alertRules.length > 0
-			? `${formatCount(workflowState.alertRules.length, "operating alert")} defined. Review each limit, urgency, and message to ensure it supports an appropriate operator response.`
-			: "Define when an operating value requires attention. Consider normal limits, warning conditions, critical conditions, equipment protection, and the action expected from the operator.",
-	simulation: (workflowState) =>
+			? t("steps.alertRules.details.configured", {
+					count: workflowState.alertRules.length,
+				})
+			: t("steps.alertRules.details.empty"),
+	simulation: (workflowState, t) =>
 		workflowState.devices.some((device) => device.type === "SIMULATOR")
-			? "A simulation source is available. Define representative values and operating changes that can be used to examine plant behavior under expected and unusual conditions."
-			: "Add a simulator under Devices and Control Equipment if you want to examine plant behavior using representative operating values and scenarios.",
-	users: (workflowState) =>
+			? t("steps.simulation.details.available")
+			: t("steps.simulation.details.unavailable"),
+	users: (workflowState, t) =>
 		workflowState.users.length > 0
-			? `${formatCount(workflowState.users.length, "team member")} assigned. Confirm that operating, supervisory, and review responsibilities are appropriately covered.`
-			: "Identify who will operate the plant, supervise performance, review conditions, or maintain the setup. Assign responsibilities according to each person's role.",
-	dashboard: () =>
-		"Open the plant overview to view the current local setup values before continuing.",
+			? t("steps.users.details.configured", {
+					count: workflowState.users.length,
+				})
+			: t("steps.users.details.empty"),
+	dashboard: (_workflowState, t) => t("steps.dashboard.details.default"),
 } satisfies Record<PlantSetupStepId, PlantSetupStepDescriptionResolver>;
 
 export const stepIcons = {
@@ -134,6 +139,7 @@ export const stepIcons = {
 export function getPlantSetupStepDescription(
 	stepId: PlantSetupStepId,
 	workflowState: PlantSetupWorkflowState,
+	t: TFunction<"plantSetup">,
 ) {
-	return plantSetupStepDescriptions[stepId](workflowState);
+	return plantSetupStepDescriptions[stepId](workflowState, t);
 }
