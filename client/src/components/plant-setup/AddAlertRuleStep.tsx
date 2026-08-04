@@ -12,21 +12,7 @@ import type { AlertOperator, AlertSeverity } from "@/types/enum";
 import type { ProcessUnit } from "@/types/process-unit";
 import type { Tag } from "@/types/tag";
 
-const alertOperators = [
-	{ value: "GT", label: "Above" },
-	{ value: "GTE", label: "At or above" },
-	{ value: "LT", label: "Below" },
-	{ value: "LTE", label: "At or below" },
-	{ value: "EQ", label: "Equal to" },
-	{ value: "NEQ", label: "Not equal to" },
-] as const satisfies readonly { value: AlertOperator; label: string }[];
-
-const alertSeverities = [
-	{ value: "LOW", label: "Low" },
-	{ value: "MEDIUM", label: "Medium" },
-	{ value: "HIGH", label: "High" },
-	{ value: "CRITICAL", label: "Critical" },
-] as const satisfies readonly { value: AlertSeverity; label: string }[];
+import { alertOperators, alertSeverities } from "@/constants/alerts";
 
 const operatorLabelByValue = Object.fromEntries(
 	alertOperators.map(({ value, label }) => [value, label]),
