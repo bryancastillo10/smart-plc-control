@@ -1,4 +1,5 @@
 import { CheckCircle2, Circle, LoaderCircle, XCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
 	type PlantSetupRequestState,
@@ -6,13 +7,27 @@ import {
 	useCreatePlantSetup,
 } from "@/features/plant/useCreatePlantSetup";
 
+const requestLabelKeys = {
+	plant: "plantFinal.requests.plant",
+	processUnits: "plantFinal.requests.processUnits",
+	devices: "plantFinal.requests.devices",
+	connections: "plantFinal.requests.connections",
+	tags: "plantFinal.requests.tags",
+	alertRules: "plantFinal.requests.alertRules",
+	simulations: "plantFinal.requests.simulations",
+} as const;
 export default function PlantFinalStep() {
+	const { t } = useTranslation("plantSetup");
 	const requests = useCreatePlantSetup();
 
 	return (
 		<div aria-live="polite" className="space-y-2">
-			{plantSetupRequests.map(({ id, label }) => (
-				<StatusRow key={id} label={label} step={requests[id]} />
+			{plantSetupRequests.map(({ id }) => (
+				<StatusRow
+					key={id}
+					label={t(requestLabelKeys[id])}
+					step={requests[id]}
+				/>
 			))}
 		</div>
 	);
@@ -25,6 +40,7 @@ function StatusRow({
 	label: string;
 	step: PlantSetupRequestState;
 }) {
+	const { t } = useTranslation("plantSetup");
 	const Icon = step.loading
 		? LoaderCircle
 		: step.status === "success"
@@ -47,7 +63,24 @@ function StatusRow({
 				/>
 				<div>
 					<p className="text-sm font-semibold text-brand-ink">{label}</p>
-					<p className="text-xs text-brand-muted">{statusText(step)}</p>
+					<p className="text-xs text-brand-muted">
+						{step.loading
+							? step.total > 1
+								? t("plantFinal.status.creatingProgress", {
+										current: Math.min(step.completed + 1, step.total),
+										total: step.total,
+									})
+								: t("plantFinal.status.creating")
+							: step.status === "success"
+								? step.total === 0
+									? t("plantFinal.status.nothing")
+									: t("plantFinal.status.completed", { count: step.completed })
+								: step.status === "failed"
+									? t("plantFinal.status.failed")
+									: step.status === "skipped"
+										? t("plantFinal.status.skipped")
+										: t("plantFinal.status.waiting")}
+					</p>
 				</div>
 			</div>
 			{step.error ? (
@@ -57,23 +90,4 @@ function StatusRow({
 			) : null}
 		</div>
 	);
-}
-
-function statusText(step: PlantSetupRequestState) {
-	if (step.loading) {
-		return step.total > 1
-			? "Creating " +
-					Math.min(step.completed + 1, step.total) +
-					" of " +
-					step.total +
-					"..."
-			: "Creating...";
-	}
-	if (step.status === "success") {
-		if (step.total === 0) return "Nothing to create";
-		return `${step.completed} request${step.completed === 1 ? "" : "s"} completed`;
-	}
-	if (step.status === "failed") return "Request failed";
-	if (step.status === "skipped") return "Skipped after an earlier failure";
-	return "Waiting";
 }
