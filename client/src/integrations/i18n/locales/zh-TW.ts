@@ -353,6 +353,97 @@ export const zhTW = {
 				others: "其他",
 			},
 		},
+		addAlertRule: {
+			tagRequired: "請先新增至少一個量測值或訊號，再定義運作警報。",
+			tag: {
+				label: "量測值或訊號",
+				placeholder: "選擇量測值或訊號",
+			},
+			selected: {
+				device: "設備：{{name}}",
+				processUnit: "程序單元：{{name}}",
+				value: "數值：{{type}}",
+			},
+			unknown: "未知",
+			notAssigned: "未指派",
+			name: {
+				label: "警報名稱",
+				placeholder: "槽體液位過高",
+			},
+			severityLabel: "緊急程度",
+			severities: {
+				low: "低",
+				medium: "中",
+				high: "高",
+				critical: "嚴重",
+			},
+			operatorLabel: "條件",
+			operators: {
+				above: "高於",
+				atOrAbove: "大於或等於",
+				below: "低於",
+				atOrBelow: "小於或等於",
+				equalTo: "等於",
+				notEqualTo: "不等於",
+			},
+			threshold: {
+				label: "運作限制",
+				statePlaceholder: "選擇狀態",
+				true: "真",
+				false: "假",
+				placeholder: "限制值",
+			},
+			message: {
+				label: "操作員訊息",
+				placeholder: "說明此條件及操作員應採取的應對措施。",
+			},
+			enabled: "啟用此運作警報",
+			add: "新增警報規則",
+			empty: "尚未新增任何運作警報。",
+			saved: "已儲存的運作警報",
+			unknownTag: "未知標籤",
+			remove: "移除 {{name}}",
+			savedDetails: {
+				device: "設備：{{name}}",
+				processUnit: "程序單元：{{name}}",
+			},
+		},
+		addSimulation: {
+			optional: {
+				title: "模擬設定為選用項目",
+				description:
+					"在設備設定期間未新增模擬器設備。你可以略過此步驟並繼續，或返回「設備」新增模擬器，以提供具代表性的程序行為。",
+			},
+			availableDevices: "可用的模擬器設備",
+			deviceDescription:
+				"模擬設定檔套用於整個工廠。模擬器設備可在測試期間提供具代表性的數值。",
+			name: {
+				label: "模擬名稱",
+				placeholder: "正常運作設定檔",
+			},
+			updateInterval: {
+				label: "更新間隔（毫秒）",
+				help: "代表性程序數值的更新頻率，最短為 100 毫秒。",
+			},
+			variation: {
+				label: "變異係數",
+				help: "為產生的數值加入自然變化；0 表示穩定值，1 表示最大變化。",
+			},
+			add: "新增模擬設定檔",
+			empty: "尚未新增任何模擬設定檔。",
+			saved: "已儲存的模擬設定檔",
+			statuses: {
+				idle: "待命",
+				running: "執行中",
+				paused: "已暫停",
+				stopped: "已停止",
+			},
+			remove: "移除 {{name}}",
+			savedDetails: {
+				updateInterval: "更新間隔：{{value}} 毫秒",
+				variation: "變異係數：{{value}}",
+			},
+		},
 	},
 	toast: {
 		auth: {

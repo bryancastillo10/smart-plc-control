@@ -372,6 +372,99 @@ export const en = {
 				others: "Others",
 			},
 		},
+		addAlertRule: {
+			tagRequired:
+				"Add at least one measurement or signal before defining operating alerts.",
+			tag: {
+				label: "Measurement or Signal",
+				placeholder: "Select a measurement or signal",
+			},
+			selected: {
+				device: "Device: {{name}}",
+				processUnit: "Process Unit: {{name}}",
+				value: "Value: {{type}}",
+			},
+			unknown: "Unknown",
+			notAssigned: "Not assigned",
+			name: {
+				label: "Alert Name",
+				placeholder: "High tank level",
+			},
+			severityLabel: "Urgency",
+			severities: {
+				low: "Low",
+				medium: "Medium",
+				high: "High",
+				critical: "Critical",
+			},
+			operatorLabel: "Condition",
+			operators: {
+				above: "Above",
+				atOrAbove: "At or above",
+				below: "Below",
+				atOrBelow: "At or below",
+				equalTo: "Equal to",
+				notEqualTo: "Not equal to",
+			},
+			threshold: {
+				label: "Operating Limit",
+				statePlaceholder: "Select a state",
+				true: "True",
+				false: "False",
+				placeholder: "Limit value",
+			},
+			message: {
+				label: "Operator Message",
+				placeholder:
+					"Describe the condition and the response expected from the operator.",
+			},
+			enabled: "Enable this operating alert",
+			add: "Add Alert Rule",
+			empty: "No operating alerts have been added yet.",
+			saved: "Saved Operating Alerts",
+			unknownTag: "Unknown tag",
+			remove: "Remove {{name}}",
+			savedDetails: {
+				device: "Device: {{name}}",
+				processUnit: "Process Unit: {{name}}",
+			},
+		},
+		addSimulation: {
+			optional: {
+				title: "Simulation setup is optional",
+				description:
+					"No Simulator device was added during Device setup. You may skip this step and continue, or return to Devices and add a Simulator if representative process behavior is needed.",
+			},
+			availableDevices: "Available Simulator Devices",
+			deviceDescription:
+				"Simulation profiles apply to the Plant as a whole. Simulator Devices enable representative values to be supplied during testing.",
+			name: {
+				label: "Simulation Name",
+				placeholder: "Normal operation profile",
+			},
+			updateInterval: {
+				label: "Update Interval (milliseconds)",
+				help: "How often representative process values are refreshed. Minimum 100 milliseconds.",
+			},
+			variation: {
+				label: "Variation Factor",
+				help: "Adds natural variation to generated values, from 0 for steady values to 1 for maximum variation.",
+			},
+			add: "Add Simulation Profile",
+			empty: "No simulation profiles have been added yet.",
+			saved: "Saved Simulation Profiles",
+			statuses: {
+				idle: "Idle",
+				running: "Running",
+				paused: "Paused",
+				stopped: "Stopped",
+			},
+			remove: "Remove {{name}}",
+			savedDetails: {
+				updateInterval: "Update interval: {{value}} ms",
+				variation: "Variation factor: {{value}}",
+			},
+		},
 	},
 	toast: {
 		auth: {
