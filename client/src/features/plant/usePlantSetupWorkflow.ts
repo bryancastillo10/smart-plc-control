@@ -1,4 +1,5 @@
-﻿import { useMemo } from "react";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
 	getPlantSetupStepDescription,
@@ -8,19 +9,27 @@ import type { PlantSetupStepId } from "@/features/plant/type";
 import { usePlantSetupStore } from "@/store/plantSetup";
 
 export function usePlantSetupWorkflow() {
+	const { t } = useTranslation("plantSetup");
 	const activeStepId = usePlantSetupStore((state) => state.activeStepId);
 	const workflowState = usePlantSetupStore((state) => state.workflowState);
 	const setActiveStepId = usePlantSetupStore((state) => state.setActiveStepId);
 	const setPlant = usePlantSetupStore((state) => state.setPlant);
 	const updatePlant = usePlantSetupStore((state) => state.updatePlant);
 
-	const activeStepIndex = plantSetupSteps.findIndex(
-		(step) => step.id === activeStepId,
+	const steps = useMemo(
+		() =>
+			plantSetupSteps.map((step) => ({
+				id: step.id,
+				title: t(step.titleKey),
+				description: t(step.descriptionKey),
+			})),
+		[t],
 	);
+	const activeStepIndex = steps.findIndex((step) => step.id === activeStepId);
 	const safeActiveStepIndex = activeStepIndex >= 0 ? activeStepIndex : 0;
-	const activeStep = plantSetupSteps[safeActiveStepIndex];
+	const activeStep = steps[safeActiveStepIndex];
 	const canGoBack = safeActiveStepIndex > 0;
-	const canGoForward = safeActiveStepIndex < plantSetupSteps.length - 1;
+	const canGoForward = safeActiveStepIndex < steps.length - 1;
 
 	const hasSimulatorDevice = useMemo(
 		() => workflowState.devices.some((device) => device.type === "SIMULATOR"),
@@ -29,26 +38,25 @@ export function usePlantSetupWorkflow() {
 
 	const stepDescriptions = useMemo(
 		() =>
-			plantSetupSteps.reduce(
-				(currentDescriptions, step) => ({
-					...currentDescriptions,
-					[step.id]: getPlantSetupStepDescription(step.id, workflowState),
-				}),
-				{} as Record<PlantSetupStepId, string>,
-			),
-		[workflowState],
+			Object.fromEntries(
+				steps.map((step) => [
+					step.id,
+					getPlantSetupStepDescription(step.id, workflowState, t),
+				]),
+			) as Record<PlantSetupStepId, string>,
+		[steps, t, workflowState],
 	);
 	const activeStepDescription = stepDescriptions[activeStep.id];
 
 	const goBack = () => {
 		if (canGoBack) {
-			setActiveStepId(plantSetupSteps[safeActiveStepIndex - 1].id);
+			setActiveStepId(steps[safeActiveStepIndex - 1].id);
 		}
 	};
 
 	const goForward = () => {
 		if (canGoForward) {
-			setActiveStepId(plantSetupSteps[safeActiveStepIndex + 1].id);
+			setActiveStepId(steps[safeActiveStepIndex + 1].id);
 		}
 	};
 
@@ -65,7 +73,7 @@ export function usePlantSetupWorkflow() {
 		hasSimulatorDevice,
 		setPlant,
 		stepDescriptions,
-		steps: plantSetupSteps,
+		steps,
 		updatePlant,
 		workflowState,
 	};

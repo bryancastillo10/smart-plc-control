@@ -1,17 +1,20 @@
 import { Cpu, Plus, Tags, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { tagDataTypes } from "@/constants/tagDataType";
 import { useCreateTag } from "@/features/tags/useCreateTag";
 import { appButtonVariants } from "@/styles/recipes";
 import type { Device } from "@/types/device";
 import type { ProcessUnit } from "@/types/process-unit";
 import type { Tag } from "@/types/tag";
-import { tagDataTypes } from "@/constants/tagDataType";
+import { deviceTypeLabelKeys, tagDataTypeLabelKeys } from "@/constants/tagLabelKeys";
 
 export function AddTagStep() {
+	const { t } = useTranslation("plantSetup");
 	const {
 		devices,
 		handleSubmit,
@@ -28,13 +31,13 @@ export function AddTagStep() {
 		<div className="space-y-6">
 			{devices.length === 0 ? (
 				<div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-900">
-					Add at least one Device before defining its measurements and signals.
+					{t("addTag.deviceRequired")}
 				</div>
 			) : null}
 
 			<form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
 				<div className="space-y-2">
-					<Label htmlFor="deviceId">Device</Label>
+					<Label htmlFor="deviceId">{t("addTag.device.label")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						disabled={devices.length === 0}
@@ -43,24 +46,24 @@ export function AddTagStep() {
 						required
 						value={tagData.deviceId}
 					>
-						<option value="">Select a device</option>
+						<option value="">{t("addTag.device.placeholder")}</option>
 						{devices.map((device) => (
 							<option key={device.id} value={device.id}>
-								{device.name} ({device.type.replaceAll("_", " ")})
+								{device.name} ({t(deviceTypeLabelKeys[device.type])})
 							</option>
 						))}
 					</select>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="processUnitId">Process Unit</Label>
+					<Label htmlFor="processUnitId">{t("addTag.processUnit.label")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="processUnitId"
 						onChange={onChange}
 						value={tagData.processUnitId ?? ""}
 					>
-						<option value="">Not assigned to a process unit</option>
+						<option value="">{t("addTag.processUnit.unassigned")}</option>
 						{processUnits.map((unit) => (
 							<option key={unit.id} value={unit.id}>
 								{unit.name}
@@ -70,18 +73,18 @@ export function AddTagStep() {
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="name">Tag Name</Label>
+					<Label htmlFor="name">{t("addTag.name.label")}</Label>
 					<Input
 						id="name"
 						onChange={onChange}
-						placeholder="Aeration Tank Level"
+						placeholder={t("addTag.name.placeholder")}
 						required
 						value={tagData.name}
 					/>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="address">Device Address</Label>
+					<Label htmlFor="address">{t("addTag.address")}</Label>
 					<Input
 						id="address"
 						onChange={onChange}
@@ -92,7 +95,7 @@ export function AddTagStep() {
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="dataType">Value Type</Label>
+					<Label htmlFor="dataType">{t("addTag.dataTypeLabel")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="dataType"
@@ -101,14 +104,14 @@ export function AddTagStep() {
 					>
 						{tagDataTypes.map((dataType) => (
 							<option key={dataType.value} value={dataType.value}>
-								{dataType.label}
+								{t(tagDataTypeLabelKeys[dataType.value])}
 							</option>
 						))}
 					</select>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="unit">Engineering Unit</Label>
+					<Label htmlFor="unit">{t("addTag.engineeringUnit")}</Label>
 					<Input
 						id="unit"
 						onChange={onChange}
@@ -118,11 +121,11 @@ export function AddTagStep() {
 				</div>
 
 				<div className="space-y-2 md:col-span-2">
-					<Label htmlFor="description">Description</Label>
+					<Label htmlFor="description">{t("addTag.description.label")}</Label>
 					<Textarea
 						id="description"
 						onChange={onChange}
-						placeholder="Describe what this value represents and how it is used during operation."
+						placeholder={t("addTag.description.placeholder")}
 						value={tagData.description ?? ""}
 					/>
 				</div>
@@ -135,7 +138,7 @@ export function AddTagStep() {
 						onChange={onChange}
 						type="checkbox"
 					/>
-					Include this measurement or signal in plant operation
+					{t("addTag.enabled")}
 				</label>
 
 				<div className="flex justify-end md:col-span-2">
@@ -145,7 +148,7 @@ export function AddTagStep() {
 						type="submit"
 					>
 						<Plus className="size-4" />
-						Add Tag
+						{t("addTag.add")}
 					</Button>
 				</div>
 			</form>
@@ -171,15 +174,14 @@ function SavedTags({
 	processUnits: ProcessUnit[];
 	tags: Tag[];
 }) {
+	const { t } = useTranslation("plantSetup");
 	const deviceById = new Map(devices.map((device) => [device.id, device]));
-	const processUnitById = new Map(
-		processUnits.map((unit) => [unit.id, unit]),
-	);
+	const processUnitById = new Map(processUnits.map((unit) => [unit.id, unit]));
 
 	if (tags.length === 0) {
 		return (
 			<div className="rounded-md border border-dashed border-line-subtle p-6 text-center text-sm text-brand-muted">
-				No tags have been added yet.
+				{t("addTag.empty")}
 			</div>
 		);
 	}
@@ -189,7 +191,7 @@ function SavedTags({
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2 font-bold text-brand-ink">
 					<Tags className="size-4 text-brand-control" />
-					Saved Measurements and Signals
+					{t("addTag.saved")}
 				</div>
 				<span className="rounded-full bg-chip px-2.5 py-1 text-xs font-bold text-brand-control">
 					{tags.length}
@@ -218,12 +220,13 @@ function SavedTags({
 											{tag.name}
 										</h4>
 										<p className="mt-1 text-xs font-semibold uppercase tracking-widest text-brand-kicker">
-											{tag.dataType} {tag.unit ? `- ${tag.unit}` : ""}
+											{t(tagDataTypeLabelKeys[tag.dataType])}{" "}
+											{tag.unit ? `- ${tag.unit}` : ""}
 										</p>
 									</div>
 								</div>
 								<Button
-									aria-label={`Remove ${tag.name}`}
+									aria-label={t("addTag.remove", { name: tag.name })}
 									onClick={() => onRemove(tag.id)}
 									size="icon-sm"
 									type="button"
@@ -233,10 +236,18 @@ function SavedTags({
 								</Button>
 							</div>
 							<div className="mt-3 space-y-1 text-xs font-semibold text-brand-muted">
-								<p>Device: {device?.name ?? "Unknown device"}</p>
-								<p>Address: {tag.address}</p>
 								<p>
-									Process Unit: {processUnit?.name ?? "Not assigned"}
+									{t("addTag.savedDetails.device", {
+										name: device?.name ?? t("addTag.unknownDevice"),
+									})}
+								</p>
+								<p>
+									{t("addTag.savedDetails.address", { address: tag.address })}
+								</p>
+								<p>
+									{t("addTag.savedDetails.processUnit", {
+										name: processUnit?.name ?? t("addTag.notAssigned"),
+									})}
 								</p>
 							</div>
 							{tag.description ? (

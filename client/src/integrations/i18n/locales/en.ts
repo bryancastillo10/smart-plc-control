@@ -12,13 +12,15 @@ export const en = {
 		password: "Password",
 		passwordPlaceholder: "Enter password",
 		language: "Language",
+		signIn: "Sign In",
 		notice: "Administrator-managed access only. Public sign-up is disabled.",
 		adminOnly: "Admin provisioned",
 		processes: "AD, AO, A2O, SBR, MBR and pilot processes",
 		role: "Role-aware access",
 		roleText: "Admin, operator and viewer permissions are enforced by the API.",
 		control: "PLC-ready",
-		controlText: "Designed for devices, tags, live readings, alarms and audit trails.",
+		controlText:
+			"Designed for devices, tags, live readings, alarms and audit trails.",
 		required: "Enter both email and password",
 		unavailable:
 			"Login service is not available yet. The client is ready for POST /api/v1/auth/login.",
@@ -65,6 +67,524 @@ export const en = {
 			cardTitle: "Access Required",
 			cardDescription:
 				"An admin user needs to allow your account access to a plant. Once access is granted, the dashboard and operating pages will become available automatically after your session refreshes.",
+		},
+	},
+	plantSetup: {
+		wizard: {
+			kicker: "First-run setup",
+			title: "Plant Setup Workflow",
+			description:
+				"Move through the static setup shell for plant configuration before backend integration is added.",
+			progress: "Step {{current}} of {{total}}",
+			currentStep: "Current step",
+			previous: "Previous",
+			next: "Next",
+		},
+		steps: {
+			plant: {
+				title: "Plant Information",
+				description:
+					"Define the plant identity, location, operating status, and overall purpose.",
+				details: {
+					configured:
+						"{{name}} has been identified as the plant for this setup. Review its location, status, and description before defining the process.",
+					empty:
+						"Begin with the basic plant information. Use the description to summarize the plant's purpose, production scope, treatment capacity, or main operating responsibilities.",
+				},
+			},
+			processUnits: {
+				title: "Process Units",
+				description:
+					"Identify the main treatment stages, production areas, and supporting units in the plant.",
+				details: {
+					configured_one:
+						"{{count}} process unit defined. Confirm that the list represents the major stages and supporting areas needed to understand the complete process.",
+					configured_other:
+						"{{count}} process units defined. Confirm that the list represents the major stages and supporting areas needed to understand the complete process.",
+					empty:
+						"Break the plant into meaningful operating areas or unit operations, such as tanks, reactors, clarifiers, filters, pump stations, storage areas, and utility systems.",
+				},
+			},
+			devices: {
+				title: "Devices and Control Equipment",
+				description:
+					"Register the equipment used to monitor, control, and exchange information across the process.",
+				details: {
+					configured_one:
+						"{{count}} device identified. Check that the equipment needed to observe and control each process area is represented.",
+					configured_other:
+						"{{count}} devices identified. Check that the equipment needed to observe and control each process area is represented.",
+					empty:
+						"Identify the PLCs, gateways, simulators, and other control equipment that collect measurements, issue commands, or connect plant areas.",
+				},
+			},
+			tags: {
+				title: "Process Measurements and Signals",
+				description:
+					"Define the measurements, equipment states, and control signals used during operation.",
+				details: {
+					configured_one:
+						"{{count}} measurement or signal defined. Confirm that each item is associated with the correct device and process area.",
+					configured_other:
+						"{{count}} measurements or signals defined. Confirm that each item is associated with the correct device and process area.",
+					empty:
+						"List the values operators need to monitor or control, such as flow, level, pressure, temperature, quality, equipment status, setpoints, and commands.",
+				},
+			},
+			diagram: {
+				title: "Process Flow Arrangement",
+				description:
+					"Arrange the process units and show how materials or utilities move between them.",
+				details: {
+					configured_one:
+						"{{count}} process connection defined. Review the sequence and direction of flow between units.",
+					configured_other:
+						"{{count}} process connections defined. Review the sequence and direction of flow between units.",
+					empty:
+						"Arrange the process units in their normal operating sequence, then describe how water, product, waste, chemicals, gas, or utilities pass from one unit to another.",
+				},
+			},
+			alertRules: {
+				title: "Operating Alerts",
+				description:
+					"Set the operating conditions that require attention and indicate their level of urgency.",
+				details: {
+					configured_one:
+						"{{count}} operating alert defined. Review each limit, urgency, and message to ensure it supports an appropriate operator response.",
+					configured_other:
+						"{{count}} operating alerts defined. Review each limit, urgency, and message to ensure it supports an appropriate operator response.",
+					empty:
+						"Define when an operating value requires attention. Consider normal limits, warning conditions, critical conditions, equipment protection, and the action expected from the operator.",
+				},
+			},
+			simulation: {
+				title: "Process Simulation",
+				description:
+					"Prepare representative operating behavior for testing process conditions and responses.",
+				details: {
+					available:
+						"A simulation source is available. Define representative values and operating changes that can be used to examine plant behavior under expected and unusual conditions.",
+					unavailable:
+						"Add a simulator under Devices and Control Equipment if you want to examine plant behavior using representative operating values and scenarios.",
+				},
+			},
+			users: {
+				title: "Team and Responsibilities",
+				description:
+					"Assign the people responsible for operating, supervising, and reviewing the plant.",
+				details: {
+					configured_one:
+						"{{count}} team member assigned. Confirm that operating, supervisory, and review responsibilities are appropriately covered.",
+					configured_other:
+						"{{count}} team members assigned. Confirm that operating, supervisory, and review responsibilities are appropriately covered.",
+					empty:
+						"Identify who will operate the plant, supervise performance, review conditions, or maintain the setup. Assign responsibilities according to each person's role.",
+				},
+			},
+			dashboard: {
+				title: "Open Plant Overview",
+				description:
+					"Complete the setup and continue to the plant's operational overview.",
+				details: {
+					default:
+						"Open the plant overview to view the current local setup values before continuing.",
+				},
+			},
+		},
+		plantInformation: {
+			name: {
+				label: "Plant Name",
+				placeholder: "Main Production Plant",
+			},
+			location: {
+				label: "Location",
+				placeholder: "Hsinchu, Taiwan",
+			},
+			status: {
+				label: "Initial Status",
+				options: {
+					active: "Active",
+					inactive: "Inactive",
+					maintenance: "Maintenance",
+				},
+			},
+			description: {
+				label: "Description",
+				placeholder:
+					"Describe the plant scope, equipment area, or operating context.",
+			},
+			save: "Save Plant Information",
+			savedTitle: "Saved Plant Information",
+			notProvided: "Not provided",
+		},
+		addDevice: {
+			plantRequired: "Save the Plant Information step before adding devices.",
+			name: {
+				label: "Device Name",
+				placeholder: "Main Process PLC",
+			},
+			typeLabel: "Device Type",
+			types: {
+				plc: "PLC",
+				simulator: "Simulator",
+				gateway: "Gateway",
+				sensorGroup: "Sensor Group",
+				actuatorGroup: "Actuator Group",
+			},
+			protocolLabel: "Communication Method",
+			protocols: {
+				modbusTcp: "Modbus TCP",
+				opcUa: "OPC UA",
+				simulator: "Simulator",
+			},
+			icon: {
+				label: "Display Icon",
+				placeholder: "Select a device icon",
+			},
+			icons: {
+				controller: "Controller",
+				server: "Server",
+				gateway: "Gateway",
+				instrumentGroup: "Instrument Group",
+				connectedEquipment: "Connected Equipment",
+			},
+			host: "Host or Address",
+			port: "Port",
+			description: {
+				label: "Description",
+				placeholder:
+					"Describe the device's responsibility and the process area it serves.",
+			},
+			enabled: "Include this device in plant operation",
+			add: "Add Device",
+			empty: "No devices have been added yet.",
+			saved: "Saved Devices",
+			internalSimulation: "Internal simulation",
+			addressNotProvided: "Address not provided",
+			remove: "Remove {{name}}",
+			noDescription: "No description provided.",
+			included: "Included",
+			notIncluded: "Not included",
+		},
+		processUnit: {
+			plantRequired:
+				"Save the Plant Information step before adding process units.",
+			name: {
+				label: "Unit Name",
+				placeholder: "Aeration Tank 1",
+			},
+			typeLabel: "Unit Type",
+			typePlaceholder: "Select a unit type",
+			types: {
+				tank: "Tank",
+				reactor: "Reactor",
+				clarifier: "Clarifier",
+				pumpStation: "Pump Station",
+				filter: "Filter",
+				custom: "Custom",
+			},
+			status: {
+				label: "Initial Status",
+				options: {
+					active: "Active",
+					inactive: "Inactive",
+					maintenance: "Maintenance",
+				},
+			},
+			icon: {
+				label: "Diagram Icon",
+				placeholder: "Select a diagram icon",
+			},
+			icons: {
+				factory: "Factory",
+				tank: "Tank",
+				waterProcess: "Water Process",
+				meteredUnit: "Metered Unit",
+			},
+			description: {
+				label: "Description",
+				placeholder: "Describe this unit's purpose in the plant process.",
+			},
+			add: "Add Process Unit",
+			empty: "No process units have been added yet.",
+			saved: "Saved Process Units",
+			remove: "Remove {{name}}",
+			noDescription: "No description provided.",
+			connectionPorts_one: "{{count}} connection port",
+			connectionPorts_other: "{{count}} connection ports",
+			iconValue: "{{icon}} icon",
+		},
+		addTag: {
+			deviceRequired:
+				"Add at least one Device before defining its measurements and signals.",
+			device: {
+				label: "Device",
+				placeholder: "Select a device",
+			},
+			processUnit: {
+				label: "Process Unit",
+				unassigned: "Not assigned to a process unit",
+			},
+			name: {
+				label: "Tag Name",
+				placeholder: "Aeration Tank Level",
+			},
+			address: "Device Address",
+			dataTypeLabel: "Value Type",
+			dataTypes: {
+				boolean: "Boolean",
+				integer: "Integer",
+				decimal: "Decimal",
+				text: "Text",
+			},
+			engineeringUnit: "Engineering Unit",
+			description: {
+				label: "Description",
+				placeholder:
+					"Describe what this value represents and how it is used during operation.",
+			},
+			enabled: "Include this measurement or signal in plant operation",
+			add: "Add Tag",
+			empty: "No tags have been added yet.",
+			saved: "Saved Measurements and Signals",
+			remove: "Remove {{name}}",
+			unknownDevice: "Unknown device",
+			notAssigned: "Not assigned",
+			savedDetails: {
+				device: "Device: {{name}}",
+				address: "Address: {{address}}",
+				processUnit: "Process Unit: {{name}}",
+			},
+		},
+		processArrangement: {
+			instructions:
+				"Drag each card to arrange the plant. To create a process flow, drag the arrow handle on the right side of one process unit and release it over another process unit.",
+			connectionsTitle: "Process Flow Connections ({{count}})",
+			empty: "No process-flow connections have been added yet.",
+			remove: "Remove process connection",
+			flowTypes: {
+				water: "Water",
+				wastewater: "Wastewater",
+				sludge: "Sludge",
+				gas: "Gas",
+				chemical: "Chemical",
+				rawMaterial: "Raw Material",
+				others: "Others",
+			},
+		},
+		addAlertRule: {
+			tagRequired:
+				"Add at least one measurement or signal before defining operating alerts.",
+			tag: {
+				label: "Measurement or Signal",
+				placeholder: "Select a measurement or signal",
+			},
+			selected: {
+				device: "Device: {{name}}",
+				processUnit: "Process Unit: {{name}}",
+				value: "Value: {{type}}",
+			},
+			unknown: "Unknown",
+			notAssigned: "Not assigned",
+			name: {
+				label: "Alert Name",
+				placeholder: "High tank level",
+			},
+			severityLabel: "Urgency",
+			severities: {
+				low: "Low",
+				medium: "Medium",
+				high: "High",
+				critical: "Critical",
+			},
+			operatorLabel: "Condition",
+			operators: {
+				above: "Above",
+				atOrAbove: "At or above",
+				below: "Below",
+				atOrBelow: "At or below",
+				equalTo: "Equal to",
+				notEqualTo: "Not equal to",
+			},
+			threshold: {
+				label: "Operating Limit",
+				statePlaceholder: "Select a state",
+				true: "True",
+				false: "False",
+				placeholder: "Limit value",
+			},
+			message: {
+				label: "Operator Message",
+				placeholder:
+					"Describe the condition and the response expected from the operator.",
+			},
+			enabled: "Enable this operating alert",
+			add: "Add Alert Rule",
+			empty: "No operating alerts have been added yet.",
+			saved: "Saved Operating Alerts",
+			unknownTag: "Unknown tag",
+			remove: "Remove {{name}}",
+			savedDetails: {
+				device: "Device: {{name}}",
+				processUnit: "Process Unit: {{name}}",
+			},
+		},
+		addSimulation: {
+			optional: {
+				title: "Simulation setup is optional",
+				description:
+					"No Simulator device was added during Device setup. You may skip this step and continue, or return to Devices and add a Simulator if representative process behavior is needed.",
+			},
+			availableDevices: "Available Simulator Devices",
+			deviceDescription:
+				"Simulation profiles apply to the Plant as a whole. Simulator Devices enable representative values to be supplied during testing.",
+			name: {
+				label: "Simulation Name",
+				placeholder: "Normal operation profile",
+			},
+			updateInterval: {
+				label: "Update Interval (milliseconds)",
+				help: "How often representative process values are refreshed. Minimum 100 milliseconds.",
+			},
+			variation: {
+				label: "Variation Factor",
+				help: "Adds natural variation to generated values, from 0 for steady values to 1 for maximum variation.",
+			},
+			add: "Add Simulation Profile",
+			empty: "No simulation profiles have been added yet.",
+			saved: "Saved Simulation Profiles",
+			statuses: {
+				idle: "Idle",
+				running: "Running",
+				paused: "Paused",
+				stopped: "Stopped",
+			},
+			remove: "Remove {{name}}",
+			savedDetails: {
+				updateInterval: "Update interval: {{value}} ms",
+				variation: "Variation factor: {{value}}",
+			},
+		},
+		plantUsers: {
+			table: {
+				user: "User",
+				responsibility: "Plant Responsibility",
+				role: "Role",
+				language: "Language",
+			},
+			owner: "Plant Owner",
+			teamMember: "Team member",
+			roleFor: "Role for {{name}}",
+			roles: {
+				admin: "Administrator",
+				operator: "Operator",
+				viewer: "Viewer",
+			},
+			languages: {
+				english: "English",
+				traditionalChinese: "Traditional Chinese",
+			},
+			empty: "No users have been assigned to this Plant.",
+			addMember: {
+				title: "Add Team Member",
+				description: "Create an account and grant access to this Plant.",
+			},
+			fields: {
+				username: "User Name",
+				email: "Email",
+				role: "Role",
+				language: "Language",
+				temporaryPassword: "Temporary Password",
+				confirmPassword: "Confirm Password",
+			},
+			validation:
+				"Complete all required fields and confirm that both passwords match.",
+			creating: "Creating Account...",
+			add: "Add User",
+			adminOnly:
+				"Only an ADMIN user can create accounts or change team member roles.",
+		},
+		plantOverview: {
+			modal: {
+				close: "Close",
+				done: "Done",
+				description:
+					"Each setup request runs in dependency order. Follow its progress below.",
+				title: "Creating plant setup",
+			},
+			introduction: {
+				title: "Open Plant Overview",
+				description:
+					"View the current local draft values before opening the plant overview. These values are read from the plant setup form store only.",
+			},
+			sections: {
+				plantInformation: "Plant Information",
+				processUnit: "Process Unit",
+				processConnection: "Process Connection",
+				device: "Device",
+				tag: "Tag",
+				alertRule: "Alert Rule",
+				simulation: "Simulation",
+			},
+			labels: {
+				name: "Name",
+				location: "Location",
+				status: "Status",
+				description: "Description",
+				type: "Type",
+				position: "Position",
+				ports: "Ports",
+				icon: "Icon",
+				sourceUnit: "Source Unit",
+				sourcePort: "Source Port",
+				targetUnit: "Target Unit",
+				targetPort: "Target Port",
+				flowType: "Flow Type",
+				label: "Label",
+				protocol: "Protocol",
+				host: "Host",
+				port: "Port",
+				enabled: "Enabled",
+				device: "Device",
+				processUnit: "Process Unit",
+				address: "Address",
+				dataType: "Data Type",
+				unit: "Unit",
+				tag: "Tag",
+				condition: "Condition",
+				severity: "Severity",
+				message: "Message",
+				plant: "Plant",
+				updateInterval: "Update Interval",
+				noiseFactor: "Noise Factor",
+			},
+			values: {
+				yes: "Yes",
+				no: "No",
+				notSet: "Not set",
+			},
+			submit: "Submit",
+		},
+		plantFinal: {
+			requests: {
+				plant: "Plant information",
+				processUnits: "Process units",
+				devices: "Devices",
+				connections: "Process connections",
+				tags: "Tags",
+				alertRules: "Alert rules",
+				simulations: "Simulations",
+			},
+			status: {
+				creatingProgress: "Creating {{current}} of {{total}}...",
+				creating: "Creating...",
+				nothing: "Nothing to create",
+				completed_one: "{{count}} request completed",
+				completed_other: "{{count}} requests completed",
+				failed: "Request failed",
+				skipped: "Skipped after an earlier failure",
+				waiting: "Waiting",
+			},
 		},
 	},
 	toast: {
@@ -285,4 +805,4 @@ export const en = {
 			},
 		},
 	},
-}
+};

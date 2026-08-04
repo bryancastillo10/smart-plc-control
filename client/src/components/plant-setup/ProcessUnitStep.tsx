@@ -1,13 +1,14 @@
-﻿import {
+import {
 	Cylinder,
 	Factory,
 	Gauge,
+	type LucideIcon,
 	Network,
 	Plus,
 	Trash2,
 	Waves,
-	type LucideIcon,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,33 +26,33 @@ import { appButtonVariants } from "@/styles/recipes";
 import type { ProcessUnit } from "@/types/process-unit";
 
 const processUnitTypes = [
-	"Tank",
-	"Reactor",
-	"Clarifier",
-	"Pump Station",
-	"Filter",
-	"Custom",
+	{ value: "Tank", labelKey: "processUnit.types.tank" },
+	{ value: "Reactor", labelKey: "processUnit.types.reactor" },
+	{ value: "Clarifier", labelKey: "processUnit.types.clarifier" },
+	{ value: "Pump Station", labelKey: "processUnit.types.pumpStation" },
+	{ value: "Filter", labelKey: "processUnit.types.filter" },
+	{ value: "Custom", labelKey: "processUnit.types.custom" },
 ] as const;
 
+const processUnitStatusLabelKeys = {
+	ACTIVE: "processUnit.status.options.active",
+	INACTIVE: "processUnit.status.options.inactive",
+	MAINTENANCE: "processUnit.status.options.maintenance",
+} as const satisfies Record<ProcessUnit["status"], string>;
+
 const processUnitIconOptions = [
-	{ value: "Factory", label: "Factory", Icon: Factory },
-	{ value: "Cylinder", label: "Tank", Icon: Cylinder },
-	{ value: "Waves", label: "Water Process", Icon: Waves },
-	{ value: "Gauge", label: "Metered Unit", Icon: Gauge },
+	{ value: "Factory", labelKey: "processUnit.icons.factory", Icon: Factory },
+	{ value: "Cylinder", labelKey: "processUnit.icons.tank", Icon: Cylinder },
+	{ value: "Waves", labelKey: "processUnit.icons.waterProcess", Icon: Waves },
+	{ value: "Gauge", labelKey: "processUnit.icons.meteredUnit", Icon: Gauge },
 ] as const satisfies readonly {
 	value: string;
-	label: string;
+	labelKey: string;
 	Icon: LucideIcon;
 }[];
 
-function getProcessUnitIcon(iconName: string) {
-	return (
-		processUnitIconOptions.find((option) => option.value === iconName)?.Icon ??
-		Factory
-	);
-}
-
 export function ProcessUnitStep() {
+	const { t } = useTranslation("plantSetup");
 	const {
 		handleSubmit,
 		onChange,
@@ -70,24 +71,24 @@ export function ProcessUnitStep() {
 		<div className="space-y-6">
 			{!plantExists ? (
 				<div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-900">
-					Save the Plant Information step before adding process units.
+					{t("processUnit.plantRequired")}
 				</div>
 			) : null}
 
 			<form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
 				<div className="space-y-2">
-					<Label htmlFor="name">Unit Name</Label>
+					<Label htmlFor="name">{t("processUnit.name.label")}</Label>
 					<Input
 						id="name"
 						onChange={onChange}
-						placeholder="Aeration Tank 1"
+						placeholder={t("processUnit.name.placeholder")}
 						required
 						value={processUnitData.name}
 					/>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="type">Unit Type</Label>
+					<Label htmlFor="type">{t("processUnit.typeLabel")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="type"
@@ -95,40 +96,46 @@ export function ProcessUnitStep() {
 						required
 						value={processUnitData.type}
 					>
-						<option value="">Select a unit type</option>
-						{processUnitTypes.map((type) => (
-							<option key={type} value={type}>
-								{type}
+						<option value="">{t("processUnit.typePlaceholder")}</option>
+						{processUnitTypes.map(({ value, labelKey }) => (
+							<option key={value} value={value}>
+								{t(labelKey)}
 							</option>
 						))}
 					</select>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="status">Initial Status</Label>
+					<Label htmlFor="status">{t("processUnit.status.label")}</Label>
 					<select
 						className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 						id="status"
 						onChange={onChange}
 						value={processUnitData.status}
 					>
-						<option value="ACTIVE">Active</option>
-						<option value="INACTIVE">Inactive</option>
-						<option value="MAINTENANCE">Maintenance</option>
+						<option value="ACTIVE">
+							{t("processUnit.status.options.active")}
+						</option>
+						<option value="INACTIVE">
+							{t("processUnit.status.options.inactive")}
+						</option>
+						<option value="MAINTENANCE">
+							{t("processUnit.status.options.maintenance")}
+						</option>
 					</select>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="icon">Diagram Icon</Label>
+					<Label htmlFor="icon">{t("processUnit.icon.label")}</Label>
 					<Select onValueChange={onIconChange} value={processUnitData.icon}>
 						<SelectTrigger className="w-full" id="icon">
-							<SelectValue placeholder="Select a diagram icon" />
+							<SelectValue placeholder={t("processUnit.icon.placeholder")} />
 						</SelectTrigger>
 						<SelectContent>
-							{processUnitIconOptions.map(({ value, label, Icon }) => (
+							{processUnitIconOptions.map(({ value, labelKey, Icon }) => (
 								<SelectItem key={value} value={value}>
 									<Icon className="size-4" />
-									{label}
+									{t(labelKey)}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -136,11 +143,13 @@ export function ProcessUnitStep() {
 				</div>
 
 				<div className="space-y-2 md:col-span-2">
-					<Label htmlFor="description">Description</Label>
+					<Label htmlFor="description">
+						{t("processUnit.description.label")}
+					</Label>
 					<Textarea
 						id="description"
 						onChange={onChange}
-						placeholder="Describe this unit's purpose in the plant process."
+						placeholder={t("processUnit.description.placeholder")}
 						value={processUnitData.description ?? ""}
 					/>
 				</div>
@@ -152,7 +161,7 @@ export function ProcessUnitStep() {
 						type="submit"
 					>
 						<Plus className="size-4" />
-						Add Process Unit
+						{t("processUnit.add")}
 					</Button>
 				</div>
 			</form>
@@ -172,10 +181,12 @@ function SavedProcessUnits({
 	onRemove: (id: string) => void;
 	processUnits: ProcessUnit[];
 }) {
+	const { t } = useTranslation("plantSetup");
+
 	if (processUnits.length === 0) {
 		return (
 			<div className="rounded-md border border-dashed border-line-subtle p-6 text-center text-sm text-brand-muted">
-				No process units have been added yet.
+				{t("processUnit.empty")}
 			</div>
 		);
 	}
@@ -185,7 +196,7 @@ function SavedProcessUnits({
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2 font-bold text-brand-ink">
 					<Network className="size-4 text-brand-control" />
-					Saved Process Units
+					{t("processUnit.saved")}
 				</div>
 				<span className="rounded-full bg-chip px-2.5 py-1 text-xs font-bold text-brand-control">
 					{processUnits.length}
@@ -194,7 +205,13 @@ function SavedProcessUnits({
 
 			<div className="grid gap-3 md:grid-cols-2">
 				{processUnits.map((unit) => {
-					const UnitIcon = getProcessUnitIcon(unit.icon);
+					const iconOption = processUnitIconOptions.find(
+						(option) => option.value === unit.icon,
+					);
+					const UnitIcon = iconOption?.Icon ?? Factory;
+					const typeOption = processUnitTypes.find(
+						(option) => option.value === unit.type,
+					);
 
 					return (
 						<article
@@ -211,12 +228,13 @@ function SavedProcessUnits({
 											{unit.name}
 										</h4>
 										<p className="mt-1 text-xs font-semibold uppercase tracking-widest text-brand-kicker">
-											{unit.type} &middot; {unit.status}
+											{typeOption ? t(typeOption.labelKey) : unit.type} &middot;{" "}
+											{t(processUnitStatusLabelKeys[unit.status])}
 										</p>
 									</div>
 								</div>
 								<Button
-									aria-label={`Remove ${unit.name}`}
+									aria-label={t("processUnit.remove", { name: unit.name })}
 									onClick={() => onRemove(unit.id)}
 									size="icon-sm"
 									type="button"
@@ -226,10 +244,14 @@ function SavedProcessUnits({
 								</Button>
 							</div>
 							<p className="mt-3 text-sm leading-5 text-brand-muted">
-								{unit.description || "No description provided."}
+								{unit.description || t("processUnit.noDescription")}
 							</p>
 							<p className="mt-3 text-xs font-semibold text-brand-muted">
-								{unit.ports.length} connection ports &middot; {unit.icon} icon
+								{t("processUnit.connectionPorts", { count: unit.ports.length })}{" "}
+								&middot;{" "}
+								{t("processUnit.iconValue", {
+									icon: iconOption ? t(iconOption.labelKey) : unit.icon,
+								})}
 							</p>
 						</article>
 					);
