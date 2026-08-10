@@ -1,10 +1,11 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
 
 import { PlantHealthSummary } from "@/components/dashboard/PlantHealthSummary";
+import { ProcessOverview } from "@/components/dashboard/ProcessOverview";
 import { plantHealthSummaryPlaceholder } from "@/constants/dashboard";
+import { processOverviewPlaceholder } from "@/constants/process_overview";
 
 const dashboardSections = [
-	"Process Units",
 	"Tag Inventory",
 	"Latest Tag Readings",
 	"Alert Rules",
@@ -32,6 +33,7 @@ function DashboardPage() {
 			</header>
 
 			<PlantHealthSummary summary={plantHealthSummaryPlaceholder} />
+			<ProcessOverview overview={processOverviewPlaceholder} />
 
 			<section aria-labelledby="dashboard-sections-title" className="space-y-4">
 				<h3
