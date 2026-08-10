@@ -451,23 +451,19 @@ Audit logs should be append-only and should not expose update or deletion endpoi
 ### WebSocket
 
 ```text
-GET /api/v1/ws/simulation
+GET /api/v1/ws/simulation?plantId=:plantId&status=:status&intervalMs=:intervalMs
 ```
 
-The simulation WebSocket broadcasts real-time events such as:
+The route is authenticated with the same JWT header or HttpOnly cookie as REST. `plantId` is required, and the authenticated user must be listed in the plant's `accessibleBy` collection. `status` is optional; `intervalMs` accepts `250`–`10000` and defaults to `1000`.
+
+The server sends both events immediately and on every interval:
 
 ```text
-tag.reading.updated
-device.status.changed
-alert.triggered
-alert.acknowledged
-alert.resolved
-simulation.started
-simulation.paused
-simulation.stopped
+simulation.snapshot
+simulation.telemetry.snapshot
 ```
 
-The client should retrieve initial state through the REST API and then use the WebSocket connection for incremental real-time updates.
+`simulation.telemetry.snapshot` contains the plant's device connection states, latest persisted reading for each tag, and active or acknowledged alerts. It does not generate readings; a simulation tick must persist `TagReadings` for values to change.
 
 If the application later broadcasts events from both simulated and physical PLCs, the endpoint can be generalized to:
 

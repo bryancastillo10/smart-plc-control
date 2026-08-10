@@ -11,26 +11,25 @@ GET /api/v1/ws/simulation
 server/internal/websockets/
 ```
 
-The socket currently streams **simulation metadata only**. It does not generate or stream tag readings, device changes, or alerts.
+The authenticated socket polls persisted plant state and emits two snapshots immediately and at each `intervalMs`:
 
-The handler validates the query, upgrades the connection, sends one snapshot immediately, then polls the `simulations` table and sends snapshots at `intervalMs`. JWT middleware is temporarily disabled for this route.
+- `simulation.snapshot`: simulation metadata.
+- `simulation.telemetry.snapshot`: device states, latest tag readings, and unresolved alerts.
 
-| Query | Values | Default |
-| --- | --- | --- |
-| `plantId` | Plant UUID | All plants |
-| `status` | `IDLE`, `RUNNING`, `PAUSED`, `STOPPED` | All statuses |
-| `intervalMs` | `250`–`10000` | `1000` |
+`plantId` is required and checked against the authenticated user's plant access. `status` is optional; `intervalMs` accepts `250`–`10000` and defaults to `1000`.
 
 ```ts
-type SimulationSnapshotMessage = {
-  type: "simulation.snapshot";
-  data?: Simulation[];
-  error?: string;
-  sentAt: string;
-};
+type SimulationStreamMessage =
+  | { type: "simulation.snapshot"; data?: Simulation[]; error?: string; sentAt: string }
+  | {
+      type: "simulation.telemetry.snapshot";
+      data?: { plantId: string; devices: DeviceState[]; readings: TagReading[]; alerts: Alert[] };
+      error?: string;
+      sentAt: string;
+    };
 ```
 
-`Simulation` matches `client/src/types/simulation.ts`. When `error` exists, preserve the last valid cache.
+When `error` exists, preserve the last valid cache.
 
 ## Current Flow
 
@@ -114,18 +113,11 @@ Treat the stream as stale after `max(intervalMs * 3, 5000 ms)` without a valid m
 
 ## Authentication
 
-Browser WebSockets cannot set an `Authorization` header. Before restoring `JWTAuthMiddleware()`:
+The route uses `JWTAuthMiddleware()`. Browser clients authenticate with the same-origin HttpOnly cookie used by REST; do not put long-lived tokens in the URL. Production still requires `wss://`, an origin policy, and proxy support for WebSocket upgrades.
 
-1. Authenticate with the same-origin HttpOnly cookie used by REST.
-2. Verify access to the requested `plantId`.
-3. Restrict origins and use `wss://` in production.
-4. Configure the production proxy for WebSocket upgrade headers.
+## Remaining Live Telemetry
 
-Avoid long-lived tokens in query parameters.
-
-## Missing Live Telemetry
-
-The server has no simulation tick that creates `TagReadings`, and the current hub has no shared broadcast API.
+Snapshots now expose persisted telemetry, but the server still has no simulation tick that creates `TagReadings` and no shared publisher for incremental events.
 
 ```mermaid
 flowchart LR
@@ -152,6 +144,7 @@ Proposed events:
 
 ```text
 simulation.snapshot
+simulation.telemetry.snapshot
 simulation.started
 simulation.paused
 simulation.stopped
