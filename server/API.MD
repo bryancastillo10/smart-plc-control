@@ -70,6 +70,7 @@ For auditability, adding a future `is_active` field and deactivating users may b
 POST     /api/v1/plants
 GET      /api/v1/plants
 GET      /api/v1/plants/:plantId
+GET      /api/v1/plants/:plantId/health-summary
 PUT    /api/v1/plants/:plantId
 DELETE   /api/v1/plants/:plantId
 ```
@@ -79,8 +80,54 @@ DELETE   /api/v1/plants/:plantId
 | `POST /api/v1/plants`            | Create a plant and assign initial admin access | `ADMIN`       |
 | `GET /api/v1/plants`             | List accessible plants    | Authenticated |
 | `GET /api/v1/plants/:plantId`    | Get plant details         | Authenticated |
+| `GET /api/v1/plants/:plantId/health-summary` | Get aggregated plant health data for the dashboard | Authenticated |
 | `PUT /api/v1/plants/:plantId`  | Update a plant            | `ADMIN`       |
 | `DELETE /api/v1/plants/:plantId` | Delete a plant            | `ADMIN`       |
+
+#### Plant Health Summary
+
+`GET /api/v1/plants/:plantId/health-summary` is a proposed dashboard endpoint. It is not yet registered in `server/bootstrap/routes.go`.
+
+The endpoint aggregates device connectivity, unresolved alerts, and the latest tag-reading quality for one plant. It avoids requiring the client to fetch and combine the device, alert, tag, and reading collections separately.
+
+Example response:
+
+```json
+{
+  "plantId": "6e08d162-aca6-4c21-aeb3-71f3f8e7fa72",
+  "updatedAt": "2026-08-10T09:30:00+08:00",
+  "devices": {
+    "total": 12,
+    "connected": 9,
+    "disconnected": 1,
+    "connecting": 1,
+    "error": 1
+  },
+  "alerts": {
+    "active": 7,
+    "critical": 2,
+    "unacknowledged": 4
+  },
+  "readings": {
+    "total": 48,
+    "good": 42,
+    "uncertain": 1,
+    "bad": 2,
+    "stale": 3
+  }
+}
+```
+
+Aggregation rules:
+
+- `devices.total` counts all devices assigned to the plant. The four connection-status counts use the existing `CONNECTED`, `DISCONNECTED`, `CONNECTING`, and `ERROR` values and should add up to `total`.
+- `alerts.active` counts unresolved alerts with either `ACTIVE` or `ACKNOWLEDGED` status.
+- `alerts.critical` counts unresolved alerts whose severity is `CRITICAL`.
+- `alerts.unacknowledged` counts alerts whose status is `ACTIVE`.
+- `readings.total` counts the latest reading returned for each plant tag. The `GOOD`, `UNCERTAIN`, `BAD`, and `STALE` quality counts should add up to `total`.
+- `updatedAt` is the server time at which the summary was generated. It is not the timestamp of an individual reading.
+
+The endpoint must verify that the authenticated user has access to `:plantId`. A missing plant returns `404`; a plant that exists but is not accessible to the current user returns `403`.
 
 ### Process Units
 
