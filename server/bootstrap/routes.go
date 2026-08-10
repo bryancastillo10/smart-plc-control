@@ -74,6 +74,8 @@ func registerPlants(r *gin.RouterGroup, DB *gorm.DB) {
 	{
 		plantGrp.POST("", middleware.RequireRoles(models.Admin), plant.CreatePlant)
 		plantGrp.GET("", plant.GetAllPlants)
+		// TODO: Implement GetPlantHealthSummary before enabling this route.
+		// plantGrp.GET("/:plantId/health-summary", plant.GetPlantHealthSummary)
 		plantGrp.GET("/:plantId", plant.GetPlantByID)
 		plantGrp.PUT("/:plantId", middleware.RequireRoles(models.Admin), plant.UpdatePlant)
 		plantGrp.DELETE("/:plantId", middleware.RequireRoles(models.Admin), plant.DeletePlant)
