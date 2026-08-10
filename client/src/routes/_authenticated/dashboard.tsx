@@ -1,14 +1,13 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
-import { useUserStore } from "@/store/user";
+
+import { PlantHealthSummary } from "@/components/dashboard/PlantHealthSummary";
+import { ProcessOverview } from "@/components/dashboard/ProcessOverview";
+import { plantHealthSummaryPlaceholder } from "@/constants/dashboard";
+import { processOverviewPlaceholder } from "@/constants/process_overview";
 
 const dashboardSections = [
-	"Plant Overview",
-	"Process Units",
-	"Device Connectivity",
 	"Tag Inventory",
 	"Latest Tag Readings",
-	"Reading Quality",
-	"Active Alerts",
 	"Alert Rules",
 	"Simulation Status",
 	"Simulation Scenarios",
@@ -21,33 +20,40 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function DashboardPage() {
-	const { user } = useUserStore();
-
-	console.log(user);
-
 	return (
-		<div className="space-y-6">
-			<div>
+		<div className="space-y-8">
+			<header>
 				<h2 className="text-2xl font-bold text-brand-ink">
 					Dashboard Overview
 				</h2>
 				<p className="mt-2 text-sm leading-6 text-brand-muted">
-					A starting map of the plant, process, device, tag, alert, simulation,
-					audit, and user areas represented by the server models.
+					Monitor the current condition of your plant and identify areas that
+					need attention.
 				</p>
-			</div>
+			</header>
 
-			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-				{dashboardSections.map((section) => (
-					<div
-						key={section}
-						className="rounded-md border border-line-subtle bg-white/55 p-4 shadow-sm backdrop-blur"
-					>
-						<h3 className="text-sm font-bold text-brand-ink">{section}</h3>
-						<div className="mt-4 min-h-24 rounded-md border border-dashed border-line-subtle bg-surface-soft/60" />
-					</div>
-				))}
-			</div>
+			<PlantHealthSummary summary={plantHealthSummaryPlaceholder} />
+			<ProcessOverview overview={processOverviewPlaceholder} />
+
+			<section aria-labelledby="dashboard-sections-title" className="space-y-4">
+				<h3
+					className="text-lg font-bold text-brand-ink"
+					id="dashboard-sections-title"
+				>
+					Operational details
+				</h3>
+				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+					{dashboardSections.map((section) => (
+						<div
+							key={section}
+							className="rounded-md border border-line-subtle bg-white/55 p-4 shadow-sm backdrop-blur"
+						>
+							<h4 className="text-sm font-bold text-brand-ink">{section}</h4>
+							<div className="mt-4 min-h-24 rounded-md border border-dashed border-line-subtle bg-surface-soft/60" />
+						</div>
+					))}
+				</div>
+			</section>
 		</div>
 	);
 }
