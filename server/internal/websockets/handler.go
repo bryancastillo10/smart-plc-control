@@ -34,6 +34,11 @@ func (h *Handler) Simulation(c *gin.Context) {
 		return
 	}
 
+	if err := h.service.AuthorizeSimulationStream(c.GetString("userID"), *query); err != nil {
+		c.Error(err)
+		return
+	}
+
 	if _, err := h.service.GetSimulationSnapshots(*query); err != nil {
 		c.Error(err)
 		return
@@ -58,7 +63,9 @@ func (h *Handler) Simulation(c *gin.Context) {
 		}
 	}()
 
-	h.sendSimulationSnapshot(client, *query)
+	if !h.sendSimulationSnapshots(client, *query) {
+		return
+	}
 
 	ticker := time.NewTicker(time.Duration(h.service.ResolveSimulationStreamInterval(*query)) * time.Millisecond)
 	defer ticker.Stop()
@@ -70,7 +77,7 @@ func (h *Handler) Simulation(c *gin.Context) {
 		case <-done:
 			return
 		case <-ticker.C:
-			if !h.sendSimulationSnapshot(client, *query) {
+			if !h.sendSimulationSnapshots(client, *query) {
 				return
 			}
 		}
@@ -90,6 +97,31 @@ func (h *Handler) sendSimulationSnapshot(client *Client, query SimulationStreamQ
 	return h.hub.Send(client, Message{
 		Type:   SimulationSnapshotEvent,
 		Data:   snapshots,
+		SentAt: time.Now().UTC(),
+	})
+}
+
+func (h *Handler) sendSimulationSnapshots(client *Client, query SimulationStreamQuery) bool {
+	if !h.sendSimulationSnapshot(client, query) {
+		return false
+	}
+
+	return h.sendSimulationTelemetrySnapshot(client, query)
+}
+
+func (h *Handler) sendSimulationTelemetrySnapshot(client *Client, query SimulationStreamQuery) bool {
+	snapshot, err := h.service.GetSimulationTelemetrySnapshot(query)
+	if err != nil {
+		return h.hub.Send(client, Message{
+			Type:   SimulationTelemetrySnapshotEvent,
+			Error:  err.Error(),
+			SentAt: time.Now().UTC(),
+		})
+	}
+
+	return h.hub.Send(client, Message{
+		Type:   SimulationTelemetrySnapshotEvent,
+		Data:   snapshot,
 		SentAt: time.Now().UTC(),
 	})
 }

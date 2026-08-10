@@ -233,8 +233,7 @@ func registerAuditLogs(r *gin.RouterGroup, DB *gorm.DB) {
 func registerWebSockets(r *gin.RouterGroup, DB *gorm.DB) {
 	websocket := websockets.NewHandler(DB)
 
-	// Note: temporarily disabled JWT Middleware on dev mode
-	wsGrp := r.Group("/ws")
+	wsGrp := r.Group("/ws", middleware.JWTAuthMiddleware())
 	{
 		wsGrp.GET("/simulation", websocket.Simulation)
 	}
