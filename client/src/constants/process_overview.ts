@@ -40,12 +40,6 @@ export type ProcessOverview = {
 	connections: readonly ProcessOverviewConnection[];
 };
 
-
-/**
- * Mirrors the anaerobic-digestion resources in server/api_tests.
- * Reading values, connectivity, and active-alert counts remain illustrative
- * because the HTTP fixtures define requests rather than response payloads.
- */
 export const processOverviewPlaceholder = {
 	plantId: "6203ddf0-52a1-4251-bafa-193f694d7601",
 	updatedAt: "2026-08-10T09:30:00+08:00",
