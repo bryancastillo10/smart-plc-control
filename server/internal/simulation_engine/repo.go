@@ -24,12 +24,24 @@ func (r *Repository) FindRunningSimulations() ([]models.Simulations, error) {
 	return simulations, err
 }
 
+func (r *Repository) HasEnabledSimulatorDevice(plantID uuid.UUID) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Devices{}).
+		Where("plant_id = ?", plantID).
+		Where("type = ?", models.DeviceSimulator).
+		Where("protocol = ?", models.Simulator).
+		Where("enabled = ?", true).
+		Count(&count).Error
+	return count > 0, err
+}
+
 func (r *Repository) FindSimulatedTags(plantID uuid.UUID) ([]models.Tags, error) {
 	var tags []models.Tags
 	err := r.db.Model(&models.Tags{}).
 		Joins("JOIN devices ON devices.id = tags.device_id").
 		Where("devices.plant_id = ?", plantID).
 		Where("devices.enabled = ?", true).
+		Where("devices.type = ?", models.DeviceSimulator).
 		Where("devices.protocol = ?", models.Simulator).
 		Where("tags.enabled = ?", true).
 		Order("tags.id ASC").
