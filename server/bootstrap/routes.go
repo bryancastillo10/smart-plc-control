@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
@@ -13,6 +14,7 @@ import (
 	"smart-plc-control-server/internal/models"
 	"smart-plc-control-server/internal/plants"
 	"smart-plc-control-server/internal/process_units"
+	"smart-plc-control-server/internal/simulation_engine"
 	"smart-plc-control-server/internal/simulation_scenarios"
 	"smart-plc-control-server/internal/simulations"
 	"smart-plc-control-server/internal/tag_readings"
@@ -232,9 +234,11 @@ func registerAuditLogs(r *gin.RouterGroup, DB *gorm.DB) {
 
 func registerWebSockets(r *gin.RouterGroup, DB *gorm.DB) {
 	websocket := websockets.NewHandler(DB)
+	simulationEngine := simulation_engine.NewEngine(DB)
 
 	wsGrp := r.Group("/ws", middleware.JWTAuthMiddleware())
 	{
+		go simulationEngine.Run(context.Background())
 		wsGrp.GET("/simulation", websocket.Simulation)
 	}
 }
