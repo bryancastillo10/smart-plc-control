@@ -1,3 +1,6 @@
+﻿import { queryOptions } from "@tanstack/react-query";
+
+import type { SimulationTelemetrySnapshot } from "@/features/simulations/websocketTypes";
 import type {
 	CreateSimulationVariables,
 	Simulation,
@@ -12,7 +15,21 @@ export const simulationQueryKeys = {
 		[...simulationQueryKeys.all, simulationId] as const,
 	list: (filters?: SimulationFilters) =>
 		[...simulationQueryKeys.all, filters] as const,
+	telemetry: (plantId: string) =>
+		[...simulationQueryKeys.all, "telemetry", plantId] as const,
 };
+
+export function simulationTelemetryQueryOptions(plantId?: string) {
+	return queryOptions({
+		enabled: false,
+		queryKey: simulationQueryKeys.telemetry(plantId ?? ""),
+		queryFn: async (): Promise<SimulationTelemetrySnapshot> => {
+			throw new Error(
+				"Simulation telemetry is supplied by the WebSocket stream.",
+			);
+		},
+	});
+}
 
 export function listSimulations(filters?: SimulationFilters) {
 	return apiFetch<Simulation[]>(createSimulationListPath(filters), {
@@ -34,7 +51,10 @@ export function createSimulation(body: CreateSimulationVariables) {
 	});
 }
 
-export function updateSimulation({ body, simulationId }: UpdateSimulationVariables) {
+export function updateSimulation({
+	body,
+	simulationId,
+}: UpdateSimulationVariables) {
 	return apiFetch<Simulation, UpdateSimulationVariables["body"]>(
 		`/simulations/${simulationId}`,
 		{
