@@ -1,18 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+﻿import { useQuery } from "@tanstack/react-query";
 
-import { simulationStreamQueryKeys } from "@/features/simulations/streamQueryKeys";
-import type { SimulationTelemetrySnapshot } from "@/features/simulations/websocketTypes";
+import { simulationTelemetryQueryOptions } from "@/features/simulations/queries";
 
 export function useSimulationTelemetry(plantId?: string) {
-	return useQuery<SimulationTelemetrySnapshot>({
-		enabled: false,
-		queryKey: simulationStreamQueryKeys.telemetry(plantId ?? ""),
-		queryFn: async () => {
-			throw new Error(
-				"Simulation telemetry is supplied by the WebSocket stream.",
-			);
-		},
-	});
+	return useQuery(simulationTelemetryQueryOptions(plantId));
 }
 
 export function useSimulationReadings(plantId?: string) {
