@@ -1,8 +1,7 @@
-import { useQueryClient } from "@tanstack/react-query";
+﻿import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 import { simulationQueryKeys } from "@/features/simulations/queries";
-import { simulationStreamQueryKeys } from "@/features/simulations/streamQueryKeys";
 import { parseSimulationStreamMessage } from "@/features/simulations/websocketTypes";
 import {
 	createSimulationSocketUrl,
@@ -151,7 +150,7 @@ export function useSimulationStream({
 				} else {
 					if (message.data.plantId !== plantId) return;
 					queryClient.setQueryData(
-						simulationStreamQueryKeys.telemetry(plantId),
+						simulationQueryKeys.telemetry(plantId),
 						message.data,
 					);
 				}
