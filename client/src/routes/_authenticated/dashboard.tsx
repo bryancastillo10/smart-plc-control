@@ -1,15 +1,14 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { PlantHealthSummary } from "@/components/dashboard/PlantHealthSummary";
 import { ProcessOverview } from "@/components/dashboard/ProcessOverview";
+import { SimulationTelemetryCharts } from "@/components/dashboard/SimulationTelemetryCharts";
 import { plantHealthSummaryPlaceholder } from "@/constants/dashboard";
 import { processOverviewPlaceholder } from "@/constants/process_overview";
 
 const dashboardSections = [
 	"Tag Inventory",
-	"Latest Tag Readings",
 	"Alert Rules",
-	"Simulation Status",
 	"Simulation Scenarios",
 	"Recent Audit Logs",
 	"Users and Roles",
@@ -33,6 +32,7 @@ function DashboardPage() {
 			</header>
 
 			<PlantHealthSummary summary={plantHealthSummaryPlaceholder} />
+			<SimulationTelemetryCharts />
 			<ProcessOverview overview={processOverviewPlaceholder} />
 
 			<section aria-labelledby="dashboard-sections-title" className="space-y-4">
