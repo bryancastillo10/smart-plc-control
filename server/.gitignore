@@ -5,3 +5,5 @@ fly.toml
 .github
 
 test-deploy
+node_modules/
+docs/dist/
