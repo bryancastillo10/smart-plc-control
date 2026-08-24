@@ -1,0 +1,53 @@
+:root {
+  --sea-ink: #173a40;
+  --sea-ink-soft: #416166;
+  --lagoon: #4fb8b2;
+  --lagoon-deep: #328f97;
+  --sand: #e7f0e8;
+  --surface-strong: rgba(255, 255, 255, 0.96);
+  --line: rgba(23, 58, 64, 0.14);
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  color-scheme: light;
+}
+
+.dark {
+  --sea-ink: #d7ece8;
+  --sea-ink-soft: #afcdc8;
+  --lagoon: #60d7cf;
+  --lagoon-deep: #8de5db;
+  --sand: #0f1a1e;
+  --surface-strong: rgba(15, 27, 31, 0.98);
+  --line: rgba(141, 229, 219, 0.18);
+  color-scheme: dark;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  color: inherit;
+}
+
+.theme-toggle {
+  position: fixed;
+  right: 18px;
+  bottom: 6px;
+  z-index: 20;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  color: var(--sea-ink-soft);
+  padding: 4px 10px;
+  font: 600 10px/1.2 var(--font-sans);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
