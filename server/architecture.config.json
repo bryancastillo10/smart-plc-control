@@ -1,0 +1,16 @@
+{
+  "coverage": "docs/src/architecture/coverage.json",
+  "output": "docs/src/architecture/measured.generated.ts",
+  "sources": [
+    "cmd/**/*.go",
+    "bootstrap/**/*.go",
+    "internal/**/*.go",
+    "pkg/**/*.go",
+    "platforms/**/*.go",
+    "api_tests/**/*.http",
+    "*.{md,toml,mod,sum}",
+    "Makefile",
+    ".gitignore"
+  ],
+  "ignore": []
+}

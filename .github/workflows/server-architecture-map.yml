@@ -1,0 +1,27 @@
+name: Server architecture map
+
+on:
+  pull_request:
+    paths:
+      - 'server/**'
+      - '.github/workflows/server-architecture-map.yml'
+  push:
+    paths:
+      - 'server/**'
+      - '.github/workflows/server-architecture-map.yml'
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npm run architecture:check

@@ -1,0 +1,23 @@
+{
+  "name": "smart-plc-control-server-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "architecture:sync": "node scripts/architecture-sync.mjs",
+    "architecture:check": "node scripts/architecture-sync.mjs --check",
+    "prebuild": "npm run architecture:sync",
+    "build": "vite build --config docs/vite.config.ts",
+    "dev": "npm run architecture:sync && vite --config docs/vite.config.ts"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.0"
+  }
+}
